@@ -2,36 +2,39 @@ namespace Orchestra;
 
 public record Key
 {
-    public Key(string name, string expression)
-    {
+    private Key(string name, string expression, 
+        bool contextual, bool identity, bool keyword, bool auto)
+    { 
         this.Name = name;
         this.Expression = expression;
-    }
-
-    public Key(string name, string expression, bool keyword)
-    {
-        Key(name, expression);
-        this.IsKeyword = keyword;
-    }
-    public Key(string name, string expression, bool keyword, bool auto)
-    {
-        Key(name, expression);
+        this.IsContextual = contextual;
+        this.IsIdentity = identity;
         this.IsKeyword = keyword;
         this.IsAuto = auto;
     }
+    
+    public static Key CreateKey(string name, string expression)
+        => new Key(name, expression, false, false, false, false);
+    
+    public static Key CreateKeyword(string name, string expression)
+        => new Key(name, expression, false, false, true, false);
+    
+    public static Key CreateIdentity(string name, string expression)
+        => new Key(name, expression, false, true, false, false);
+    
+    public static Key CreateKeyword(string name, string expression)
+        => new Key(name, expression, false, false, true, false);
+    
+    public static Key CreateAutoKeyword(string name)
+        => new Key(name, null, false, false, true, true);
 
-    public Key(string name, string expression, 
-        bool keyword, bool auto, bool contextual, bool identity)
-    {
-        Key(name, expression, keyword, auto);
-        this.IsContextual = contextual;
-        this.IsIdentity = identity;
-    }
+    public static Key CreateContextual(string name, string expression)
+        => new Key(name, expression, true, false, true, false);
 
-    public string Name { get; init; }
-    public string Expression { get; init; }
-    public bool IsContextual { get; init; } = false;
-    public bool IsIdentity { get; init; } = false;
-    public bool IsKeyword { get; init; } = false;
-    public bool IsAuto { get; init; } = false;
+    public string Name { get; private set; }
+    public string Expression { get; private set; }
+    public bool IsContextual { get; private set; }
+    public bool IsIdentity { get; private set; }
+    public bool IsKeyword { get; private set; }
+    public bool IsAuto { get; private set; }
 }
