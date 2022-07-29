@@ -21,10 +21,7 @@ public record Key
     
     public static Key CreateIdentity(string name, string expression)
         => new Key(name, expression, false, true, false, false);
-    
-    public static Key CreateKeyword(string name, string expression)
-        => new Key(name, expression, false, false, true, false);
-    
+      
     public static Key CreateAutoKeyword(string name)
         => new Key(name, null, false, false, true, true);
 
