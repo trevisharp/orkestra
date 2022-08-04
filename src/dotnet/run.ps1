@@ -1,3 +1,5 @@
+clear
+
 cd ..\..\res\dotnet\
 Write-Host ""
 Write-Host "Compilando Orkestra Core" -ForegroundColor Blue
