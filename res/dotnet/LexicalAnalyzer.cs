@@ -8,39 +8,31 @@ public class LexicalAnalyzer
     public List<Key> Keys { get; private set; } = new List<Key>();
     public void Add(Key key) => this.Keys.Add(key);
 
-    public IEnumerable<Token> Parse(string text)
+    public IEnumerable<Token> Parse(string code)
     {
-        Regex regex = null;
-        int tokenIndex = 0;
-        int i = 0;
+        int startIndex = 0;
         int keyIndex = 0;
         int minToken = int.MaxValue;
+        int tokenCount = 0;
         Match crrMatch = null;
         Key crrKey = null;
         List<Key> keys = new List<Key>(this.Keys);
-        List<Match> matches = new List<Match>();
+        
+        var matches = getRegexMatchList(keys, code);
         
         while (keys.Count > 0)
         {
-            var key = keys[keyIndex];
-            regex = new Regex(key.Expression);
-            Match match;
+            var match = getCurrentMatch(matches[keyIndex], startIndex);
+            matches[keyIndex] = match;
 
-            if (keyIndex < matches.Count)
-            {
-                match = matches[keyIndex]
-                    .NextMatch();
-            }
-            else
-            {
-                match = regex.Match(text, i);
-                matches.Add(match);
-            }
-            
             if (!match.Success)
             {
                 keys.RemoveAt(keyIndex);
                 matches.RemoveAt(keyIndex);
+
+                if (keyIndex >= keys.Count)
+                    yield break;
+
                 continue;
             }
 
@@ -48,7 +40,7 @@ public class LexicalAnalyzer
             {
                 minToken = match.Index;
                 crrMatch = match;
-                crrKey = key;
+                crrKey = keys[keyIndex];
             }
 
             keyIndex++;
@@ -61,15 +53,45 @@ public class LexicalAnalyzer
             Token token = new Token(
                 crrKey,
                 crrMatch.Value,
-                tokenIndex
+                tokenCount++
             );
             yield return token;
 
-            tokenIndex++;
-            crrKey = null;
+            startIndex = crrMatch.Index + crrMatch.Value.Length;
+            minToken = int.MaxValue;
             crrMatch = null;
+            crrKey = null;
             keyIndex = 0;
-            i = match.Index + match.Value.Length;
         }
+    }
+
+    private List<Match> getRegexMatchList(List<Key> keys, string code)
+    {
+        List<Match> matches = new List<Match>();
+
+        for (int j = 0; j < keys.Count; j++)
+        {
+            var key = keys[j];
+            var regex = new Regex(key.Expression);
+            var match = regex.Match(code);
+            
+            if (!match.Success)
+            {
+                keys.RemoveAt(j);
+                j--;
+                continue;
+            }
+            
+            matches.Add(match);
+        }
+
+        return matches;
+    }
+
+    private Match getCurrentMatch(Match match, int startIndex)
+    {
+        while (match.Index < startIndex && match.Success)
+            match = match.NextMatch();
+        return match;
     }
 }
