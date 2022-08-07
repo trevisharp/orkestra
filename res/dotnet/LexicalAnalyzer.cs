@@ -50,12 +50,7 @@ public class LexicalAnalyzer
             if (crrMatch == null)
                 yield break;
             
-            Token token = new Token(
-                crrKey,
-                crrMatch.Value,
-                tokenCount++
-            );
-            yield return token;
+            yield return createToken(crrKey, crrMatch, tokenCount++);
 
             startIndex = crrMatch.Index + crrMatch.Value.Length;
             minToken = int.MaxValue;
@@ -93,5 +88,15 @@ public class LexicalAnalyzer
         while (match.Index < startIndex && match.Success)
             match = match.NextMatch();
         return match;
+    }
+
+    private Token createToken(Key key, Match match, int count)
+    {           
+        Token token = new Token(
+            key,
+            match.Value,
+            count
+        );
+        return token;
     }
 }

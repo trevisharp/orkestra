@@ -1,6 +1,6 @@
 namespace Orkestra;
 
-public record Key
+public record Key : IRuleToken
 {
     private Key(string name, string expression, 
         bool contextual, bool identity, bool keyword, bool auto)

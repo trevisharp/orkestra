@@ -64,10 +64,10 @@ contextual key CONTINUE = /continue/
 contextual key SKIP = /skip/
 contextual key NEXT = /next/
 
-key ENDFILE = /@endfile/
-key ENDLINE = /@endline/
-key STARTBLOCK = /@startBlock/
-key ENDBLOCK = /@endBlock/
+auto keyword ENDFILE
+auto keyword ENDLINE
+auto keyword STARTBLOCK
+auto keyword ENDBLOCK
 key BRACES = /\{/
 key BRACES_CLOSE = /\}/
 key PARENTHESES = /\(/
