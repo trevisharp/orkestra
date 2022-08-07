@@ -67,6 +67,14 @@ public class LexicalAnalyzer
         for (int j = 0; j < keys.Count; j++)
         {
             var key = keys[j];
+
+            if (key.IsAuto)
+            {
+                keys.RemoveAt(j);
+                j--;
+                continue;
+            }
+
             var regex = new Regex(key.Expression);
             var match = regex.Match(code);
             
