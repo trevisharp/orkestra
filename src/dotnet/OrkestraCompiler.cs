@@ -21,7 +21,7 @@ public class OrkestraCompiler : Compiler
 
     public OrkestraCompiler()
     {
-        rule_key = Rule.Create("key",
+        rule_key = Rule.CreateRule("key",
             SubRule.Create(key_KEY, key_ID, key_EQUAL, key_EXPRESSION),
             SubRule.Create(key_CONTEXTUAL, key_KEY, key_EQUAL, key_EXPRESSION)
         );

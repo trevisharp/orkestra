@@ -35,7 +35,11 @@ public abstract class Compiler
         SyntacticAnalyzer syntacticAnalyzer =  new SyntacticAnalyzer();
 
         foreach (var rule in getFields<Rule>())
+        {
+            if (rule.IsStartRule)
+                syntacticAnalyzer.StartRule = rule;
             syntacticAnalyzer.Add(rule);
+        }
 
         return syntacticAnalyzer;
     }
