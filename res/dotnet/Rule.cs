@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Orkestra;
 
-public class Rule : IRuleElement
+public record Rule : IRuleElement
 {
     private List<SubRule> subRules;
 

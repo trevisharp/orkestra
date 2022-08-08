@@ -12,12 +12,15 @@ public abstract class Compiler
         var parser = buildSyntacticAnalyzer();
 
         var tokens = lex.Parse(sourceCode);
-        parser.Parse(tokens);
 
         foreach (var token in tokens)
         {
             Console.WriteLine(token.Key.Name);
         }
+
+        var tree = parser.Parse(tokens);
+        
+        Console.WriteLine(tree);
     }
 
     private LexicalAnalyzer buildLexicalAnalyzer()

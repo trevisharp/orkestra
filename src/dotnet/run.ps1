@@ -4,10 +4,15 @@ cd ..\..\res\dotnet\
 Write-Host ""
 Write-Host "Compilando Orkestra Core" -ForegroundColor Blue
 Write-Host ""
-dotnet build
+dotnet build -c Release
 
 cd ..\..\src\dotnet\
 Write-Host ""
 Write-Host "Executando Orkestra Lang" -ForegroundColor Blue
 Write-Host ""
-dotnet run
+if ($args.Length -ne 0) {
+    dotnet run -c $args[0]
+}
+else {
+    dotnet run
+}

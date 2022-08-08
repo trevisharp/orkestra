@@ -12,5 +12,5 @@ public record RuleMatch : INode
     public INode[] Children { get; private set; }
 
     public bool Is(IRuleElement node)
-        => node is SubRule subRule && subRule == this.SubRule;
+        => node is Rule rule && rule == this.SubRule.Parent;
 }
