@@ -1,6 +1,6 @@
 ﻿namespace Orkestra;
 
-public record Token
+public record Token : INode
 {
     public Token(Key key, string value, int index)
     {
@@ -12,4 +12,7 @@ public record Token
     public Key Key { get; init; }
     public string Value { get; init; }
     public int Index { get; init; }
+
+    public bool Is(IRuleElement token)
+        => token is Key key && key == this.Key;
 }

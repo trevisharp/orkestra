@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Orkestra;
 
-public class Rule : IRuleToken
+public class Rule : IRuleElement
 {
     private List<SubRule> subRules;
 
@@ -12,6 +12,9 @@ public class Rule : IRuleToken
         this.subRules = new List<SubRule>();
         this.subRules.AddRange(subRules);
         this.IsStartRule = startRule;
+
+        foreach (var subRule in subRules)
+            subRule.Parent = this;
     }
     
     public string Name { get; set; }
