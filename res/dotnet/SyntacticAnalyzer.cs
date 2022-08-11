@@ -18,13 +18,22 @@ public class SyntacticAnalyzer
         ReduceBuffer buffer = new ReduceBuffer(tokens);
         Dictionary<IRuleElement, SubRule[]> dict = new Dictionary<IRuleElement, SubRule[]>();
 
-        foreach (var initial in buffer)
+        bool hasSuccess = true;
+
+        while (hasSuccess)
         {
-            var startRules = getStartRules(initial.Value, dict);
-            searchMatches(initial, startRules);
+            hasSuccess = false;
+            foreach (var initial in buffer)
+            {
+                var startRules = getStartRules(initial.Value, dict);
+                hasSuccess |= searchMatches(initial, startRules);
+            }
         }
 
-        tree.Root = buffer.First().Value;
+        if (buffer.Count() != 3)
+            return null;
+
+        tree.Root = buffer.Skip(1).First().Value;
         return tree;
     }
 
