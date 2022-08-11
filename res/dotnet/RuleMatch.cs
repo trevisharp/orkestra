@@ -9,6 +9,7 @@ public record RuleMatch : INode
     }
 
     public SubRule SubRule { get; init; }
+    public IRuleElement Element => SubRule;
     public INode[] Children { get; private set; }
 
     public bool Is(IRuleElement node)

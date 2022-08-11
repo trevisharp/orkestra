@@ -10,6 +10,7 @@ public record Token : INode
     }
 
     public Key Key { get; init; }
+    public IRuleElement Element => Key;
     public string Value { get; init; }
     public int Index { get; init; }
 
