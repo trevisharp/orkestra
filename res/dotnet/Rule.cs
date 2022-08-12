@@ -21,6 +21,8 @@ public record Rule : IRuleElement
     public bool IsStartRule { get; set; }
     public IEnumerable<SubRule> SubRules => subRules;
 
+    public string KeyName => Name;
+    
     public static Rule CreateRule(string name, params SubRule[] subRules)
         => new Rule(name, false, subRules);
 

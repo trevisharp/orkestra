@@ -6,8 +6,6 @@ namespace Orkestra;
 
 public abstract class Compiler
 {
-    public static IRuleElement self = new Self();
-
     public void Compile(string sourceCode)
     {
         var lex = buildLexicalAnalyzer();

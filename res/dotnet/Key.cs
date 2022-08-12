@@ -34,4 +34,6 @@ public record Key : IRuleElement
     public bool IsIdentity { get; private set; }
     public bool IsKeyword { get; private set; }
     public bool IsAuto { get; private set; }
+
+    public string KeyName => Name;
 }

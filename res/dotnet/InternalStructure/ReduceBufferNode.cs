@@ -11,7 +11,8 @@ public class ReduceBufferNode
     }
 
     public Stack<ReduceBufferNode> NextStack { get; set; }
-    public ReduceBufferNode Next => NextStack.Peek();
+    public ReduceBufferNode Next => HasNext ? NextStack.Peek() : null;
+    public bool HasNext => NextStack.Count > 0;
 
     public Stack<ReduceBufferNode> PreviousStack { get; set; }
     public ReduceBufferNode Previous => PreviousStack.Peek();

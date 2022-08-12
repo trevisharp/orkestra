@@ -18,7 +18,12 @@ public class ReduceBuffer : IEnumerable<ReduceBufferNode>
             var newnode = new ReduceBufferNode();
             newnode.Value = node;
             last.Connect(newnode);
+            last = newnode;
         }
+        
+        ReduceBufferNode footer = new ReduceBufferNode();
+        footer.Value = null;
+        last.Connect(footer);
     }
 
     public void Reduce(
@@ -40,7 +45,7 @@ public class ReduceBuffer : IEnumerable<ReduceBufferNode>
         while (crr != null)
         {
             yield return crr;
-            crr = crr.NextStack.Peek();
+            crr = crr.Next;
         }
     }
 

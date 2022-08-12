@@ -1,6 +1,10 @@
 using System.Linq;
 using System.Collections.Generic;
 
+#if DEBUG
+using static System.Console;
+#endif
+
 namespace Orkestra;
 
 using InternalStructure;
@@ -25,11 +29,23 @@ public class SyntacticAnalyzer
             hasSuccess = false;
             foreach (var initial in buffer)
             {
+                if (initial.Value == null)
+                    continue;
+                
                 var startRules = getStartRules(initial.Value, dict);
-                hasSuccess |= searchMatches(initial, startRules);
+                hasSuccess = searchMatches(initial, startRules);
+                if (hasSuccess)
+                    break;
             }
         }
-
+        
+        #if DEBUG
+        foreach (var node in buffer)
+        {
+            WriteLine(node.Value);
+        }
+        #endif
+        
         if (buffer.Count() != 3)
             return null;
 
