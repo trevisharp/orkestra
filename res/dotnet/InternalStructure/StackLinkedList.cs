@@ -3,35 +3,35 @@ using System.Collections.Generic;
 
 namespace Orkestra.InternalStructure;
 
-public class ReduceBuffer : IEnumerable<ReduceBufferNode>
+public class StackLinkedList : IEnumerable<StackLinkedListNode>
 {
-    private ReduceBufferNode root = null;
-    public ReduceBuffer(IEnumerable<INode> buffer)
+    private StackLinkedListNode root = null;
+    public StackLinkedList(IEnumerable<INode> buffer)
     {
-        ReduceBufferNode header = new ReduceBufferNode();
+        StackLinkedListNode header = new StackLinkedListNode();
         header.Value = null;
         this.root = header;
         
-        ReduceBufferNode last = header;
+        StackLinkedListNode last = header;
         foreach (var node in buffer)
         {
-            var newnode = new ReduceBufferNode();
+            var newnode = new StackLinkedListNode();
             newnode.Value = node;
             last.Connect(newnode);
             last = newnode;
         }
         
-        ReduceBufferNode footer = new ReduceBufferNode();
+        StackLinkedListNode footer = new StackLinkedListNode();
         footer.Value = null;
         last.Connect(footer);
     }
 
     public void Reduce(
-        ReduceBufferNode initialNode, 
+        StackLinkedListNode initialNode, 
         INode inner,
-        ReduceBufferNode finalNode)
+        StackLinkedListNode finalNode)
     {
-        ReduceBufferNode innerNode = new ReduceBufferNode();
+        StackLinkedListNode innerNode = new StackLinkedListNode();
         innerNode.Value = inner;
         var previous = initialNode.Previous;
         var next = finalNode.Next;
@@ -39,7 +39,7 @@ public class ReduceBuffer : IEnumerable<ReduceBufferNode>
         next.Connect(finalNode);
     }
 
-    public IEnumerator<ReduceBufferNode> GetEnumerator()
+    public IEnumerator<StackLinkedListNode> GetEnumerator()
     {
         var crr = root;
         while (crr != null)

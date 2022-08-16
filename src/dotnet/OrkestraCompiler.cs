@@ -28,8 +28,7 @@ public class OrkestraCompiler : Compiler
         );
 
         rule_start = Rule.CreateStartRule("start", 
-            SubRule.Create(rule_key, rule_key),
-            SubRule.Create(rule_key)
+            SubRule.Create(rule_key, rule_key)
         );
     }
 }
