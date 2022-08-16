@@ -7,39 +7,21 @@ public class SyntacticStateGraph
 {
     public StackLinkedList TokenList { get; private set; }
     public List<Rule> RuleList { get; private set; }
-
-    private Dictionary<IRuleElement, SubRule[]> dict = new Dictionary<IRuleElement, SubRule[]>();
+    public SubRuleDictionary Dictionary { get; private set; }
 
     public SyntacticStateGraph(IEnumerable<INode> tokens, IEnumerable<Rule> rules)
     {
         this.TokenList = new StackLinkedList(tokens);
         this.RuleList = new List<Rule>(rules);
+        this.Dictionary = new SubRuleDictionary(rules);
     }
 
-    private SubRule[] getStartRules(INode node, Dictionary<IRuleElement, SubRule[]> dict)
+    public INode DepthFirstSearch()
     {
-        // foreach (var key in dict.Keys)
-        // {
-        //     if (node.Is(key))
-        //         return dict[key];
-        // }
-
-        var list = new List<SubRule>();
-        foreach (var rule in RuleList)
-        {
-            foreach (var subRule in rule.SubRules)
-            {
-                if (node.Is(subRule.RuleTokens.FirstOrDefault()))
-                    list.Add(subRule);
-            }
-        }
-        
-        var subRules = list
-            .OrderByDescending(r => r.RuleTokens.Count())
-            .ToArray();
-        // dict.Add(node.Element, subRules);
-
-        return subRules;
+        depthFirstSearch();
+        var header = TokenList.FirstOrDefault();
+        var main = header.Next;
+        return main.Value;
     }
 
     private StackLinkedListNode searchMatches(StackLinkedListNode initial, SubRule[] rules)
@@ -86,29 +68,28 @@ public class SyntacticStateGraph
 
         return newNode;
     }
-
-    private StackLinkedListNode discover()
+    
+    private void reduce()
     {
-        StackLinkedListNode discovered = null;
-        
-        foreach (var initial in TokenList)
-        {
-            if (initial.Value == null)
-                continue;
-            
-            var startRules = getStartRules(initial.Value, dict);
-            discovered = searchMatches(initial, startRules);
-            if (discovered != null)
-                break;
-        }
 
-        return discovered;
     }
 
-    private StackLinkedList depthFirstSearch()
+    private void reverse()
     {
-        Stack<object> stack = new Stack<object>();
 
-        throw new System.NotImplementedException();
+    }
+
+    private void depthFirstSearch()
+    {
+        var stack = new Stack<StackLinkedListNode>();
+
+        var header = TokenList.FirstOrDefault();
+        var first = header.Next;
+        stack.Push(first);
+
+        while (stack.Count > 0)
+        {
+            
+        }
     }
 }
