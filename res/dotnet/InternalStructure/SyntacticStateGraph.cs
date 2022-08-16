@@ -7,13 +7,13 @@ public class SyntacticStateGraph
 {
     public StackLinkedList TokenList { get; private set; }
     public List<Rule> RuleList { get; private set; }
-    public SubRuleDictionary Dictionary { get; private set; }
+    public AttemptDictionary Dictionary { get; private set; }
 
     public SyntacticStateGraph(IEnumerable<INode> tokens, IEnumerable<Rule> rules)
     {
         this.TokenList = new StackLinkedList(tokens);
         this.RuleList = new List<Rule>(rules);
-        this.Dictionary = new SubRuleDictionary(rules);
+        this.Dictionary = new AttemptDictionary(rules);
     }
 
     public INode DepthFirstSearch()
@@ -68,28 +68,43 @@ public class SyntacticStateGraph
 
         return newNode;
     }
-    
-    private void reduce()
-    {
 
+    private (ReductionState state, ReductionState newState) tryReduce(ReductionState state)
+    {
+        throw new System.NotImplementedException();
     }
 
-    private void reverse()
+    private void reverse(ReductionState state)
     {
-
+        throw new System.NotImplementedException();
     }
 
     private void depthFirstSearch()
     {
-        var stack = new Stack<StackLinkedListNode>();
+        var stack = new Stack<ReductionState>();
 
         var header = TokenList.FirstOrDefault();
         var first = header.Next;
-        stack.Push(first);
+        var attempts = Dictionary.GetAttempts(first.Value);
+        var state = new ReductionState(first, first, attempts);
+        stack.Push(state);
 
         while (stack.Count > 0)
         {
+            var crrState = stack.Pop();
+            var result = tryReduce(crrState);
+            crrState = result.state;
+            var newNode = result.newState;
             
+            if (newNode == null)
+            {
+                reverse(crrState);
+            }
+            else
+            {
+                stack.Push(crrState);
+                stack.Push(newNode);
+            }
         }
     }
 }

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace Orkestra.InternalStructure;
 
-public class SubRuleDictionary
+public class AttemptDictionary
 {
     private List<Rule> RuleList = null;
     private Dictionary<IRuleElement, SubRule[]> dict = new Dictionary<IRuleElement, SubRule[]>();
 
-    public SubRuleDictionary(IEnumerable<Rule> rules)
+    public AttemptDictionary(IEnumerable<Rule> rules)
         => this.RuleList = new List<Rule>(rules);
 
     private IEnumerable<SubRule> findSubRules(INode node)
@@ -23,7 +23,7 @@ public class SubRuleDictionary
         }
     }
 
-    public IEnumerable<SubRule> Get(INode node)
+    public IEnumerable<SubRule> GetAttempts(INode node)
     {
         // foreach (var key in dict.Keys)
         // {
