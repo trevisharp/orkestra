@@ -27,7 +27,10 @@ public class StackLinkedListNode
 
     public void Disconnect()
     {
-        var node = this.NextStack.Pop();
-        node.PreviousStack.Pop();
+        var next = this.NextStack.Pop();
+        next.PreviousStack.Pop();
+
+        var previous = this.PreviousStack.Pop();
+        previous.NextStack.Pop();
     }
 }

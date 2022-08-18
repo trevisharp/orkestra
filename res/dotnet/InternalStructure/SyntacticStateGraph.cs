@@ -171,6 +171,33 @@ public class SyntacticStateGraph
 
     private INode buildTree(StackLinkedListNode node)
     {
+        if (node == null)
+            return null;
+        if (node.Value is RuleMatch match)
+        {
+            WriteLine($"Match ({match}) Finded!");
+            var start = node.Previous;
+            var end = node.Next;
+            node.Disconnect();
+
+            var it = start.Next;
+            while (it != end)
+            {
+                var value = buildTree(it);
+                match.Children.Add(value);
+                it = it.Next;
+                WriteLine($"{it.Value} != {end.Value} = {it != end}");
+            }
+
+            WriteLine($"Match: {match}");
+            return match;
+        }
+        else if (node.Value is Token token)
+        {
+            WriteLine($"Token: {token}");
+
+            return token;
+        }
         return null;
     }
 }
