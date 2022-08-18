@@ -18,12 +18,11 @@ public class SyntacticStateGraph
         this.Dictionary = new AttemptDictionary(rules);
     }
 
-    public INode DepthFirstSearch()
+    public ExpressionTree DepthFirstSearch()
     {
-        depthFirstSearch();
-        var header = TokenList.FirstOrDefault();
-        var main = header.Next;
-        return main.Value;
+        var result = depthFirstSearch();
+        
+        return result;
     }
 
     private (ReductionState state, StackLinkedListNode match) tryReduce(ReductionState state)
@@ -105,7 +104,7 @@ public class SyntacticStateGraph
         return (updatedState, null);
     }
 
-    private void depthFirstSearch()
+    private ExpressionTree depthFirstSearch()
     {
         var stack = new Stack<ReductionState>();
 
@@ -124,7 +123,7 @@ public class SyntacticStateGraph
 
             if (TokenList.Count() == 3)
             {
-                return;
+                break;
             }
 
             var result = tryReduce(crrState);
@@ -161,5 +160,17 @@ public class SyntacticStateGraph
                 stack.Push(newState);
             }
         }
+
+        header = TokenList.FirstOrDefault();
+        var main = header.Next;
+        
+        ExpressionTree tree = new ExpressionTree();
+        tree.Root = buildTree(main);
+        return tree;
+    }
+
+    private INode buildTree(StackLinkedListNode node)
+    {
+        return null;
     }
 }

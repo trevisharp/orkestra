@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Orkestra;
 
 public record RuleMatch : INode
@@ -7,6 +9,7 @@ public record RuleMatch : INode
 
     public SubRule SubRule { get; init; }
     public IRuleElement Element => SubRule;
+    public List<INode> Children { get; set; } = new List<INode>();
 
     public bool Is(IRuleElement node)
         => node is Rule rule && rule == this.SubRule.Parent;
