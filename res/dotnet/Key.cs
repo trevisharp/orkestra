@@ -38,5 +38,5 @@ public record Key : IRuleElement
     public string KeyName => Name;
 
     public override string ToString()
-        => $"Key: {Name}";
+        => $"K:{Name}";
 }

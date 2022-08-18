@@ -2,6 +2,10 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 
+#if DEBUG
+using static System.Console;
+#endif
+
 namespace Orkestra;
 
 public abstract class Compiler
@@ -13,14 +17,22 @@ public abstract class Compiler
 
         var tokens = lex.Parse(sourceCode);
 
+        #if DEBUG
+        foreach (var token in tokens)
+            Write($"{token} ");
+        WriteLine();
+        #endif
+
         var tree = parser.Parse(tokens);
         
-        Console.WriteLine(tree);
+        #if DEBUG
+        WriteLine(tree);
+        #endif
     }
 
     private LexicalAnalyzer buildLexicalAnalyzer()
     {
-        LexicalAnalyzer lexicalAnalyzer =  new LexicalAnalyzer();
+        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer();
 
         foreach (var key in getFields<Key>())
             lexicalAnalyzer.Add(key);
@@ -30,7 +42,7 @@ public abstract class Compiler
 
     private SyntacticAnalyzer buildSyntacticAnalyzer()
     {
-        SyntacticAnalyzer syntacticAnalyzer =  new SyntacticAnalyzer();
+        SyntacticAnalyzer syntacticAnalyzer = new SyntacticAnalyzer();
 
         foreach (var rule in getFields<Rule>())
         {

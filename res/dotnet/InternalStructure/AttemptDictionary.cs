@@ -13,6 +13,9 @@ public class AttemptDictionary
 
     private IEnumerable<SubRule> findSubRules(INode node)
     {
+        if (node == null)
+            yield break;
+        
         foreach (var rule in RuleList)
         {
             foreach (var subRule in rule.SubRules)

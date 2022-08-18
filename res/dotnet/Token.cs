@@ -18,5 +18,5 @@ public record Token : INode
         => token is Key key && key == this.Key;
 
     public override string ToString()
-        => $"Token: {Key.Name}";
+        => $"T:{Key.Name}";
 }

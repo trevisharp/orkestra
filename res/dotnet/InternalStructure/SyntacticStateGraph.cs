@@ -41,12 +41,12 @@ public class SyntacticStateGraph
         
         while (updatedAttempts.Count > 0)
         {
-            WriteLine($"\tAttempts Size: {updatedAttempts.Count}");
+            WriteLine($"\tIn Attempt {updatedAttempts.Count}:");
             for (int i = 0; i < updatedAttempts.Count; i++)
             {
                 if (!itList[i].MoveNext()) // Match
                 {
-                    WriteLine("\tMatch!");
+                    WriteLine("\t\tMatch!");
                     updatedCurrentIndex++;
 
                     var start = updatedInitial.Previous;
@@ -55,17 +55,30 @@ public class SyntacticStateGraph
                     RuleMatch match = new RuleMatch(updatedAttempts[i]);
                     StackLinkedListNode newNode = new StackLinkedListNode();
                     newNode.Value = match;
+
+                    //TODO: Remove this to use treeBuilder
+                    var it = updatedInitial;
+                    while (it != end)
+                    {
+                        match.Children.Add(it.Value);
+                        it = it.Next;
+                    }
+
                     start.Connect(newNode);
                     newNode.Connect(end);
 
-                    var crr = start;
+                    #if DEBUG
+                    var crr = TokenList.FirstOrDefault();
+                    Write("\t\tNew Buffer:\n\t\t\t");
                     while (true)
                     {
-                        WriteLine($"\t\t{crr.Value?.ToString() ?? "null"}");
+                        Write($"{crr.Value?.ToString() ?? "null"},  ");
                         if (!crr.HasNext)
                             break;
                         crr = crr.Next;
                     }
+                    WriteLine();
+                    #endif
         
                     updatedState = new ReductionState(
                         updatedInitial, 
@@ -77,17 +90,20 @@ public class SyntacticStateGraph
 
                     return (updatedState, newNode);
                 }
-                
-                WriteLine($"\tCurrent: {updatedCurrent.Value}");
-                WriteLine($"\tIterator: {itList[i].Current}");
 
-                if (updatedCurrent.Value.Is(itList[i].Current))
+                bool subMatchCondition = updatedCurrent.Value != null && updatedCurrent.Value.Is(itList[i].Current);
+
+                #if DEBUG
+                WriteLine($"\t\tAttempt {updatedCurrent.Value} is {itList[i].Current} = {subMatchCondition}");
+                #endif
+
+                if (subMatchCondition)
                 {
                     updatedCurrent = updatedCurrent.Next;
                     continue;
                 }
                 
-                WriteLine("\tRemoving Attempt...");
+                WriteLine("\t\tRemoving Attempt...");
                 itList.RemoveAt(i);
                 updatedAttempts.RemoveAt(i);
                 i--;
@@ -165,10 +181,12 @@ public class SyntacticStateGraph
         var main = header.Next;
         
         ExpressionTree tree = new ExpressionTree();
-        tree.Root = buildTree(main);
+        tree.Root = main.Value;
         return tree;
     }
 
+    //TODO: correct this without use Disconnect to improve
+    //      the performance
     private INode buildTree(StackLinkedListNode node)
     {
         if (node == null)

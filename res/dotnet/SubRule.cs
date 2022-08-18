@@ -21,5 +21,5 @@ public record SubRule : IRuleElement
         => new SubRule(tokens);
 
     public override string ToString()
-        => $"SubRule: {Parent?.Name ?? "null"}";
+        => $"sR:{Parent?.Name ?? "null"}";
 }

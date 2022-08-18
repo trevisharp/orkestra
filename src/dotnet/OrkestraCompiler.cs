@@ -27,8 +27,10 @@ public class OrkestraCompiler : Compiler
             SubRule.Create(key_KEY, key_ID, key_EQUAL, key_EXPRESSION)
         );
 
-        rule_start = Rule.CreateStartRule("start", 
-            SubRule.Create(rule_key, rule_key)
+        rule_start = Rule.CreateStartRule("start");
+        rule_start.AddSubRules(
+            SubRule.Create(rule_key, rule_start),
+            SubRule.Create(rule_key)
         );
     }
 }

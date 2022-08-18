@@ -15,5 +15,5 @@ public record RuleMatch : INode
         => node is Rule rule && rule == this.SubRule.Parent;
 
     public override string ToString()
-        => $"Match: ({SubRule})";
+        => $"M:({SubRule})";
 }

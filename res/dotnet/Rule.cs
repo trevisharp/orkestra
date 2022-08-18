@@ -23,8 +23,14 @@ public record Rule : IRuleElement
 
     public string KeyName => Name;
 
-    public void AddSubRule(SubRule subRule)
-        => subRules.Add(subRule);
+    public void AddSubRules(params SubRule[] subRules)
+    {
+        this.subRules.AddRange(subRules);
+
+        foreach (var subRule in subRules)
+            subRule.Parent = this;
+
+    }
     
     public static Rule CreateRule(string name, params SubRule[] subRules)
         => new Rule(name, false, subRules);
@@ -33,5 +39,5 @@ public record Rule : IRuleElement
         => new Rule(name, true, subRules);
 
     public override string ToString()
-        => $"Rule: {Name}";
+        => $"R:{Name}";
 }
