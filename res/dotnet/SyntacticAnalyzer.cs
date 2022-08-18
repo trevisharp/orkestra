@@ -1,9 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
-
-#if DEBUG
-using static System.Console;
-#endif
 
 namespace Orkestra;
 
@@ -19,12 +14,6 @@ public class SyntacticAnalyzer
     public ExpressionTree Parse(IEnumerable<Token> tokens)
     {
         SyntacticStateGraph graph = new SyntacticStateGraph(tokens, this.Rules);
-
-        var result = graph.DepthFirstSearch();
-
-        ExpressionTree tree = new ExpressionTree();
-        tree.Root = graph.TokenList.FirstOrDefault().Next.Value;
-        
-        return tree;
+        return graph.DepthFirstSearch();
     }
 }

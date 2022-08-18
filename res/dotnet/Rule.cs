@@ -22,6 +22,9 @@ public record Rule : IRuleElement
     public IEnumerable<SubRule> SubRules => subRules;
 
     public string KeyName => Name;
+
+    public void AddSubRule(SubRule subRule)
+        => subRules.Add(subRule);
     
     public static Rule CreateRule(string name, params SubRule[] subRules)
         => new Rule(name, false, subRules);
