@@ -16,4 +16,7 @@ public record Token : INode
 
     public bool Is(IRuleElement token)
         => token is Key key && key == this.Key;
+
+    public override string ToString()
+        => $"Token: {Key.Name}";
 }

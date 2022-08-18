@@ -13,11 +13,6 @@ public abstract class Compiler
 
         var tokens = lex.Parse(sourceCode);
 
-        foreach (var token in tokens)
-        {
-            Console.WriteLine(token.Key.Name);
-        }
-
         var tree = parser.Parse(tokens);
         
         Console.WriteLine(tree);

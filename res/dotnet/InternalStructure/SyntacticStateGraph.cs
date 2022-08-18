@@ -1,6 +1,8 @@
 using System.Linq;
 using System.Collections.Generic;
 
+using static System.Console;
+
 namespace Orkestra.InternalStructure;
 
 public class SyntacticStateGraph
@@ -24,59 +26,83 @@ public class SyntacticStateGraph
         return main.Value;
     }
 
-    private StackLinkedListNode searchMatches(StackLinkedListNode initial, SubRule[] rules)
+    private (ReductionState state, StackLinkedListNode match) tryReduce(ReductionState state)
     {
-        if (rules.Length == 0)
-            return null;
+        WriteLine("In TryReduce:");
 
-        foreach (var rule in rules)
+        StackLinkedListNode updatedInitial = state.InitialNode;
+        StackLinkedListNode updatedCurrent = state.CurrentNode;
+        int updatedCurrentIndex = state.CurrentNodeIndex;
+        List<SubRule> updatedAttempts = new List<SubRule>(state.Attempts);
+        List<IEnumerator<IRuleElement>> itList = updatedAttempts
+            .Select(sb => sb.RuleTokens
+                .Skip(updatedCurrentIndex).GetEnumerator())
+            .ToList();
+        ReductionState updatedState = null;
+        
+        while (updatedAttempts.Count > 0)
         {
-            var newNode = testMatch(initial, rule);
+            WriteLine($"\tAttempts Size: {updatedAttempts.Count}");
+            for (int i = 0; i < updatedAttempts.Count; i++)
+            {
+                if (!itList[i].MoveNext()) // Match
+                {
+                    WriteLine("\tMatch!");
+                    updatedCurrentIndex++;
 
-            if (newNode == null)
-                continue;
-            return newNode;
+                    var start = updatedInitial.Previous;
+                    var end = updatedCurrent;
+
+                    RuleMatch match = new RuleMatch(updatedAttempts[i]);
+                    StackLinkedListNode newNode = new StackLinkedListNode();
+                    newNode.Value = match;
+                    start.Connect(newNode);
+                    newNode.Connect(end);
+
+                    var crr = start;
+                    while (true)
+                    {
+                        WriteLine($"\t\t{crr.Value?.ToString() ?? "null"}");
+                        if (!crr.HasNext)
+                            break;
+                        crr = crr.Next;
+                    }
+        
+                    updatedState = new ReductionState(
+                        updatedInitial, 
+                        updatedCurrent, 
+                        updatedCurrentIndex, 
+                        updatedAttempts,
+                        null
+                    );
+
+                    return (updatedState, newNode);
+                }
+                
+                WriteLine($"\tCurrent: {updatedCurrent.Value}");
+                WriteLine($"\tIterator: {itList[i].Current}");
+
+                if (updatedCurrent.Value.Is(itList[i].Current))
+                {
+                    updatedCurrent = updatedCurrent.Next;
+                    continue;
+                }
+                
+                WriteLine("\tRemoving Attempt...");
+                itList.RemoveAt(i);
+                updatedAttempts.RemoveAt(i);
+                i--;
+            }
         }
-
-        return null;
-    }
-
-    private StackLinkedListNode testMatch(StackLinkedListNode initial, SubRule rule)
-    {
-        var it = initial;
-        var tokensIterator = rule.RuleTokens.GetEnumerator();
-        var nodes = new List<INode>();
-
-        while (tokensIterator.MoveNext())
-        {   
-            if (it == null || it.Value == null)
-                return null;
-            
-            if (!it.Value.Is(tokensIterator.Current))
-                return null;
-            nodes.Add(it.Value);
-            
-            it = it.Next;
-        }
-
-        RuleMatch match = new RuleMatch(rule, nodes.ToArray());
-        StackLinkedListNode newNode = new StackLinkedListNode();
-        newNode.Value = match;
-
-        initial.Previous.Connect(newNode);
-        newNode.Connect(it);
-
-        return newNode;
-    }
-
-    private (ReductionState state, ReductionState newState) tryReduce(ReductionState state)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    private void reverse(ReductionState state)
-    {
-        throw new System.NotImplementedException();
+        
+        updatedState = new ReductionState(
+            updatedInitial, 
+            updatedCurrent, 
+            updatedCurrentIndex, 
+            updatedAttempts,
+            null
+        );
+        return (updatedState, null);
     }
 
     private void depthFirstSearch()
@@ -86,24 +112,53 @@ public class SyntacticStateGraph
         var header = TokenList.FirstOrDefault();
         var first = header.Next;
         var attempts = Dictionary.GetAttempts(first.Value);
-        var state = new ReductionState(first, first, attempts);
+        var state = new ReductionState(first, first, 0, attempts, null);
         stack.Push(state);
 
         while (stack.Count > 0)
         {
+            WriteLine($"Stack Size: {stack.Count}");
+            WriteLine($"Buffer Size: {TokenList.Count()}");
+
             var crrState = stack.Pop();
+
+            if (TokenList.Count() == 3)
+            {
+                return;
+            }
+
             var result = tryReduce(crrState);
             crrState = result.state;
-            var newNode = result.newState;
+            var match = result.match;
             
-            if (newNode == null)
+            if (match == null)
             {
-                reverse(crrState);
+                if (!crrState.InitialNode.HasNext)
+                {
+                    var reverseParameter = crrState.ReverseParameter;
+                    if (reverseParameter == null)
+                    {
+                        throw new System.NotImplementedException();
+                    }
+                    reverseParameter.Disconnect();
+                }
+                else
+                {
+                    var next = crrState.InitialNode.Next;
+                    var nextAttempts = Dictionary.GetAttempts(next.Value);
+                    var updatedState = new ReductionState(next, next, 0, nextAttempts, null);
+                    stack.Push(updatedState);
+                }
             }
             else
             {
                 stack.Push(crrState);
-                stack.Push(newNode);
+
+                header = TokenList.FirstOrDefault();
+                first = header.Next;
+                attempts = Dictionary.GetAttempts(first.Value);
+                var newState = new ReductionState(first, first, 0, attempts, match);
+                stack.Push(newState);
             }
         }
     }

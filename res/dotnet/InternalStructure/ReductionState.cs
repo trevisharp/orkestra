@@ -4,5 +4,7 @@ namespace Orkestra.InternalStructure;
 
 public record ReductionState(
     StackLinkedListNode InitialNode, 
-    StackLinkedListNode CurrentNode, 
-    IEnumerable<SubRule> Attempts);
+    StackLinkedListNode CurrentNode,
+    int CurrentNodeIndex,
+    IEnumerable<SubRule> Attempts,
+    StackLinkedListNode ReverseParameter);

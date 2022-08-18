@@ -36,4 +36,7 @@ public record Key : IRuleElement
     public bool IsAuto { get; private set; }
 
     public string KeyName => Name;
+
+    public override string ToString()
+        => $"Key: {Name}";
 }

@@ -19,4 +19,7 @@ public record SubRule : IRuleElement
 
     public static SubRule Create(params IRuleElement[] tokens)
         => new SubRule(tokens);
+
+    public override string ToString()
+        => $"SubRule: {Parent?.Name ?? "null"}";
 }

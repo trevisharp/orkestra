@@ -28,4 +28,7 @@ public record Rule : IRuleElement
 
     public static Rule CreateStartRule(string name, params SubRule[] subRules)
         => new Rule(name, true, subRules);
+
+    public override string ToString()
+        => $"Rule: {Name}";
 }

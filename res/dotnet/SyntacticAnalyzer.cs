@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 #if DEBUG
 using static System.Console;
@@ -19,6 +20,11 @@ public class SyntacticAnalyzer
     {
         SyntacticStateGraph graph = new SyntacticStateGraph(tokens, this.Rules);
 
-        throw new System.NotImplementedException();
+        var result = graph.DepthFirstSearch();
+
+        ExpressionTree tree = new ExpressionTree();
+        tree.Root = graph.TokenList.FirstOrDefault().Next.Value;
+        
+        return tree;
     }
 }
