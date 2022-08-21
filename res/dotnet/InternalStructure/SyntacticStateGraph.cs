@@ -133,7 +133,6 @@ public class SyntacticStateGraph
             ReadKey(true);
             #endif
 
-
             if (TokenList.Count() == 3)
             {
                 break;
@@ -145,7 +144,7 @@ public class SyntacticStateGraph
             
             if (match == null)
             {
-                if (!crrState.InitialNode.HasNext)
+                if (crrState.InitialNode.Next.Value == null)
                 {
                     var reverseParameter = crrState.ReverseParameter;
                     if (reverseParameter == null)
@@ -153,14 +152,13 @@ public class SyntacticStateGraph
                         throw new System.NotImplementedException();
                     }
                     reverseParameter.Disconnect();
+                    continue;
                 }
-                else
-                {
-                    var next = crrState.InitialNode.Next;
-                    var nextAttempts = Dictionary.GetAttempts(next.Value);
-                    var updatedState = new ReductionState(next, next, 0, nextAttempts, crrState.ReverseParameter);
-                    stack.Push(updatedState);
-                }
+                
+                var next = crrState.InitialNode.Next;
+                var nextAttempts = Dictionary.GetAttempts(next.Value);
+                var updatedState = new ReductionState(next, next, 0, nextAttempts, crrState.ReverseParameter);
+                stack.Push(updatedState);
             }
             else
             {
