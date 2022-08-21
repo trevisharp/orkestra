@@ -27,10 +27,10 @@ public class SyntacticStateGraph
 
     private (ReductionState state, StackLinkedListNode match) tryReduce(ReductionState state)
     {
-        WriteLine("In TryReduce:");
 
         StackLinkedListNode updatedInitial = state.InitialNode;
         StackLinkedListNode updatedCurrent = state.CurrentNode;
+        var updatedReverseParameter = state.ReverseParameter;
         int updatedCurrentIndex = state.CurrentNodeIndex;
         List<SubRule> updatedAttempts = new List<SubRule>(state.Attempts);
         List<IEnumerator<IRuleElement>> itList = updatedAttempts
@@ -38,10 +38,9 @@ public class SyntacticStateGraph
                 .Skip(updatedCurrentIndex).GetEnumerator())
             .ToList();
         ReductionState updatedState = null;
-        
+
         while (updatedAttempts.Count > 0)
         {
-            WriteLine($"\tIn Attempt {updatedAttempts.Count}:");
             for (int i = 0; i < updatedAttempts.Count; i++)
             {
                 if (!itList[i].MoveNext()) // Match
@@ -66,56 +65,37 @@ public class SyntacticStateGraph
 
                     start.Connect(newNode);
                     newNode.Connect(end);
-
-                    #if DEBUG
-                    var crr = TokenList.FirstOrDefault();
-                    Write("\t\tNew Buffer:\n\t\t\t");
-                    while (true)
-                    {
-                        Write($"{crr.Value?.ToString() ?? "null"},  ");
-                        if (!crr.HasNext)
-                            break;
-                        crr = crr.Next;
-                    }
-                    WriteLine();
-                    #endif
         
                     updatedState = new ReductionState(
                         updatedInitial, 
                         updatedCurrent, 
                         updatedCurrentIndex, 
                         updatedAttempts,
-                        null
+                        updatedReverseParameter
                     );
 
                     return (updatedState, newNode);
                 }
 
                 bool subMatchCondition = updatedCurrent.Value != null && updatedCurrent.Value.Is(itList[i].Current);
-
-                #if DEBUG
-                WriteLine($"\t\tAttempt {updatedCurrent.Value} is {itList[i].Current} = {subMatchCondition}");
-                #endif
-
+                WriteLine($"\t\t{i}: {updatedCurrent.Value} is {itList[i].Current} = {subMatchCondition}");
                 if (subMatchCondition)
-                {
-                    updatedCurrent = updatedCurrent.Next;
                     continue;
-                }
                 
-                WriteLine("\t\tRemoving Attempt...");
                 itList.RemoveAt(i);
                 updatedAttempts.RemoveAt(i);
                 i--;
             }
+            updatedCurrent = updatedCurrent.Next;
         }
+        WriteLine("\t\tFail!");
         
         updatedState = new ReductionState(
-            updatedInitial, 
-            updatedCurrent, 
-            updatedCurrentIndex, 
+            updatedInitial,
+            updatedCurrent,
+            updatedCurrentIndex,
             updatedAttempts,
-            null
+            updatedReverseParameter
         );
         return (updatedState, null);
     }
@@ -132,10 +112,27 @@ public class SyntacticStateGraph
 
         while (stack.Count > 0)
         {
-            WriteLine($"Stack Size: {stack.Count}");
-            WriteLine($"Buffer Size: {TokenList.Count()}");
-
             var crrState = stack.Pop();
+
+            #if DEBUG
+            WriteLine();
+            WriteLine($"Stack Size: {stack.Count}");
+            var crr = TokenList.FirstOrDefault();
+            Write("Buffer:\n\t");
+            while (true)
+            {
+                if (crrState.CurrentNode.Value == crr.Value)
+                    Write($"[{crr.Value?.ToString() ?? "null"}],  ");
+                else Write($"{crr.Value?.ToString() ?? "null"},  ");
+                if (!crr.HasNext)
+                    break;
+                crr = crr.Next;
+            }
+            WriteLine();
+            WriteLine($"\tindex = {crrState.CurrentNodeIndex}, attempts = {crrState.Attempts.Count()}, reverse = {crrState.ReverseParameter?.Value.ToString() ?? "null"}");
+            ReadKey(true);
+            #endif
+
 
             if (TokenList.Count() == 3)
             {
@@ -161,7 +158,7 @@ public class SyntacticStateGraph
                 {
                     var next = crrState.InitialNode.Next;
                     var nextAttempts = Dictionary.GetAttempts(next.Value);
-                    var updatedState = new ReductionState(next, next, 0, nextAttempts, null);
+                    var updatedState = new ReductionState(next, next, 0, nextAttempts, crrState.ReverseParameter);
                     stack.Push(updatedState);
                 }
             }
