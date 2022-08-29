@@ -1,6 +1,6 @@
 ﻿string code = @"contextual key KEY = /key/
                 key CONTEXTUAL = /contextual/
-                contextual key KEY = /key/";
+                contextual key FOR = /for/";
 
 OrkestraCompiler compiler = new OrkestraCompiler();
 
