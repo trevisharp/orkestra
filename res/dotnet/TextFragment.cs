@@ -1,6 +1,6 @@
 namespace Orkestra;
 
-public class ParseState
+public class TextFragment
 {
     
 }

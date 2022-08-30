@@ -14,6 +14,7 @@ public abstract class Compiler
     {
         var lex = buildLexicalAnalyzer();
         var parser = buildSyntacticAnalyzer();
+        var machine = buildProcessingMachine();
 
         var tokens = lex.Parse(sourceCode);
 
@@ -28,6 +29,16 @@ public abstract class Compiler
         #if DEBUG
         WriteLine(tree);
         #endif
+    }
+
+    private ProcessingMachine buildProcessingMachine()
+    {
+        ProcessingMachine machine = new ProcessingMachine();
+
+        foreach (var process in getFields<Processing>())
+            machine.Add(process);
+
+        return machine;
     }
 
     private LexicalAnalyzer buildLexicalAnalyzer()
