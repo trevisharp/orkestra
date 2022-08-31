@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Orkestra;
+namespace Orkestra.Processings;
 
 public class ProcessingMachine
 {

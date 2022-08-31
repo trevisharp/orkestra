@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 
-namespace Orkestra;
+namespace Orkestra.SyntacticAnalysis;
+
+using LexicalAnalysis;
 
 public record RuleMatch : INode
 {

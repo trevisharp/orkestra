@@ -1,4 +1,4 @@
-namespace Orkestra;
+namespace Orkestra.Processings;
 
 public class ProcessingParameters
 {

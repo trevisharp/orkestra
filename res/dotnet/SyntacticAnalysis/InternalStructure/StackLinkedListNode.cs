@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 
-namespace Orkestra.InternalStructure;
+namespace Orkestra.SyntacticAnalysis.InternalStructure;
+
+using LexicalAnalysis;
 
 public class StackLinkedListNode
 {

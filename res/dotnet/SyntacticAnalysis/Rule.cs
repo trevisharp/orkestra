@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Orkestra;
+namespace Orkestra.SyntacticAnalysis;
 
 public record Rule : IRuleElement
 {

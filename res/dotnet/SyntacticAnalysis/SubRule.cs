@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Orkestra;
+namespace Orkestra.SyntacticAnalysis;
 
 public record SubRule : IRuleElement
 {

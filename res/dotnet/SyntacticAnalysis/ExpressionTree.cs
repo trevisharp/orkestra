@@ -1,6 +1,8 @@
 using System.Text;
 
-namespace Orkestra;
+namespace Orkestra.SyntacticAnalysis;
+
+using LexicalAnalysis;
 
 public class ExpressionTree
 {

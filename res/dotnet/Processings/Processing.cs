@@ -1,6 +1,6 @@
 using System;
 
-namespace Orkestra;
+namespace Orkestra.Processings;
 
 public abstract class Processing
 {

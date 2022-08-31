@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace Orkestra;
+namespace Orkestra.LexicalAnalysis;
 
 public class LexicalAnalyzer
 {

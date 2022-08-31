@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 
-namespace Orkestra;
+namespace Orkestra.SyntacticAnalysis;
 
 using InternalStructure;
+using LexicalAnalysis;
 
 public class SyntacticAnalyzer
 {

@@ -1,4 +1,6 @@
-﻿namespace Orkestra;
+﻿namespace Orkestra.LexicalAnalysis;
+
+using SyntacticAnalysis;
 
 public record Token : INode
 {

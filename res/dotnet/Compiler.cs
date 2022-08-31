@@ -8,6 +8,10 @@ using static System.Console;
 
 namespace Orkestra;
 
+using LexicalAnalysis;
+using SyntacticAnalysis;
+using Processings;
+
 public abstract class Compiler
 {
     public void Compile(string sourceCode)

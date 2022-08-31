@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Orkestra.InternalStructure;
+namespace Orkestra.SyntacticAnalysis.InternalStructure;
 
 public record ReductionState(
     StackLinkedListNode InitialNode,

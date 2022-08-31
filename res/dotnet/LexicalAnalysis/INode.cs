@@ -1,6 +1,6 @@
-using System.Collections.Generic;
+namespace Orkestra.LexicalAnalysis;
 
-namespace Orkestra;
+using SyntacticAnalysis;
 
 public interface INode
 {

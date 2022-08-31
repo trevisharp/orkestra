@@ -3,7 +3,9 @@ using System.Collections.Generic;
 
 using static System.Console;
 
-namespace Orkestra.InternalStructure;
+namespace Orkestra.SyntacticAnalysis.InternalStructure;
+
+using LexicalAnalysis;
 
 public class SyntacticStateGraph
 {
