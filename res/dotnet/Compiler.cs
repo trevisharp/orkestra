@@ -8,9 +8,9 @@ using static System.Console;
 
 namespace Orkestra;
 
+using Processings;
 using LexicalAnalysis;
 using SyntacticAnalysis;
-using Processings;
 
 public abstract class Compiler
 {
@@ -35,14 +35,14 @@ public abstract class Compiler
         #endif
     }
 
-    private ProcessingMachine buildProcessingMachine()
+    private ProcessingPackage buildProcessingMachine()
     {
-        ProcessingMachine machine = new ProcessingMachine();
+        ProcessingPackage package = new ProcessingPackage();
 
         foreach (var process in getFields<Processing>())
-            machine.Add(process);
+            package.Add(process);
 
-        return machine;
+        return package;
     }
 
     private LexicalAnalyzer buildLexicalAnalyzer()

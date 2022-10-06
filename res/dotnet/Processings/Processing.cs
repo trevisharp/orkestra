@@ -2,7 +2,9 @@ using System;
 
 namespace Orkestra.Processings;
 
-public abstract class Processing
+using Packages;
+
+public abstract class Processing : PackageElement
 {
-    public abstract TextFragment Process(string[] lines);
+    public abstract TextFragment Process(TextFragment text);
 }
