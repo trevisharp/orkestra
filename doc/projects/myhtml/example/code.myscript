@@ -1,0 +1,11 @@
+func Logar
+    if login is "Xispita" and password is "123" then
+        goto \mainPage
+    else
+        show "Senha ou Login incorretos"
+    end
+end
+
+func Sair
+    goto \login
+end

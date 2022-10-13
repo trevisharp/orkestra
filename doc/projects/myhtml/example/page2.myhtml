@@ -1,0 +1,15 @@
+use code.myscript
+
+title
+    Meu belo Sistema
+title
+
+block
+    subtitle message
+    subtitle
+
+    button btSair
+        Sair
+        click=Sair
+    button
+block

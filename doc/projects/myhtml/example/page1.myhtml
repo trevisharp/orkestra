@@ -1,0 +1,20 @@
+use code.myscript
+
+title
+    Meu belo sistema
+title
+
+block
+    field login
+        Login
+    field
+
+    field password
+        Senha
+    field
+
+    button btlogar
+        Logar
+        click=Logar
+    button
+block
