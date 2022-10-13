@@ -1,10 +1,51 @@
-using System.Collections.Generic;
+using System;
 using System.Text;
+using System.Collections.Generic;
 
 namespace Orkestra.Processings;
 
 public class TextFragment
 {
+    public UnityType Type
+    {
+        get
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public TextFragment Parent
+    {
+        get
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public TextFragment All
+    {
+        get
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public TextFragment Lines
+    {
+        get
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public TextFragment Characters
+    {
+        get
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     private List<string> parts;
     private int listIndex = 0;
     private int charIndex = 0;
