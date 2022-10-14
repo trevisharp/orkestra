@@ -1,0 +1,5 @@
+include blockprocess
+
+file myscript = /*.myscript/
+
+keyword FUNC = /func/

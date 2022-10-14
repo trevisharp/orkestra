@@ -1,0 +1,20 @@
+include blockprocess
+
+file myconfig = /*.myconfig/
+
+keyword ROUTE = /route/
+keyword ASSIGN = /->/
+keyword EXTENSION = /.myhtml/
+keyword BAR = /\//
+
+identity key = /[0-9a-zA-Z]+/
+
+start assign:
+    BAR identity ASSIGN identity EXTENSION ENDFILE
+
+start assignCollection:
+    assign assignCollection
+    assign
+
+start rule:
+    ROUTE ENDLINE STARTBLOCK assignCollection ENDBLOCK ROUTE ENDLINE

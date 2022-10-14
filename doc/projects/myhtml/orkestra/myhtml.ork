@@ -1,2 +1,67 @@
+include blockprocess
+
 file myhtml = /*.myhtml/
 
+keyword TITLE = /title/
+keyword BLOCK = /block/
+keyword FIELD = /field/
+keyword BUTTON = /button/
+keyword USE = /use/
+keyword DOT = /./
+keyword EQUAL = /=/
+
+identity key = /[0-9a-zA-Z]+/
+
+key string = /(")(.?*)(")/
+
+rule componentDefinition:
+    componentDefinition componentDefinition
+    data EQUAL string ENDLINE
+    data EQUAL data ENDLINE
+    data ENDLINE
+    string ENDLINE
+
+rule componentBlock:
+    STARTBLOCK componentDefinition ENDBLOCK
+
+rule title:
+    TITLE ENDLINE commandBlock ENDLINE TITLE
+    TITLE ENDLINE TITLE ENDLINE
+
+rule button:
+    BUTTON identity ENDLINE commandBlock ENDLINE BUTTON
+    BUTTON ENDLINE BUTTON ENDLINE
+
+rule field:
+    FIELD identity ENDLINE commandBlock FIELD BUTTON
+    FIELD ENDLINE FIELD ENDLINE
+
+rule block:
+    BLOCK ENDLINE componentCollection BLOCK ENDLINE
+    BLOCK ENDLINE BLOCK ENDLINE
+
+rule component:
+    field
+    title
+    button
+    block
+
+rule componentCollection:
+    component componentCollection
+    component
+
+rule data:
+    data DOT identity
+    identity
+
+rule use:
+    USE data ENDLINE
+
+rule useCollection:
+    use useCollection
+    use
+
+start rule page:
+    useCollection componentCollection
+    useCollection
+    componentCollection

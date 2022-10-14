@@ -1,0 +1,27 @@
+auto key STARTBLOCK
+auto key ENDBLOCK
+auto key ENDLINE
+
+processing all:
+	level = 0
+	processing line:
+		currentLevel = 0
+		processing character:
+			if not character is tab:
+				complete
+			currentLevel++
+		
+		if currentLevel > level:
+			prepend tab * level + STARTBLOCK + newline
+			currentLevel--
+		
+		while currentLevel < level:
+			append newline + tab * level + ENDBLOCK
+			currentLevel++
+		
+		return line + ENDLINE
+
+processing line:
+	processing character:
+		if character is "#":
+			break

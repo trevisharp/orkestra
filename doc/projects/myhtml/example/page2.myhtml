@@ -1,15 +1,15 @@
 use code.myscript
 
 title
-    Meu belo Sistema
+    "Meu belo Sistema"
 title
 
 block
-    subtitle message
-    subtitle
+    field message
+    field
 
     button btSair
-        Sair
+        "Sair"
         click=Sair
     button
 block

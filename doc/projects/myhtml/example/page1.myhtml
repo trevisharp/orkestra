@@ -1,20 +1,20 @@
 use code.myscript
 
 title
-    Meu belo sistema
+    "Meu belo Sistema"
 title
 
 block
     field login
-        Login
+        "Login"
     field
 
     field password
-        Senha
+        "Senha"
     field
 
     button btlogar
-        Logar
+        "Logar"
         click=Logar
     button
 block
