@@ -10,6 +10,6 @@ folder scripts:
     name => "scripts"
     [myscript]
 
-project myLang:
+project mylang:
     pages scripts myconfig
     

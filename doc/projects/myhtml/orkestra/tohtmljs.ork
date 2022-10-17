@@ -12,3 +12,20 @@ partial entity Field:
         >> tab "<label>" text "</label> newline
         >> tab "<input type='text' id='" this.Name "'/>" newline
         >> "</span>" newline
+
+file htmlFile(page):
+    title:
+        return page.Name + ".html"
+    content:
+        >> "<html>" newline
+        >> tab "<body>" newline
+        
+        for component in page.Components:
+            >> tab tab component
+
+        >> tab "<\body>" newline
+        >> "<\html>
+
+compiler mylang:
+    for page in pages:
+        htmlFile(page)
