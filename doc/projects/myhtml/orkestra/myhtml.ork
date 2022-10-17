@@ -1,4 +1,5 @@
 include blockprocess
+import model
 
 file myhtml = /*.myhtml/
 
@@ -15,30 +16,25 @@ identity key = /[0-9a-zA-Z]+/
 key string = /(")(.?*)(")/
 
 rule componentDefinition:
-    componentDefinition componentDefinition
-    data EQUAL string ENDLINE
-    data EQUAL data ENDLINE
-    data ENDLINE
-    string ENDLINE
+    data EQUAL string => (.0, .1)
+    data EQUAL data => (.0, .1)
+    data => (.0, null)
+    string => (.0, null)
 
 rule componentBlock:
-    STARTBLOCK componentDefinition ENDBLOCK
+    STARTBLOCK [componentDefinition ENDLINE] ENDBLOCK
 
 rule title:
-    TITLE ENDLINE commandBlock ENDLINE TITLE
-    TITLE ENDLINE TITLE ENDLINE
+    TITLE ENDLINE componentBlock? ENDLINE TITLE
 
 rule button:
-    BUTTON identity ENDLINE commandBlock ENDLINE BUTTON
-    BUTTON ENDLINE BUTTON ENDLINE
+    BUTTON identity ENDLINE componentBlock? ENDLINE BUTTON
 
 rule field:
-    FIELD identity ENDLINE commandBlock FIELD BUTTON
-    FIELD ENDLINE FIELD ENDLINE
+    FIELD identity ENDLINE componentBlock? FIELD BUTTON
 
 rule block:
-    BLOCK ENDLINE componentCollection BLOCK ENDLINE
-    BLOCK ENDLINE BLOCK ENDLINE
+    BLOCK ENDLINE [component]? BLOCK ENDLINE
 
 rule component:
     field
@@ -46,22 +42,12 @@ rule component:
     button
     block
 
-rule componentCollection:
-    component componentCollection
-    component
-
 rule data:
-    data DOT identity
-    identity
+    data DOT identity => .0 + "." + .1
+    identity => .0
 
 rule use:
     USE data ENDLINE
 
-rule useCollection:
-    use useCollection
-    use
-
 start rule page:
-    useCollection componentCollection
-    useCollection
-    componentCollection
+    {[use] [component]}

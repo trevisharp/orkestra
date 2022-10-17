@@ -1,0 +1,14 @@
+include mylang
+import model
+
+partial entity Field:
+    override file ToFile():
+        text = ""
+        for x in Definitions:
+            if x.1 is null:
+                text = x.0
+                break
+        >> "<span>" newline
+        >> tab "<label>" text "</label> newline
+        >> tab "<input type='text' id='" this.Name "'/>" newline
+        >> "</span>" newline

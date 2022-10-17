@@ -12,9 +12,5 @@ identity key = /[0-9a-zA-Z]+/
 start assign:
     BAR identity ASSIGN identity EXTENSION ENDFILE
 
-start assignCollection:
-    assign assignCollection
-    assign
-
 start rule:
-    ROUTE ENDLINE STARTBLOCK assignCollection ENDBLOCK ROUTE ENDLINE
+    ROUTE ENDLINE STARTBLOCK [assign] ENDBLOCK ROUTE ENDLINE

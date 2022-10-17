@@ -2,3 +2,13 @@ import myhtml
 import myscript
 import myconfig
 
+folder pages:
+    name => "pages"
+    [myhtml]
+
+folder scripts:
+    name => "scripts"
+    [myscript]
+
+project myLang:
+    pages scripts myconfig
