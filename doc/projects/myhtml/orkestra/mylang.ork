@@ -12,3 +12,4 @@ folder scripts:
 
 project myLang:
     pages scripts myconfig
+    

@@ -23,6 +23,13 @@ entity Use
     constructor(this.File)
 
 entity Page
+    property string Name
     property list Use Uses
     property list Component Components
-    constructor(this.Uses = null, this.Components = null)
+    constructor(this.Name, this.Uses = null, this.Components = null)
+
+entity CodeModule:
+    list Function Functions
+    constructor(this.Functions)
+
+entity Function

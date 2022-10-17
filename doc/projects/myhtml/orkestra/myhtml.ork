@@ -50,4 +50,6 @@ rule use:
     USE data ENDLINE
 
 start rule page:
-    {[use] [component]}
+    {[use] [component]}:
+        Page page = new Page(filename, .0, .1)
+        return page
