@@ -5,14 +5,14 @@ namespace Orkestra.Processings;
 
 using InternalStructure;
 
-public class TextFragment
+public class Text
 {
     private FastInsertionList<CodeUnity> list = null;
-    private TextFragment parent = null;
+    private Text parent = null;
     private UnityType type = UnityType.All;
     private int pos = -1;
 
-    private TextFragment(string text)
+    private Text(string text)
     {
         this.list = new FastInsertionList<CodeUnity>();
         int count = 0;
@@ -30,8 +30,8 @@ public class TextFragment
         }
     }
 
-    private TextFragment(
-        TextFragment parent, 
+    private Text(
+        Text parent, 
         UnityType type,
         int pos)
     {
@@ -43,12 +43,12 @@ public class TextFragment
 
     public UnityType Type => type;
 
-    public TextFragment Parent => parent;
+    public Text Parent => parent;
 
-    public TextFragment All 
+    public Text All 
         => this;
 
-    public IEnumerable<TextFragment> Lines
+    public IEnumerable<Text> Lines
     {
         get
         {
@@ -56,7 +56,7 @@ public class TextFragment
         }
     }
 
-    public IEnumerable<TextFragment> Characters
+    public IEnumerable<Text> Characters
     {
         get
         {

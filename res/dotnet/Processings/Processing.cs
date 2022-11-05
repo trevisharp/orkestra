@@ -4,5 +4,5 @@ using Packages;
 
 public abstract class Processing : PackageElement
 {
-    public abstract TextFragment Process(TextFragment text);
+    public abstract Text Process(Text text);
 }
