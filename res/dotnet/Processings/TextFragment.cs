@@ -1,12 +1,54 @@
 using System;
-using System.Text;
 using System.Collections.Generic;
 
 namespace Orkestra.Processings;
 
+using InternalStructure;
+
 public class TextFragment
 {
-    public UnityType Type
+    private FastInsertionList<CodeUnity> list = null;
+    private TextFragment parent = null;
+    private UnityType type = UnityType.All;
+    private int pos = -1;
+
+    private TextFragment(string text)
+    {
+        this.list = new FastInsertionList<CodeUnity>();
+        int count = 0;
+        foreach (var line in text.Split('\n'))
+        {
+            count++;
+            foreach (var character in line)
+            {
+                list.Add(new CodeUnity()
+                {
+                    SourceLine = count,
+                    Value = character
+                });
+            }
+        }
+    }
+
+    private TextFragment(
+        TextFragment parent, 
+        UnityType type,
+        int pos)
+    {
+        this.list = parent.list;
+        this.pos = pos;
+        this.parent = parent;
+        this.type = type;
+    }
+
+    public UnityType Type => type;
+
+    public TextFragment Parent => parent;
+
+    public TextFragment All 
+        => this;
+
+    public IEnumerable<TextFragment> Lines
     {
         get
         {
@@ -14,64 +56,11 @@ public class TextFragment
         }
     }
 
-    public TextFragment Parent
+    public IEnumerable<TextFragment> Characters
     {
         get
         {
             throw new NotImplementedException();
         }
-    }
-
-    public TextFragment All
-    {
-        get
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public TextFragment Lines
-    {
-        get
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public TextFragment Characters
-    {
-        get
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    private List<string> parts;
-    private int listIndex = 0;
-    private int charIndex = 0;
-
-    public TextFragment(string value)
-    {
-        parts = new List<string>();
-
-        foreach (var lines in value.Split('\n'))
-        {
-            parts.Add(lines);
-            parts.Add("\n");
-        }
-
-        parts.RemoveAt(parts.Count - 1);
-    }
-
-    public static TextFragment operator +(TextFragment t, string s)
-    {
-        t.parts.Add(s);
-        return t;
-    }
-
-    public static implicit operator TextFragment(string value)
-    {
-        TextFragment fragment = new TextFragment(value);
-        return fragment;
     }
 }
