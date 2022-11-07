@@ -1,20 +1,17 @@
-TextFragment processing1(TextFragment all)
+Text processing1(Text txt)
 {
     int level = 0;
     int current = 0;
     bool emptyline = true;
     char tabulationtype = 'x';
-    for (int p1 = 0; p1 < all.Lines.Count; p1++)
+    foreach (var line in txt.Lines)
     {
-        var line = all.Lines[p1];
-
         emptyline = true;
         current = 0;
         tabulationtype = 'x';
 
-        for (int p2 = 0; p2 < line.Characters.Count; p2++)
+        foreach (var character in line.Characters)
         {
-            var character = line.character[p2];
             if (character.Is("#"))
             {
                 character.Break(character);
@@ -32,9 +29,8 @@ TextFragment processing1(TextFragment all)
             continue;
         }
 
-        for (int p2 = 0; p2 < line.Characters.Count; p2++)
+        foreach (var character in line.Characters)
         {
-            var character = line.character[p2];
             if (tabulationtype == 'x')
             {
                 if (character.Is("\t") || character.Is(" "))
@@ -61,9 +57,8 @@ TextFragment processing1(TextFragment all)
             }
         }
 
-        for (int p1 = 0; p1 < line.Lines.Count; p1++)
+        foreach (var line in txt.Lines)
         {
-            var line2 = all.Lines[p1];
             if (current < level)
             {
                 level = current;

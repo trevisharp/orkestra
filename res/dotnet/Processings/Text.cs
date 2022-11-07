@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Orkestra.Processings;
@@ -10,7 +11,7 @@ public class Text
     private FastInsertionList<CodeUnity> list = null;
     private Text parent = null;
     private UnityType type = UnityType.All;
-    private int pos = -1;
+    private IEnumerable<CodeUnity> data = null;
 
     private Text(string text)
     {
@@ -27,16 +28,22 @@ public class Text
                     Value = character
                 });
             }
+            list.Add(new CodeUnity()
+            {
+                SourceLine = count,
+                Value = '\n'
+            });
         }
+        data = list;
     }
 
     private Text(
         Text parent, 
         UnityType type,
-        int pos)
+        IEnumerable<CodeUnity> data)
     {
         this.list = parent.list;
-        this.pos = pos;
+        this.data = data;
         this.parent = parent;
         this.type = type;
     }
@@ -45,14 +52,28 @@ public class Text
 
     public Text Parent => parent;
 
-    public Text All 
-        => this;
+    public Text All => this;
 
     public IEnumerable<Text> Lines
     {
         get
         {
-            throw new NotImplementedException();
+            if (this.type < UnityType.All)
+            {
+                yield return new Text(
+                    this, UnityType.Line, data);
+                yield break;
+            }
+
+            var all = this.All;
+            var it = all.list.GetEnumerator();
+
+            foreach (var bk in list.BreakPoints)
+            {   
+                Text text = new Text(
+                    this, UnityType.Line, bk);
+                yield return text;
+            }
         }
     }
 
@@ -60,7 +81,19 @@ public class Text
     {
         get
         {
-            throw new NotImplementedException();
+            CodeUnity[] vec = new CodeUnity[1];
+            foreach (var x in data)
+            {
+                vec[0] = x;
+                yield return new Text(
+                    this, UnityType.Character,
+                    vec);
+            }
         }
+    }
+
+    public bool Is(string str)
+    {
+        throw new NotImplementedException();
     }
 }
