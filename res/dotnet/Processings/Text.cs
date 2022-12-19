@@ -7,6 +7,7 @@ using System.Collections.Generic;
 namespace Orkestra.Processings;
 
 using InternalStructure;
+using LexicalAnalysis;
 
 public class Text : IEnumerable<Text>
 {
@@ -47,6 +48,36 @@ public class Text : IEnumerable<Text>
     }
 
     public void Complete()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Replace(string text)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Append(string text)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Prepend(string text)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Replace(Token token)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Append(Token token)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Prepend(Token token)
     {
         throw new NotImplementedException();
     }
