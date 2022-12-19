@@ -14,7 +14,7 @@ Text processing1(Text txt)
         {
             if (character.Is("#"))
             {
-                character.Break(character);
+                character.Break();
                 break;
             }
             if (!character.Is("\t") && !character.Is("\n") && !character.Is(" "))
