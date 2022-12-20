@@ -11,20 +11,22 @@ using LexicalAnalysis;
 
 public class Text : IEnumerable<Text>
 {
-    private IEnumerable<Line> originalLines;
+    private FastList<Line> lines = null;
+
     private Text parent = null;
     private UnityType type = UnityType.All;
 
     public Text(IEnumerable<string> lines)
     {
-        this.originalLines = lines
+        this.lines.AddRange(lines
             .Select((ln, index) => new Line()
             {
                 Code = ln,
                 Token = null,
                 Number = index,
                 EndLine = true
-            });
+            })
+        );
     }
 
     public bool Is(string str)
