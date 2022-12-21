@@ -12,11 +12,12 @@ using LexicalAnalysis;
 public class Text : IEnumerable<Text>
 {
     private FastList<Line> lines = null;
+    private LinkedListNode<FastListNode<Line>> crr = null;
 
     private Text parent = null;
     private UnityType type = UnityType.All;
 
-    public Text(IEnumerable<string> lines)
+    private Text(IEnumerable<string> lines)
     {
         this.lines.AddRange(lines
             .Select((ln, index) => new Line()
@@ -27,6 +28,15 @@ public class Text : IEnumerable<Text>
                 EndLine = true
             })
         );
+        crr = this.lines.Nodes.FirstOrDefault();
+    }
+
+    private Text(Text parent, UnityType type)
+    {
+        this.parent = parent;
+        this.type = type;
+        this.lines = this.parent.lines;
+        this.crr = this.parent.crr;
     }
 
     public bool Is(string str)
@@ -85,20 +95,10 @@ public class Text : IEnumerable<Text>
     }
 
     public Text Lines
-    {
-        get
-        {
-            throw new NotImplementedException();
-        }
-    }
+        => new Text(this, UnityType.Line);
 
     public Text Characters
-    {
-        get
-        {
-            throw new NotImplementedException();
-        }
-    }
+        => new Text(this, UnityType.Character);
 
     public IEnumerator<Text> GetEnumerator()
     {
