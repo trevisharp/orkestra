@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Orkestra.Processings.InternalStructure;
+namespace Orkestra.InternalStructure;
 
 internal class FastListNode<T> : IEnumerable<T>
 {

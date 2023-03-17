@@ -1,6 +1,7 @@
+using System.Collections.Generic;
+
 namespace Orkestra.Processings;
 
-using System.Collections.Generic;
 using Packages;
 
 public class ProcessingPackage : Package<Processing>
@@ -10,4 +11,9 @@ public class ProcessingPackage : Package<Processing>
 
     public void Add(Processing processing)
         => this.processings.Add(processing);
+
+    public Text ProcessAll(Text text)
+    {
+        return null;
+    }
 }

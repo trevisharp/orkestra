@@ -6,99 +6,133 @@ using System.Collections.Generic;
 
 namespace Orkestra.Processings;
 
-using InternalStructure;
 using LexicalAnalysis;
+using InternalStructure;
 
+/// <summary>
+/// A Tree Pointer for Text elements
+/// </summary>
 public class Text : IEnumerable<Text>
 {
-    private FastList<Line> lines = null;
-    private LinkedListNode<FastListNode<Line>> crr = null;
-
-    private Text parent = null;
-    private UnityType type = UnityType.All;
-
     private Text(IEnumerable<string> lines)
     {
-        this.lines.AddRange(lines
-            .Select((ln, index) => new Line()
-            {
-                Code = ln,
-                Token = null,
-                Number = index,
-                EndLine = true
-            })
-        );
-        crr = this.lines.Nodes.FirstOrDefault();
+        throw new NotImplementedException();
     }
 
     private Text(Text parent, UnityType type)
     {
-        this.parent = parent;
-        this.type = type;
-        this.lines = this.parent.lines;
-        this.crr = this.parent.crr;
+        throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Compare current unity with a expression
+    /// </summary>
+    /// <param name="str">A regular expression</param>
+    /// <returns>Return true if the expression and text match</returns>
     public bool Is(string str)
     {
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// End a processing iteration removing the units.
+    /// </summary>
     public void Break()
     {
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Go to next unity of processing keeping the current unity.
+    /// </summary>
     public void Continue()
     {
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Go to next unity of processing removing the current unity.
+    /// </summary>
     public void Jump()
     {
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// End a processing iteration keeping the units.
+    /// </summary>
     public void Complete()
     {
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Replaces current unity with a text
+    /// </summary>
     public void Replace(string text)
     {
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Append current unity with a text
+    /// </summary>
     public void Append(string text)
     {
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Preprend current unity with a text
+    /// </summary>
     public void Prepend(string text)
     {
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Replace current unity with a token
+    /// </summary>
     public void Replace(Token token)
     {
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Append current unity with a token
+    /// </summary>
     public void Append(Token token)
     {
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Preprend current unity with a token
+    /// </summary>
     public void Prepend(Token token)
     {
         throw new NotImplementedException();
     }
 
-    public Text Lines
-        => new Text(this, UnityType.Line);
+    /// <summary>
+    /// Reset processing.
+    /// </summary>
+    public void Reset()
+    {
+        throw new NotImplementedException();
+    }
 
-    public Text Characters
-        => new Text(this, UnityType.Character);
+    /// <summary>
+    /// Return a Text pointer to lines of current unity
+    /// </summary>
+    public Text Lines =>
+        throw new NotImplementedException();
+
+    /// <summary>
+    /// Return a Text pointer to characters of current unity
+    /// </summary>
+    public Text Characters =>
+        throw new NotImplementedException();
 
     public IEnumerator<Text> GetEnumerator()
     {
@@ -107,7 +141,22 @@ public class Text : IEnumerable<Text>
 
     IEnumerator IEnumerable.GetEnumerator()
         => GetEnumerator();
-    
+
+    private void next()
+    {
+        throw new NotImplementedException();
+    }
+
+    private void prev()
+    {
+        throw new NotImplementedException();
+    }
+
+    private void reset()
+    {
+        throw new NotImplementedException();
+    }
+
     public static Text FromFile(string path)
     {
         Text text = new Text(open());

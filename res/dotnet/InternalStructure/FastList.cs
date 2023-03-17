@@ -2,11 +2,10 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Orkestra.Processings.InternalStructure;
+namespace Orkestra.InternalStructure;
 
 internal class FastList<T> : IEnumerable<T>
 {
-    private List<LinkedListNode<FastListNode<T>>> criticNodes = new();
     private LinkedList<FastListNode<T>> list = new();
     private int count = 0;
 
@@ -34,9 +33,6 @@ internal class FastList<T> : IEnumerable<T>
         }
     }
 
-    internal IEnumerable<LinkedListNode<FastListNode<T>>> CriticNodes
-        => criticNodes;
-
     internal void Add(T value)
     {
         count++;
@@ -62,10 +58,7 @@ internal class FastList<T> : IEnumerable<T>
         => this.AddRange(values.ToArray());
     
     internal void AddNode(T[] values)
-    {
-        this.list.AddLast(new FastListNode<T>(values));
-        criticNodes.Add(list.Last);
-    }
+        => this.list.AddLast(new FastListNode<T>(values));
 
     internal void Replace(LinkedListNode<FastListNode<T>> node, T[] values)
         => node.Value.Replace(values);
