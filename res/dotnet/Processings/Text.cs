@@ -12,9 +12,19 @@ using InternalStructure;
 /// <summary>
 /// A Tree Pointer for Text elements
 /// </summary>
-public class Text : IEnumerable<Text>
+public unsafe class Text : IEnumerable<Text>
 {
+    private Text parent = null;
+    private FastList<Text> children = null;
+    private Text current = null;
+    private void* source = null;
+
     private Text(IEnumerable<string> lines)
+    {
+        throw new NotImplementedException();
+    }
+
+    private Text(string text)
     {
         throw new NotImplementedException();
     }
@@ -157,6 +167,11 @@ public class Text : IEnumerable<Text>
         throw new NotImplementedException();
     }
 
+    public override string ToString()
+    {
+        throw new NotImplementedException();
+    }
+
     public static Text FromFile(string path)
     {
         Text text = new Text(open());
@@ -172,4 +187,10 @@ public class Text : IEnumerable<Text>
             reader.Close();
         }
     }
+
+    public static implicit operator string(Text text)
+        => text?.ToString() ?? string.Empty;
+
+    public static implicit operator Text(string source)
+        => new Text(source);
 }

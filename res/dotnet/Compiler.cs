@@ -20,18 +20,30 @@ public abstract class Compiler
         var parser = buildSyntacticAnalyzer();
         var machine = buildProcessingMachine();
 
-        var tokens = lex.Parse(sourceCode);
+        var processedText = machine.ProcessAll(sourceCode);
 
         #if DEBUG
+        WriteLine("Processed Text:");
+        WriteLine(processedText);
+        WriteLine();
+        #endif
+
+        var tokens = lex.Parse(processedText);
+
+        #if DEBUG
+        WriteLine("Token List:");
         foreach (var token in tokens)
             Write($"{token} ");
+        WriteLine();
         WriteLine();
         #endif
 
         var tree = parser.Parse(tokens);
         
         #if DEBUG
+        WriteLine("Syntax Tree:");
         WriteLine(tree);
+        WriteLine();
         #endif
     }
 

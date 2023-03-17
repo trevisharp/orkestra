@@ -14,6 +14,9 @@ public class ProcessingPackage : Package<Processing>
 
     public Text ProcessAll(Text text)
     {
-        return null;
+        foreach (var processing in this.processings)
+            text = processing.Process(text);
+        
+        return text;
     }
 }

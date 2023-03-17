@@ -1,12 +1,20 @@
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Orkestra.LexicalAnalysis;
 
+using Processings;
+
 public class LexicalAnalyzer
 {
     public List<Key> Keys { get; private set; } = new List<Key>();
     public void Add(Key key) => this.Keys.Add(key);
+
+    public IEnumerable<Token> Parse(Text text)
+    {
+        throw new NotImplementedException();
+    }
 
     public IEnumerable<Token> Parse(string code)
     {
