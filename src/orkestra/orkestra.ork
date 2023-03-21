@@ -6,6 +6,7 @@ processing all:
 	int current = 0
 	bool emptyline = true
 	char tabulationtype = 'x'
+
 	processing line:
 		emptyline = true
 		current = 0
@@ -16,8 +17,9 @@ processing all:
 				break
 			if character not is tab and character not is newline and character not is space:
 				emptyline = false
+		
 		if emptyline:
-			jump
+			discard
 		
 		processing character:
 			if tabulationtype is 'x':
@@ -25,92 +27,127 @@ processing all:
 					tabulationtype = character
 				else:
 					complete
+			
 			if character not is tabulationtype:
 				complete
+			
 			if character is tab:
 				current += 2
 			else if character is space:
 				current += 1
 		
-		#TODO: tratar espaçamentos exagerados como erros
-		processing line:
-			if current > level:
-				level = current
-				return "@startblock" + newline + line
+		if current > level + 2:
+			throw TabulationError
+
+		if current > level:
+			level = current
+			append STARTBLOCK
 		
 		while level > current:
 			level -= 2
-			processing line:
-				return "@endblock" + newline + line
-
-		if emptyline:
-			continue
-		return line + " @endline"
-	return all + " @endfile"
+			prepend ENDBLOCK
+		
+		append ENDLINE
+	append ENDFILE
 
 ##########################################################################################################
 ############################################  Key definition  ############################################
 
-key AS = /as/
-
-key PROCESSING = /processing/
-contextual key ALL = /all/
-contextual key LINE = /line/
-contextual key CHARACTER = /character/
-contextual key BREAK = /break/
-contextual key COMPLETE = /complete/
-contextual key JUMP = /jump/
-contextual key CONTINUE = /continue/
-contextual key SKIP = /skip/
-contextual key NEXT = /next/
-
+# auto keywords
 auto keyword ENDFILE
 auto keyword ENDLINE
 auto keyword STARTBLOCK
 auto keyword ENDBLOCK
-key BRACES = /\{/
-key BRACES_CLOSE = /\}/
-key PARENTHESES = /\(/
-key PARENTHESES_CLOSE = /\)/
-key BRACKETS = /\[/
-key BRACKETS_CLOSE = /\]/
-key OPSUM = /\+/
-key OPSUBTRACT = /\-/
-key OPTIMES = /\*/
-key OPPOW = /\^/
-key OPMODULE = /\%/
-key EQUAL = /\=/
-key DOUBLEDOT = /\:/
-key DOT = /\./
-key COMMA = /,/
-key LAMBDA = /=>/
+
+# processing keywords
+keyword PROCESSING = /processing/
+keyword IS = /is/
+keyword NEWLINE = /newline/
+keyword TAB = /tab/
+keyword SPACE = /space/
+contextual keyword ALL = /all/
+contextual keyword LINE = /line/
+contextual keyword CHARACTER = /character/
+contextual keyword BREAK = /break/
+contextual keyword DISCARD = /discard/
+contextual keyword COMPLETE = /complete/
+contextual keyword CONTINUE = /continue/
+contextual keyword APPEND = /append/
+contextual keyword PREPEND = /prepend/
+contextual keyword REPLACE = /replace/
+
+# keys keywords
+contextual keyword KEY = /key/
+contextual keyword KEYWORD = /keyword/
+contextual keyword AUTO = /auto/
+contextual keyword CONTEXTUAL = /contextual/
+key EXPRESSION = //.*?//
+
+# rules keywords
+contextual keyword RULE = /rule/
+keyword START = /start/
+contextual keyword IDENTITY = /identity/
+
+# imports keywords
+contextual keyword IMPORT = /import/
+contextual keyword USING = /using/
+contextual keyword INCLUDE = /include/
+
+# data keywords
+keyword BRACES = /\{/
+keyword BRACES_CLOSE = /\}/
+keyword PARENTHESES = /\(/
+keyword PARENTHESES_CLOSE = /\)/
+keyword BRACKETS = /\[/
+keyword BRACKETS_CLOSE = /\]/
+keyword OPSUM = /\+/
+keyword OPSUBTRACT = /\-/
+keyword OPTIMES = /\*/
+keyword OPDIVIDE = /\//
+keyword OPPOW = /\^/
+keyword OPMODULE = /\%/
+keyword EQUAL = /\=/
+keyword DOUBLEDOT = /\:/
+keyword DOT = /\./
+keyword COMMA = /,/
+keyword IN = /in/
+keyword NOT = /not/
+keyword BIGGEREQUAL = />=/
+keyword SMALLEREQUAL = /<=/
+keyword BIGGER = />/
+keyword SMALLER = /</
+keyword AND = /and/
+keyword OR = /or/
+keyword XOR = /xor/
+keyword INT = /int/
+keyword STRING = /string/
+keyword DECIMAL = /decimal/
+keyword BOOL = /bool/
+keyword CHAR = /char/
+keyword ANY = /any/
+keyword LIST = /list/
+keyword MAP = /map/
+keyword TUPLE = /tuple/
+key NULLVALUE = /null/
+key NEW = /new/
+
+# flow keywords
 contextual key IF = /if/
 contextual key ELSE = /else/
 contextual key FOR = /for/
 contextual key WHILE = /while/
-key IN = /in/
-key IS = /is/
-key NOT = /not/
-key BIGGEREQUAL = />=/
-key SMALLEREQUAL = /<=/
-key BIGGER = />/
-key SMALLER = /</
-key AND = /and/
-key OR = /or/
-key XOR = /xor/
-key INT = /int/
-key STRING = /string/
-key DECIMAL = /decimal/
-key BOOL = /bool/
-key CHAR = /char/
-key ANY = /any/
-key LIST = /list/
-key MAP = /map/
-key TUPLE = /tuple/
-key DOCTREE = /doctree/
-contextual key KEY = /key/
-key NULLVALUE = /null/
-key NEW = /new/
+
+# value keywords
+identity key ID = /[A-Za-z_][A-Za-z_0-9]*/
+key STRINGVALUE = /\".*?\/
+key INTEGERVALUE = /[+-]?[0-9]+/
+key DOUBLEVALUE = /[+-]?[0-9]*"."[0-9]+/
+key CHARVALUE = /\'.\'/
+key BOOLVALUE = /[true|false]/
+
+# temp keywords
+contextual key PARSE = /parse/
+key LAMBDA = /=>/
 key OVERRIDE = /override/
 contextual key ENTITY = /enity/
 contextual key PARTIAL = /partial/
@@ -127,31 +164,13 @@ key GET = /get/
 key SET = /set/
 key VALUE = /value/
 contextual key CONSTRUCTOR = /constructor/
-contextual key RULE = /rule/
 contextual key COMPILER = /compiler/
-key START = /start/
 contextual key FOLDER = /folder/
 contextual key FILE = /file/
 contextual key TITLE = /title/
 contextual key CONTENT = /content/
-key CONTEXTUAL = /contextual/
 key OPEN = /open/
 key PRINT = />>/
-contextual key PARSE = /parse/
-key NEWLINE = /newline/
-key TAB = /tab/
-key SPACE = /space/
-contextual key USING = /using/
-contextual key INCLUDE = /include/
-key IDENTITY = /identity/
-identity key ID = /[A-Za-z_][A-Za-z_0-9]*/
-key STRINGVALUE = /\".*?\/
-key INTEGERVALUE = /[+-]?[0-9]+/
-key DOUBLEVALUE = /[+-]?[0-9]*"."[0-9]+/
-key CHARVALUE = /\'.\'/
-key BOOLVALUE = /[true|false]/
-key EXPRESSION = //.*?//
-key OPDIVIDE = /\//
 
 #############################################################################################################
 ############################################  Entity definition  ############################################
@@ -717,3 +736,8 @@ compiler langcompiler(tuple string files):
 		parse open file
 	flexfile()
 	src()
+
+##########################################################################################################
+###########################################  Error definition  ###########################################
+
+error TabulationError
