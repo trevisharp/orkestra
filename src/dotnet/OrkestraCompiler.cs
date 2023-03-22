@@ -20,6 +20,8 @@ public class OrkestraCompiler : Compiler
     Rule rule_key;
     Rule rule_start;
 
+    Processing processing1;
+
     public OrkestraCompiler()
     {
         rule_key = Rule.CreateRule("key",
@@ -31,6 +33,13 @@ public class OrkestraCompiler : Compiler
         rule_start.AddSubRules(
             SubRule.Create(rule_key, rule_start),
             SubRule.Create(rule_key)
+        );
+
+        processing1 = Processing.FromFunction(
+            text =>
+            {
+                return text;
+            }
         );
     }
 }

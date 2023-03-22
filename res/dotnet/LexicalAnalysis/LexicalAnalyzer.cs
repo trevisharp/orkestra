@@ -9,11 +9,22 @@ using Processings;
 public class LexicalAnalyzer
 {
     public List<Key> Keys { get; private set; } = new List<Key>();
-    public void Add(Key key) => this.Keys.Add(key);
+    public void Add(Key key) 
+        => this.Keys.Add(key);
 
     public IEnumerable<Token> Parse(Text text)
     {
-        throw new NotImplementedException();
+        var sources = text.ToSources();
+        foreach (var source in sources)
+        {
+            if (source is Token tk)
+                yield return tk;
+            else if (source is string str)
+            {
+                foreach (var token in this.Parse(str))
+                    yield return token;
+            }
+        }
     }
 
     public IEnumerable<Token> Parse(string code)

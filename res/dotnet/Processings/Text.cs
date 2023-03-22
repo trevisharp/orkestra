@@ -8,30 +8,42 @@ namespace Orkestra.Processings;
 
 using LexicalAnalysis;
 using InternalStructure;
+using System.Text.RegularExpressions;
 
 /// <summary>
 /// A Tree Pointer for Text elements
 /// </summary>
 public unsafe class Text : IEnumerable<Text>
 {
+    private UnityType crrUnity = 0;
+    private int crrIndex = -1;
+    private Text crrChild = null;
+
     private Text parent = null;
-    private FastList<Text> children = null;
-    private Text current = null;
-    private void* source = null;
+    private FastList<Text> lines = null;
+    
+    private Token tokenSource = null;
 
-    private Text(IEnumerable<string> lines)
+    private UnityType type;
+    private string stringSource = null;
+    private int sourceStart = -1;
+    private int sourceEnd = -1;
+
+    private Text(string source)
     {
-        throw new NotImplementedException();
+        this.type = UnityType.All;
+        this.stringSource = source;
+        this.sourceStart = 0;
+        this.sourceEnd = source.Length;
     }
 
-    private Text(string text)
+    private Text(Text parent, UnityType newUnity, int start, int end)
     {
-        throw new NotImplementedException();
-    }
-
-    private Text(Text parent, UnityType type)
-    {
-        throw new NotImplementedException();
+        this.type = newUnity;
+        this.parent = parent;
+        this.stringSource = parent.stringSource;
+        this.sourceStart = start;
+        this.sourceEnd = end;
     }
 
     /// <summary>
@@ -41,7 +53,11 @@ public unsafe class Text : IEnumerable<Text>
     /// <returns>Return true if the expression and text match</returns>
     public bool Is(string str)
     {
-        throw new NotImplementedException();
+        Regex regex = new Regex(str);
+        var match = regex.Match(
+            this.stringSource, this.sourceStart
+        );
+        return match.Success;
     }
 
     /// <summary>
@@ -123,31 +139,73 @@ public unsafe class Text : IEnumerable<Text>
     {
         throw new NotImplementedException();
     }
-
+    
     /// <summary>
-    /// Reset processing.
+    /// Return pointers for lines
     /// </summary>
-    public void Reset()
+    public IEnumerable<Text> Lines
     {
-        throw new NotImplementedException();
-    }
+        get
+        {
+            if (this.stringSource == null)
+                yield break;
+            
+            if (this.lines != null)
+            {
+                foreach (var child in this.lines)
+                    yield return child;
+                
+                yield break;
+            }
 
-    /// <summary>
-    /// Return a Text pointer to lines of current unity
-    /// </summary>
-    public Text Lines =>
-        throw new NotImplementedException();
+            this.lines = new FastList<Text>();
+            
+            int j = sourceStart;
+            for (int i = sourceStart; i < sourceEnd; i++)
+            {
+                if (this.stringSource[i] != '\n')
+                    continue;
+
+                Text line = new Text(this,
+                    UnityType.Line, j, i
+                );
+                this.lines.Add(line);
+
+                this.crrChild = line;
+                this.crrUnity = UnityType.Line; 
+                j = i;
+
+                yield return line;
+            }
+        }
+    }
 
     /// <summary>
     /// Return a Text pointer to characters of current unity
     /// </summary>
-    public Text Characters =>
-        throw new NotImplementedException();
+    public IEnumerable<Text> Characters
+    {
+        get
+        {
+            Text temp = new Text(this, 
+                UnityType.Character, this.sourceStart, this.sourceStart + 1
+            );
+
+            for (int i = this.sourceStart; i < this.sourceEnd; i++)
+            {
+                temp.sourceStart = i;
+                temp.sourceEnd = i + 1;
+                yield return temp;
+            }
+        }
+    }
 
     public IEnumerator<Text> GetEnumerator()
-    {
-        throw new NotImplementedException();
-    }
+        => this.type switch
+        {
+            UnityType.All => Lines.GetEnumerator(),
+            _ => Characters.GetEnumerator()
+        };
 
     IEnumerator IEnumerable.GetEnumerator()
         => GetEnumerator();
@@ -172,20 +230,24 @@ public unsafe class Text : IEnumerable<Text>
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Return a array of texts splited by possible
+    /// inserted tokens.
+    /// </summary>
+    /// <returns>A object array of string and Token objects</returns>
+    public object[] ToSources()
+    {
+        throw new NotImplementedException();
+    }
+
     public static Text FromFile(string path)
     {
-        Text text = new Text(open());
+        StreamReader reader = new StreamReader(path);
+        string source = reader.ReadToEnd();
+        reader.Close();
+
+        Text text = new Text(source);
         return text;
-
-        IEnumerable<string> open()
-        {
-            StreamReader reader = new StreamReader(path);
-
-            while (!reader.EndOfStream)
-                yield return reader.ReadLine();
-
-            reader.Close();
-        }
     }
 
     public static implicit operator string(Text text)

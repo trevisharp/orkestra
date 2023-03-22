@@ -2,7 +2,8 @@ namespace Orkestra.Processings;
 
 public enum UnityType
 {
-    All = 2,
-    Line = 1,
-    Character = 0
+    None = 0,
+    All = 1,
+    Line = 2,
+    Character = 4
 }

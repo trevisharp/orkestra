@@ -54,14 +54,13 @@ processing all:
 ############################################  Key definition  ############################################
 
 # auto keywords
-auto keyword ENDFILE
-auto keyword ENDLINE
-auto keyword STARTBLOCK
-auto keyword ENDBLOCK
+keyword ENDFILE
+keyword ENDLINE
+keyword STARTBLOCK
+keyword ENDBLOCK
 
 # processing keywords
 keyword PROCESSING = /processing/
-keyword IS = /is/
 keyword NEWLINE = /newline/
 keyword TAB = /tab/
 keyword SPACE = /space/
@@ -79,7 +78,6 @@ contextual keyword REPLACE = /replace/
 # keys keywords
 contextual keyword KEY = /key/
 contextual keyword KEYWORD = /keyword/
-contextual keyword AUTO = /auto/
 contextual keyword CONTEXTUAL = /contextual/
 key EXPRESSION = //.*?//
 
@@ -87,6 +85,7 @@ key EXPRESSION = //.*?//
 contextual keyword RULE = /rule/
 keyword START = /start/
 contextual keyword IDENTITY = /identity/
+keyword INHERITS = /inherits/
 
 # imports keywords
 contextual keyword IMPORT = /import/
@@ -110,6 +109,7 @@ keyword EQUAL = /\=/
 keyword DOUBLEDOT = /\:/
 keyword DOT = /\./
 keyword COMMA = /,/
+keyword IS = /is/
 keyword IN = /in/
 keyword NOT = /not/
 keyword BIGGEREQUAL = />=/
@@ -132,10 +132,10 @@ key NULLVALUE = /null/
 key NEW = /new/
 
 # flow keywords
-contextual key IF = /if/
-contextual key ELSE = /else/
-contextual key FOR = /for/
-contextual key WHILE = /while/
+contextual keyword IF = /if/
+contextual keyword ELSE = /else/
+contextual keyword FOR = /for/
+contextual keyword WHILE = /while/
 
 # value keywords
 identity key ID = /[A-Za-z_][A-Za-z_0-9]*/
@@ -145,19 +145,25 @@ key DOUBLEVALUE = /[+-]?[0-9]*"."[0-9]+/
 key CHARVALUE = /\'.\'/
 key BOOLVALUE = /[true|false]/
 
+# functions keywords
+contextual keyword FUNCTION = /function/
+contextual keyword PARSE = /parse/
+keyword RETURN = /return/
+keyword PRINT = />>/
+keyword LAMBDA = /=>/
+
+# errors keywords
+contextual keyword THROW = /throw/
+contextual keyword ERROR = /error/
+
 # temp keywords
-contextual key PARSE = /parse/
-key LAMBDA = /=>/
 key OVERRIDE = /override/
 contextual key ENTITY = /enity/
 contextual key PARTIAL = /partial/
 contextual key FULL = /full/
 key THIS = /this/
 key BASE = /base/
-contextual key FUNCTION = /function/
 contextual key METHOD = /method/
-key RETURN = /return/
-key INHERITS = /inherits/
 contextual key PROPERTY = /property/
 key READONLY = /readonly/
 key GET = /get/
@@ -170,241 +176,51 @@ contextual key FILE = /file/
 contextual key TITLE = /title/
 contextual key CONTENT = /content/
 key OPEN = /open/
-key PRINT = />>/
-
-#############################################################################################################
-############################################  Entity definition  ############################################
-
-full entity CodeEntity:
-	method file gerateCode()
-
-entity Key inherits CodeEntity:
-	property string Name
-	property string Expression
-	property bool isAssociative
-	property string AssociateType
-	property bool isContextual
-	property bool isIdentity
-
-entity Command inherits CodeEntity
-
-entity CommandBlock inherits CodeEntity:
-	property list Command Commands = []
-	method add_command(command):
-		this.Commands.Add(command)
-
-entity Data inherits CodeEntity
-
-entity ScopeCommand inherits Command:
-	property CommandBlock Block
-
-entity Condition inherits CodeEntity
-
-entity Comparation inherits Condition:
-	property Data LeftData = null
-	property Data RightData = null
-	property int ComparationType = 0
-
-entity Relation inherits Condition:
-	property Condition LeftCondition = null
-	property Condition RightCondition = null
-	property int RelationType = 0 
-
-entity If inherits ScopeCommand:
-	property Condition Condition
-
-entity ElseIf inherits ScopeCommand:
-	property Condition Condition
-
-entity Else inherits ScopeCommand
-
-entity IfStructure inherits Command:
-	property If If
-	property list ElseIf Elifs
-	property Else Else = null
-
-entity RuleBody inherits ScopeCommand:
-	property list string Expression = []
-
-entity Rule inherits CodeEntity:
-	property string Name
-	property list RuleBody Body = []
-
-####################################################################################################################
-############################################  Code Geration definition  ############################################
-
-partial entity ElseIf:
-	override file gerateCode():
-		>> "else if (" this.Condition.gerateCode() ")" newline
-		>> "{" newline
-		>> tab this.Block.gerateCode()
-		>> "}" newline
-
-partial entity If:
-	override file gerateCode():
-		>> "if (" this.Condition.gerateCode() ")" newline
-		>> "{" newline
-		>> tab this.Block.gerateCode()
-		>> "}" newline
-
-partial entity Else:
-	override file gerateCode():
-		>> "else" newline
-		>> "{" newline
-		>> tab this.Block.gerateCode()
-		>> "}" newline
-
-partial entity IfStructure:
-	override file gerateCode():
-		>> if.gerateCode()
-		for elif in this.Elifs:
-			>> elif.gerateCode()
-		if this.else not is null:
-			>> else.gerateCode()
-
-partial entity Key:
-	override file gerateCode():
-		>> "lc.Key" this.Name " = (\"" this.Name ", \"" this.Expression "\");" newline
-
-partial entity RuleBody:
-	override file gerateCode():
-		for exp in Expression:
-			>> exp + " "
-		if Code not is null:
-			>> Block.gerateCode()
-
-partial entity Rule:
-	override file gerateBody():
-		>> ": " rb.gerateCode()
-		for rb in Body:
-			>> "| " rb.gerateCode()
-		>> ";"
-	override file gerateCode():
-		>> this.Name newline
-		>> tab + this.gerateBody()
 
 ###########################################################################################################
 ############################################  Rule definition  ############################################
 
-rule processing:
-	PROCESSING ALL DOUBLEDOT ENDLINE commandBlock
-	PROCESSING LINE DOUBLEDOT ENDLINE commandBlock
-	PROCESSING CHARACTER DOUBLEDOT ENDLINE commandBlock
-
 rule basetype:
-	INT => "int"
-	STRING => "string"
-	DECIMAL => "double"
-	BOOL => "bool"
-	CHAR => "char"
-	ANY => "any"
+	{INT STRING DECIMAL BOOL CHAR ANY}
 
 rule type:
 	basetype
 	TUPLE type
 	LIST type
 	MAP basetype type
-	DOCTREE
 	TUPLE
 	LIST
 	MAP basetype
-	ID
-
-rule ruleexpression:
-	IDENTITY ruleexpression
-	IDENTITY
-	identity ruleexpression
 	identity
 
-rule ruleelement:
-	ruleexpression DOUBLEDOT ENDLINE STARTBLOCK ENDBLOCK
-	ruleexpression ENDLINE
+rule dataCollection:
+	{[data COMMA]} data
+	
+rule listvalue:
+	BRACKETS {dataCollection} BRACKETS_CLOSE
 
-rule rulebody:
-	ruleelement rulebody
-	ruleelement
+rule mapkey:
+	data DOUBLEDOT data
 
-rule rule:
-	RULE identity DOUBLEDOT ENDLINE STARTBLOCK rulebody ENDBLOCK
+rule mapkeycollection:
+	mapkey COMMA ENDLINE mapkeycollection
+	mapkey COMMA mapkeycollection
+	mapkey ENDLINE
+	mapkey
 
-rule key:
-	KEY ID EQUAL EXPRESSION ENDLINE:
-		Key key = new Key()
-		key.Name = this[1]
-		key.Expression = this[3]
-		g.add_key(key)
-	KEY ID EQUAL EXPRESSION ASSOCIATE basetype ENDLINE:
-		Key key = new Key()
-		key.Name = this[1]
-		key.Expression = this[3]
-		key.isAssociative = true
-		key.AssociateType = this[5]
-		g.add_key(key)
-	CONTEXTUAL KEY ID EQUAL EXPRESSION ENDLINE:
-		Key key = new Key()
-		key.Name = this[2]
-		key.Expression = this[4]
-		key.isContextual = true
-		g.add_key(key)
-	CONTEXTUAL KEY ID EQUAL EXPRESSION ASSOCIATE basetype ENDLINE:
-		Key key = new Key()
-		key.Name = this[2]
-		key.Expression = this[4]
-		key.isAssociative = true
-		key.AssociateType = this[6]
-		key.isContextual = true
-		g.add_key(key)
-	IDENTITY KEY ID EQUAL EXPRESSION ENDLINE:
-		Key key = new Key()
-		key.Name = this[2]
-		key.Expression = this[4]
-		key.isIdentity = true
-		g.add_key(key)
-	IDENTITY KEY ID EQUAL EXPRESSION ASSOCIATE basetype ENDLINE:
-		Key key = new Key()
-		key.Name = this[2]
-		key.Expression = this[4]
-		key.isAssociative = true
-		key.AssociateType = this[6]
-		key.isIdentity = true
-		g.add_key(key)
+rule mapvalue:
+	BRACES ENDLINE mapkeycollection BRACES_CLOSE
+	BRACES mapkeycollection BRACES_CLOSE
+	BRACES ENDLINE BRACES_CLOSE
+	BRACES BRACES_CLOSE
 
-rule startrule:
-	START RULE DOUBLEDOT ENDLINE STARTBLOCK rulebody ENDBLOCK
+rule tuplevalue:
+	PARENTHESES {[data]} PARENTHESES_CLOSE
 
-rule reference:
-	ID DOT reference
-	ID
-
-rule using:
-	USING reference ENDLINE
-
-rule include:
-	INCLUDE ID
-
-rule element:
-	key element
-	rule element
-	startrule element
-	variable element
-	function element
-	entity element
-	file element
-	folder element
-	compiler element
-	using element
-	include element
-	key
-	rule
-	startrule
-	variable
-	function
-	entity
-	file
-	folder
-	compiler
-	using
-	include
+rule collection:
+	listvalue
+	mapvalue
+	tuplevalue
 
 rule condition:
 	BOOLVALUE
@@ -420,6 +236,12 @@ rule condition:
 	condition XOR condition
 	NOT condition
 	PARENTHESES condition PARENTHESES_CLOSE
+	
+rule functionCall:
+	data PARENTHESES {dataCollection} PARENTHESES_CLOSE
+	
+rule indexer:
+	data BRACKETS data BRACKETS_CLOSE
 
 rule data:
 	data OPSUM data
@@ -437,68 +259,18 @@ rule data:
 	EXPRESSION
 	NULLVALUE
 	condition
+	functionCall
 	collection
 	indexer
-	THIS
-	BASE
-	NEW ID PARENTHESES PARENTHESES_CLOSE
-	NEW ID PARENTHESES paramcollection PARENTHESES_CLOSE
-	functioncall
-	PARENTHESES data PARENTHESES_CLOSE
-	data DOT ID
+	data DOT identity
 	NEWLINE
 	SPACE
 	TAB
-	ID
-	VALUE
-
-rule variable:
+	PARENTHESES data PARENTHESES_CLOSE
 	identity
-	type identity
-	type identity EQUAL data
 
-rule itemcollection:
-	data COMMA itemcollection
-	data
-
-rule functioncall:
-	ID PARENTHESES PARENTHESES_CLOSE
-	ID PARENTHESES itemcollection PARENTHESES_CLOSE
-	data DOT functioncall
-
-rule listvalue:
-	BRACKETS itemcollection BRACKETS_CLOSE
-	BRACKETS BRACKETS_CLOSE
-
-rule mapkey:
-	data DOUBLEDOT data
-
-rule mapkeycollection:
-	mapkey COMMA mapkeycollection
-	mapkey
-
-rule mapvalue:
-	BRACES mapkeycollection BRACES_CLOSE
-	BRACES BRACES_CLOSE
-
-rule tuplevalue:
-	PARENTHESES itemcollection PARENTHESES_CLOSE
-	PARENTHESES PARENTHESES_CLOSE
-
-rule doctreevalue:
-	OPEN data
-
-rule collection:
-	listvalue
-	mapvalue
-	tuplevalue
-
-rule indexer:
-	data BRACKETS data BRACKETS_CLOSE
-
-rule paramcollection:
-	variable COMMA paramcollection
-	variable
+rule text:
+	[data]
 
 rule if:
 	IF condition DOUBLEDOT ENDLINE commandBlock
@@ -517,225 +289,121 @@ rule ifstructure:
 	if elseif else
 
 rule operation:
-	OPSUM
-	OPSUBTRACT
-	OPTIMES
-	OPDIVIDE
-	OPMODULE
-	OPPOW
+	{OPSUM OPSUBTRACT OPTIMES OPDIVIDE OPMODULE OPPOW}
 
-rule command:
-	functioncall ENDLINE
-	ifstructure
-	processing
+rule print:
+	PRINT text
+
+rule parse:
+	PARSE data
+
+rule variable:
+	identity
+	identity EQUAL data
+	type identity
+	type identity EQUAL data
+
+rule loop:
 	FOR identity IN collection DOUBLEDOT ENDLINE commandBlock
 	FOR type identity IN collection DOUBLEDOT ENDLINE commandBlock
-	FOR condition DOUBLEDOT ENDLINE commandBlock
 	WHILE condition DOUBLEDOT ENDLINE commandBlock
+
+rule throw:
+	THROW identity
+
+rule command:
+	functionCall ENDLINE
 	identity EQUAL data ENDLINE
 	identity operation EQUAL data ENDLINE
 	RETURN data ENDLINE
 	print ENDLINE
 	parse ENDLINE
 	BREAK ENDLINE
-	COMPLETE ENDLINE
-	JUMP ENDLINE
 	CONTINUE ENDLINE
-	SKIP ENDLINE
-	NEXT ENDLINE
 	variable ENDLINE
+	ifstructure
+	throw
+	loop
+
+rule commandBlock:
+	STARTBLOCK [command] ENDBLOCK
+
+rule processingCommand inherits command:
+	COMPLETE
+	DISCARD
+	APPEND text
+	PREPEND text
+	REPLACE text
+	processing
+
+rule processingCommandBlock:
+	STARTBLOCK [processingCommand] ENDBLOCK
+
+rule processing:
+	PROCESSING ALL DOUBLEDOT ENDLINE processingCommandBlock
+	PROCESSING LINE DOUBLEDOT ENDLINE processingCommandBlock
+	PROCESSING CHARACTER DOUBLEDOT ENDLINE processingCommandBlock
+
+rule key:
+	{CONTEXTUAL IDENTITY} {KEY KEYWORD} ID {(EQUAL EXPRESSION)} ENDLINE
+
+rule ruleelement:
+	[{IDENTITY identity}] ENDLINE
+
+rule rule:
+	RULE identity DOUBLEDOT ENDLINE STARTBLOCK [ruleelement] ENDBLOCK
+	RULE identity
+
+rule startrule:
+	START RULE DOUBLEDOT ENDLINE
+
+rule reference:
+	identity DOT reference
+	identity
+
+rule using:
+	USING reference ENDLINE
+
+rule include:
+	INCLUDE reference ENDLINE
+
+rule import:
+	IMPORT reference ENDLINE
+
+rule element:
+	[{key rule startrule variable function using include import error}]
+
+rule doctreevalue:
+	OPEN data
+
+rule paramcollection:
+	variable COMMA paramcollection
+	variable
 
 rule lambda:
 	LAMBDA data
 	LAMBDA command
-
-rule commandcollection:
-	command
-	command commandcollection
-
-rule commandBlock:
-	STARTBLOCK commandcollection ENDBLOCK
 
 rule codedefinition:
 	ENDLINE commandBlock
 	lambda
 	ENDLINE STARTBLOCK lambda ENDBLOCK
 
-
-rule method:
-	METHOD ID PARENTHESES PARENTHESES_CLOSE codedefinition
-	METHOD ID PARENTHESES paramcollection PARENTHESES_CLOSE codedefinition
-	METHOD type ID PARENTHESES PARENTHESES_CLOSE codedefinition
-	METHOD type ID PARENTHESES paramcollection PARENTHESES_CLOSE codedefinition
-	METHOD ID PARENTHESES PARENTHESES_CLOSE ENDLINE
-	METHOD ID PARENTHESES paramcollection PARENTHESES_CLOSE ENDLINE
-	METHOD type ID PARENTHESES PARENTHESES_CLOSE ENDLINE
-	METHOD type ID PARENTHESES paramcollection PARENTHESES_CLOSE ENDLINE
-	OVERRIDE ID PARENTHESES PARENTHESES_CLOSE codedefinition
-	OVERRIDE ID PARENTHESES paramcollection PARENTHESES_CLOSE codedefinition
-	OVERRIDE type ID PARENTHESES PARENTHESES_CLOSE codedefinition
-	OVERRIDE type ID PARENTHESES paramcollection PARENTHESES_CLOSE codedefinition
-
 rule function:
-	FUNCTION ID PARENTHESES PARENTHESES_CLOSE codedefinition
-	FUNCTION ID PARENTHESES paramcollection PARENTHESES_CLOSE codedefinition
-	FUNCTION type ID PARENTHESES PARENTHESES_CLOSE codedefinition
-	FUNCTION type ID PARENTHESES paramcollection PARENTHESES_CLOSE codedefinition
-	FUNCTION ID PARENTHESES PARENTHESES_CLOSE ENDLINE
-	FUNCTION ID PARENTHESES paramcollection PARENTHESES_CLOSE ENDLINE
-	FUNCTION type ID PARENTHESES PARENTHESES_CLOSE ENDLINE
-	FUNCTION type ID PARENTHESES paramcollection PARENTHESES_CLOSE ENDLINE
+	FUNCTION identity PARENTHESES PARENTHESES_CLOSE codedefinition
+	FUNCTION identity PARENTHESES paramcollection PARENTHESES_CLOSE codedefinition
+	FUNCTION type identity PARENTHESES PARENTHESES_CLOSE codedefinition
+	FUNCTION type identity PARENTHESES paramcollection PARENTHESES_CLOSE codedefinition
+	FUNCTION identity PARENTHESES PARENTHESES_CLOSE ENDLINE
+	FUNCTION identity PARENTHESES paramcollection PARENTHESES_CLOSE ENDLINE
+	FUNCTION type identity PARENTHESES PARENTHESES_CLOSE ENDLINE
+	FUNCTION type identity PARENTHESES paramcollection PARENTHESES_CLOSE ENDLINE
 
-rule entity:
-	ENTITY ID DOUBLEDOT ENDLINE STARTBLOCK entitybody ENDBLOCK
-	ENTITY ID ENDLINE
-	ENTITY ID INHERITS ID DOUBLEDOT ENDLINE STARTBLOCK entitybody ENDBLOCK
-	ENTITY ID INHERITS ID ENDLINE
-	FULL ENTITY ID DOUBLEDOT ENDLINE STARTBLOCK entitybody ENDBLOCK
-	FULL ENTITY ID ENDLINE
-	FULL ENTITY ID INHERITS ID DOUBLEDOT ENDLINE STARTBLOCK entitybody ENDBLOCK
-	FULL ENTITY ID INHERITS ID ENDLINE
-	PARTIAL ENTITY ID DOUBLEDOT ENDLINE STARTBLOCK entitybody ENDBLOCK
-	PARTIAL ENTITY ID ENDLINE
-
-rule constructor:
-	CONSTRUCTOR PARENTHESES PARENTHESES_CLOSE DOUBLEDOT ENDLINE commandBlock
-	CONSTRUCTOR PARENTHESES paramcollection PARENTHESES_CLOSE DOUBLEDOT ENDLINE commandBlock
-	CONSTRUCTOR PARENTHESES PARENTHESES_CLOSE ENDLINE
-	CONSTRUCTOR PARENTHESES_CLOSE itemcollection PARENTHESES_CLOSE ENDLINE 
-
-rule getdefinition:
-	GET ENDLINE
-	GET codedefinition
-
-rule setdefinition:
-	SET ENDLINE
-	SET codedefinition
-
-rule getsetdefinition:
-	getdefinition
-	setdefinition
-	getdefinition setdefinition
-	setdefinition getdefinition
-
-rule property:
-	PROPERTY variable ENDLINE
-	PROPERTY READONLY variable ENDLINE
-	PROPERTY variable DOUBLEDOT ENDLINE STARTBLOCK getsetdefinition ENDBLOCK
-
-rule entitybody:
-	property entitybody
-	function entitybody
-	constructor entitybody
-	variable entitybody
-	READONLY variable entitybody
-	method entitybody
-	property variable
-	function
-	constructor
-	READONLY variable
-	method
-
-rule print:
-	PRINT text
-
-rule text:
-	data text
-	data
-
-rule parse:
-	PARSE data
-
-rule title:
-	TITLE DOUBLEDOT ENDLINE commandBlock
-	TITLE lambda ENDLINE
-	TITLE
-
-rule content:
-	CONTENT DOUBLEDOT ENDLINE commandBlock
-	CONTENT lambda ENDLINE
-	CONTENT
-
-rule docbody:
-	title content
-	content title
-	title
-
-rule file:
-	FILE ID PARENTHESES PARENTHESES_CLOSE DOUBLEDOT ENDLINE STARTBLOCK docbody ENDBLOCK
-	FILE ID PARENTHESES paramcollection PARENTHESES_CLOSE DOUBLEDOT ENDLINE STARTBLOCK docbody ENDBLOCK
-
-rule folder:
-	FOLDER ID PARENTHESES PARENTHESES_CLOSE DOUBLEDOT ENDLINE STARTBLOCK docbody ENDBLOCK
-	FOLDER ID PARENTHESES paramcollection PARENTHESES_CLOSE DOUBLEDOT ENDLINE STARTBLOCK docbody ENDBLOCK
-
-rule compiler:
-	COMPILER ID PARENTHESES PARENTHESES_CLOSE DOUBLEDOT ENDLINE commandBlock
-	COMPILER ID PARENTHESES paramcollection PARENTHESES_CLOSE DOUBLEDOT ENDLINE commandBlock
+rule error:
+	ERROR identity
 
 start rule:
-	element ENDFILE
-	ENDFILE
-
-############################################################################################################
-############################################  Graph definition  ############################################
-
-entity Graph:
-	property list Key keys = []
-	method add_key(key):
-		keys.Add(key)
-
-Graph g = new Graph()
-
-###########################################################################################################
-############################################  File definition  ############################################
-
-file flexfile():
-	title => "lex.l"
-	content:
-		>> "%{" newline
-		>> tab "#include <string.h>" newline
-		>> tab "#include <stdlib.h>" newline
-		>> tab "#include bison.tab.h" newline
-		>> "%}" newline
-		>> newline "%%" newline newline
-		for k in g.keys:
-			>> k.gerateCode()
-		>> newline "%%" newlin newline
-		>> "int yywrap()" newline
-		>> "{" newline
-		>> tab "return 1;" newline
-		>> "}"
-
-file filestructures_cpp():
-	title => "FileStructures.cpp"
-	content:
-		>> "#ifndef FILESTRUCTURES_H" newline
-		>> "#define FILESTRUCTURES_H" newline newline
-		>> "#include <string>" newline
-		>> "using namespace std;" newline newline
-		>> "class FileStructures" newline
-		>> "{" newline
-		>> "public:" newline
-		>> "};" newline 
-		>> "#endif"
-
-#############################################################################################################
-############################################  Folder definition  ############################################
-
-folder src():
-	title => "src"
-	content
-		filestructures_cpp()
-
-#################################################################################################################
-############################################  Compilator definition  ############################################
-
-compiler langcompiler(tuple string files):
-	for file in files:
-		parse open file
-	flexfile()
-	src()
+	element {ENDFILE}
 
 ##########################################################################################################
 ###########################################  Error definition  ###########################################
