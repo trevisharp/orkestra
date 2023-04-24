@@ -1,5 +1,10 @@
 public class OrkestraCompiler : Compiler
 {
+    Key key_ENDFILE = Key.CreateAutoKeyword("ENDFILE");
+    Key key_ENDLINE = Key.CreateAutoKeyword("ENDLINE");
+    Key key_STARTBLOCK = Key.CreateAutoKeyword("STARTBLOCK");
+    Key key_ENDBLOCK = Key.CreateAutoKeyword("ENDBLOCK");
+    
     Key key_IF = Key.CreateKeyword("IF", "if");
     Key key_FOR = Key.CreateKeyword("FOR", "for");
     Key key_INT = Key.CreateKeyword("INT", "int");
@@ -11,10 +16,6 @@ public class OrkestraCompiler : Compiler
     Key key_KEY = Key.CreateKeyword("KEY", "key");
     Key key_CONTEXTUAL = Key.CreateKeyword("CONTEXTUAL", "contextual");
     Key key_EXPRESSION = Key.CreateKey("EXPRESSION", "\\/.*?\\/");
-    Key key_ENDFILE = Key.CreateAutoKeyword("ENDFILE");
-    Key key_ENDLINE = Key.CreateAutoKeyword("ENDLINE");
-    Key key_STARTBLOCK = Key.CreateAutoKeyword("STARTBLOCK");
-    Key key_ENDBLOCK = Key.CreateAutoKeyword("ENDBLOCK");
     Key key_ID = Key.CreateIdentity("ID", "[A-Za-z_][A-Za-z0-9_]*");
 
     Rule rule_key;
