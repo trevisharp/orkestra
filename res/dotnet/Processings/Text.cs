@@ -100,6 +100,14 @@ public class Text
         this.pointerStack.Push(step);
     }
 
+    public string Current
+    {
+        get
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public bool NextLine()
     {
         var step = this.pointerStack.Peek();
@@ -190,6 +198,16 @@ public class Text
             return false;
 
         return true;
+    }
+
+    public bool Is(char character)
+    {
+        var step = this.pointerStack.Peek();
+        var index = step.Index;
+
+        return
+            index < this.source.Count && 
+            this.source[index].Character == character;
     }
 
     private void append(Data data)
@@ -377,17 +395,17 @@ public class Text
 
     public void Replace(string str)
     {
-
+        throw new NotImplementedException();
     }
 
     public void Replace(Token token)
     {
-
+        throw new NotImplementedException();
     }
 
     public void Replace(Key baseKey)
     {
-        
+        throw new NotImplementedException();
     }
 
     public void Break()
@@ -423,17 +441,17 @@ public class Text
 
     public void Complete()
     {
-
+        throw new NotImplementedException();
     }
 
     public void Continue()
     {
-        
+        throw new NotImplementedException();
     }
 
     public void Discard()
     {
-
+        throw new NotImplementedException();
     }
 
     public object[] ToSources()
@@ -441,7 +459,7 @@ public class Text
         throw new NotImplementedException();
     }
 
-    public override string ToString()
+    private string toString()
     {
         StringBuilder sb = new StringBuilder();
         foreach (var data in this.source)
@@ -451,6 +469,44 @@ public class Text
             else sb.Append(data.Token);
         }
         return sb.ToString();
+    }
+
+    public override string ToString()
+    {
+        if (this.pointerStack.Count == 0 || this.pointerStack.Peek().Type == UnityType.All)
+            return toString();
+        
+        var step = this.pointerStack.Peek();
+        var type = step.Type;
+        var index = step.Index;
+
+        if (type == UnityType.Line)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            var start = getStartLineIndex(step);
+            var end = getEndLineIndex(step);
+            for (int i = start; i < end; i++)
+            {
+                var data = this.source[i];
+                if (data.Token is null)
+                    sb.Append(data.Character);
+                else sb.Append(data.Token);
+            }
+            
+            return sb.ToString();
+        }
+
+        if (type == UnityType.Character)
+        {
+            var data = this.source[index];
+            if (data.Token is null)
+                return data.Character.ToString();
+            
+            return data.Token.ToString();
+        }
+
+        return "";
     }
 
     public static Text FromFile(string path)

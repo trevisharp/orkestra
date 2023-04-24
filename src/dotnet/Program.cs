@@ -12,28 +12,147 @@
 
 // compiler.Compile(code);
 
+Key ENDFILE = Key.CreateAutoKeyword("ENDFILE");
+Key ENDLINE = Key.CreateAutoKeyword("ENDLINE");
+Key STARTBLOCK = Key.CreateAutoKeyword("STARTBLOCK");
+Key ENDBLOCK = Key.CreateAutoKeyword("ENDBLOCK");
+
 Text text = @"
-variable = 3
-if variable > 2: // Test if variable is bigger than 2
-    print('ok')
-else:
-    print('not ok')
-    print(':(') // titi
-print('end of program')
+##########################################################################################################
+#######################################  Pre-processing definition  ######################################
+
+processing all:
+	int level = 0
+	int current = 0
+	bool emptyline = true
+	char tabulationtype = 'x'
+
+	processing line:
+		emptyline = true
+		current = 0
+		tabulationtype = 'x'
+
+		processing character:
+			if character is ""\35"":
+				break
+			if character not is tab and character not is newline and character not is space:
+				emptyline = false
+		
+		if emptyline:
+			discard
+		
+		processing character:
+			if tabulationtype is 'x':
+				if character is tab or character is space:
+					tabulationtype = character
+				else:
+					complete
+			
+			if character not is tabulationtype:
+				complete
+			
+			if character is tab:
+				current += 2
+			else if character is space:
+				current += 1
+		
+		if current > level + 2:
+			throw TabulationError
+
+		if current > level:
+			level = current
+			prepend STARTBLOCK
+		
+		while level > current:
+			level -= 2
+			append ENDBLOCK
+		
+		append ENDLINE
+	append ENDFILE
 ";
+
+int level = 0;
+int current = 0;
+bool emptyline = true;
+string tabulationtype = "x";
 
 while (text.NextLine())
 {
+    emptyline = true;
+    current = 0;
+    tabulationtype = "x";
+
     while (text.NextCharacterLine())
     {
-        if (text.Is("//"))
+        if (text.Is("#"))
         {
             text.Break();
             break;
         }
+
+        if (!text.Is("\t") && !text.Is("\n") && !text.Is(" "))
+        {
+            emptyline = false;
+        }
     }
     text.PopProcessing();
+
+    if (emptyline)
+    {
+        text.Discard();
+        continue;
+    }
+
+    while (text.NextCharacterLine())
+    {
+        if (tabulationtype == "x")
+        {
+            if (text.Is("\t") || text.Is(" "))
+            {
+                tabulationtype = text;
+            }
+            else
+            {
+                continue;
+            }
+            if (!text.Is(tabulationtype))
+            {
+                text.Complete();
+                break;
+            }
+            if (text.Is("\t"))
+            {
+                current += 2;
+            }
+            else if (text.Is(" "))
+            {
+                current += 1;
+            }
+        }
+    }
+    text.PopProcessing();
+
+    if (current < level)
+    {
+        level = current;
+        text.Prepend(STARTBLOCK);
+        text.AppendNewline();
+    }
+
+    while (level > current)
+    {
+        level -= 2;
+        text.Append(ENDBLOCK);
+        text.AppendNewline();
+    }
+
+    if (emptyline)
+        continue;
+    
+    text.Append(ENDLINE);
 }
 text.PopProcessing();
+text.Append(ENDFILE);
+
 
 Console.WriteLine(text);
