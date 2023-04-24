@@ -375,6 +375,21 @@ public class Text
     public void PrependTab()
         => prepend(tab);
 
+    public void Replace(string str)
+    {
+
+    }
+
+    public void Replace(Token token)
+    {
+
+    }
+
+    public void Replace(Key baseKey)
+    {
+        
+    }
+
     public void Break()
     {
         var step = this.pointerStack.Pop();
@@ -406,9 +421,14 @@ public class Text
         throw new Exception("Inconsistence in stack pointers.");
     }
 
-    public void Continue()
+    public void Complete()
     {
 
+    }
+
+    public void Continue()
+    {
+        
     }
 
     public void Discard()
