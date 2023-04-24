@@ -41,11 +41,11 @@ processing all:
 
 		if current > level:
 			level = current
-			append STARTBLOCK
+			prepend STARTBLOCK
 		
 		while level > current:
 			level -= 2
-			prepend ENDBLOCK
+			append ENDBLOCK
 		
 		append ENDLINE
 	append ENDFILE

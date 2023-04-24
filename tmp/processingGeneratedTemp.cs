@@ -1,35 +1,46 @@
+Key ENDFILE = new Key();
+Key ENDLINE = new Key();
+Key STARTBLOCK = new Key();
+Key ENDBLOCK = new Key();
+
+// ...
+
 Text processing1(Text txt)
 {
     int level = 0;
     int current = 0;
     bool emptyline = true;
     char tabulationtype = 'x';
-    foreach (var line in txt.Lines)
+
+    while (txt.NextLine())
     {
         emptyline = true;
         current = 0;
         tabulationtype = 'x';
 
-        foreach (var character in line.Characters)
+        while (txt.NextCharacterLine())
         {
-            if (character.Is("#"))
+            var character = txt.Current;
+            if (txt.Is("#"))
             {
                 character.Break();
                 break;
             }
+
             if (!character.Is("\t") && !character.Is("\n") && !character.Is(" "))
             {
                 emptyline = false;
             }
         }
+        txt.PopProcessing();
 
         if (emptyline)
         {
-            line.Jump();
+            line.Discard();
             continue;
         }
 
-        foreach (var character in line.Characters)
+        while (txt.NextCharacterLine())
         {
             if (tabulationtype == 'x')
             {
@@ -56,32 +67,26 @@ Text processing1(Text txt)
                 }
             }
         }
+        txt.PopProcessing();
 
-        foreach (var line in txt.Lines)
+        if (current < level)
         {
-            if (current < level)
-            {
-                level = current;
-                line2.Return("@startblock" + "\n" + line2);
-            }
+            level = current;
+            line2.Prepend(STARTBLOCK, "\n");
         }
 
         while (level > current)
         {
             level -= 2;
-            for (int p1 = 0; p1 < line.Lines.Count; p1++)
-            {
-                var line2 = all.Lines[p1];
-                line2.Return("@endblock" + "\n" + line2);
-            }
+            line.Append(ENDBLOCK, "\n");
         }
 
         if (emptyline)
-        {
             continue;
-        }
-        line.Return(line + " @endline");
+        
+        line.Append(ENDLINE);
     }
-    all.Return(all + " @endfile");
+    txt.PopProcessing();
+    all.Append(ENDFILE);
     return all;
 }

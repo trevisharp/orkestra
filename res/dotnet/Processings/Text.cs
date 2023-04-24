@@ -1,243 +1,436 @@
 using System;
 using System.IO;
-using System.Linq;
+using System.Text;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Orkestra.Processings;
 
 using LexicalAnalysis;
 using InternalStructure;
-using System.Text.RegularExpressions;
 
 /// <summary>
 /// A Tree Pointer for Text elements
 /// </summary>
-public unsafe class Text : IEnumerable<Text>
+public class Text
 {
-    private UnityType crrUnity = 0;
-    private int crrIndex = -1;
-    private Text crrChild = null;
+    private struct ProcessStep
+    {
+        public int Index { get; set; }
+        public UnityType Type { get; set; }
+    }
 
-    private Text parent = null;
-    private FastList<Text> lines = null;
-    
-    private Token tokenSource = null;
+    private struct Data
+    {
+        public char Character { get; set; }
+        public Token Token { get; set; }
+    }
 
-    private UnityType type;
-    private string stringSource = null;
-    private int sourceStart = -1;
-    private int sourceEnd = -1;
+    private readonly Data newline = new Data()
+    {
+        Character = '\n',
+        Token = null
+    };
+
+    private readonly Data tab = new Data()
+    {
+        Character = '\t',
+        Token = null
+    };
+
+    private Stack<ProcessStep> pointerStack;
+    private FastList<Data> source;
 
     private Text(string source)
     {
-        this.type = UnityType.All;
-        this.stringSource = source;
-        this.sourceStart = 0;
-        this.sourceEnd = source.Length;
+        initFastList(source);
+        this.pointerStack = new Stack<ProcessStep>();
+        addStep(-1, UnityType.All);
     }
 
-    private Text(Text parent, UnityType newUnity, int start, int end)
+    private int getStartLineIndex(ProcessStep step)
     {
-        this.type = newUnity;
-        this.parent = parent;
-        this.stringSource = parent.stringSource;
-        this.sourceStart = start;
-        this.sourceEnd = end;
+        int i = step.Index;
+        while (i >= 0 && this.source[i].Character != '\n')
+            i--;
+        
+        return i + 1;
     }
 
-    /// <summary>
-    /// Compare current unity with a expression
-    /// </summary>
-    /// <param name="str">A regular expression</param>
-    /// <returns>Return true if the expression and text match</returns>
-    public bool Is(string str)
+    private int getEndLineIndex(ProcessStep step)
     {
-        Regex regex = new Regex(str);
-        var match = regex.Match(
-            this.stringSource, this.sourceStart
-        );
-        return match.Success;
+        int i = step.Index;
+        while (i < this.source.Count && this.source[i].Character != '\n')
+            i++;
+        
+        return i;
     }
 
-    /// <summary>
-    /// End a processing iteration removing the units.
-    /// </summary>
-    public void Break()
+    private void initFastList(string text)
     {
-        throw new NotImplementedException();
-    }
+        this.source = new FastList<Data>();
 
-    /// <summary>
-    /// Go to next unity of processing keeping the current unity.
-    /// </summary>
-    public void Continue()
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// Go to next unity of processing removing the current unity.
-    /// </summary>
-    public void Jump()
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// End a processing iteration keeping the units.
-    /// </summary>
-    public void Complete()
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// Replaces current unity with a text
-    /// </summary>
-    public void Replace(string text)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// Append current unity with a text
-    /// </summary>
-    public void Append(string text)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// Preprend current unity with a text
-    /// </summary>
-    public void Prepend(string text)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// Replace current unity with a token
-    /// </summary>
-    public void Replace(Token token)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// Append current unity with a token
-    /// </summary>
-    public void Append(Token token)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// Preprend current unity with a token
-    /// </summary>
-    public void Prepend(Token token)
-    {
-        throw new NotImplementedException();
+        char[] characters = text.ToCharArray();
+        Data[] data = new Data[characters.Length];
+        for (int i = 0; i < data.Length; i++)
+            data[i] = new Data()
+            {
+                Character = characters[i],
+                Token = null
+            };
+        
+        this.source.AddRange(data);
     }
     
-    /// <summary>
-    /// Return pointers for lines
-    /// </summary>
-    public IEnumerable<Text> Lines
+    private void addStep(int index, UnityType type)
     {
-        get
+        this.pointerStack.Push(new ProcessStep
         {
-            if (this.stringSource == null)
-                yield break;
-            
-            if (this.lines != null)
-            {
-                foreach (var child in this.lines)
-                    yield return child;
-                
-                yield break;
-            }
-
-            this.lines = new FastList<Text>();
-            
-            int j = sourceStart;
-            for (int i = sourceStart; i < sourceEnd; i++)
-            {
-                if (this.stringSource[i] != '\n')
-                    continue;
-
-                Text line = new Text(this,
-                    UnityType.Line, j, i
-                );
-                this.lines.Add(line);
-
-                this.crrChild = line;
-                this.crrUnity = UnityType.Line; 
-                j = i;
-
-                yield return line;
-            }
-        }
+            Index = index,
+            Type = type,
+        });
     }
 
-    /// <summary>
-    /// Return a Text pointer to characters of current unity
-    /// </summary>
-    public IEnumerable<Text> Characters
+    private void updateStep(int index, UnityType type)
     {
-        get
-        {
-            Text temp = new Text(this, 
-                UnityType.Character, this.sourceStart, this.sourceStart + 1
-            );
-
-            for (int i = this.sourceStart; i < this.sourceEnd; i++)
-            {
-                temp.sourceStart = i;
-                temp.sourceEnd = i + 1;
-                yield return temp;
-            }
-        }
+        var step = this.pointerStack.Pop();
+        step.Index = index;
+        step.Type = type;
+        this.pointerStack.Push(step);
     }
 
-    public IEnumerator<Text> GetEnumerator()
-        => this.type switch
+    public bool NextLine()
+    {
+        var step = this.pointerStack.Peek();
+
+        if (step.Type == UnityType.All)
         {
-            UnityType.All => Lines.GetEnumerator(),
-            _ => Characters.GetEnumerator()
+            addStep(0, UnityType.Line);
+            return true;
+        }
+
+        if (step.Type != UnityType.Line)
+            throw new Exception("Invalid processing: Line processing need start in all processing.");
+
+        var end = getEndLineIndex(step);
+
+        if (end == this.source.Count)
+            return false;
+        
+        updateStep(end + 1, UnityType.Line);
+        return true;
+    }
+
+    public bool NextCharacter()
+    {
+        var step = this.pointerStack.Peek();
+
+        if (step.Type == UnityType.All || step.Type == UnityType.Line)
+        {
+            addStep(0, UnityType.Character);
+            return true;
+        }
+
+        if (step.Type != UnityType.Character)
+            throw new Exception("Invalid processing: Character processing need start in all or line processing.");
+
+        int index = step.Index;
+        index++;
+        if (index >= source.Count)
+            return false;
+        
+        updateStep(index, UnityType.Character);
+        return true;
+    }
+
+    public bool NextCharacterLine()
+    {
+        var step = this.pointerStack.Peek();
+
+        if (step.Type == UnityType.Line)
+        {
+            addStep(step.Index, UnityType.Character);
+            return true;
+        }
+
+        if (step.Type != UnityType.Character)
+            throw new Exception("Invalid processing: Character processing need start in all or line processing.");
+
+        int index = step.Index;
+        index++;
+        if (index >= source.Count)
+            return false;
+        
+        if (source[index].Character == '\n')
+            return false;
+
+        updateStep(index, UnityType.Character);
+        return true;
+    }
+
+    public void PopProcessing()
+        => this.pointerStack.Pop();
+
+    public bool Is(string comparation)
+    {
+        var step = this.pointerStack.Peek();
+        var index = step.Index;
+        int i = 0;
+
+        while (i < comparation.Length && index < this.source.Count)
+        {
+            if (this.source[index++].Character == comparation[i++])
+                continue;
+            
+            return false;
+        }
+
+        if (index == this.source.Count && i < comparation.Length)
+            return false;
+
+        return true;
+    }
+
+    private void append(Data data)
+    {
+        var step = this.pointerStack.Peek();
+        var type = step.Type;
+
+        if (type == UnityType.All)
+        {
+            this.source.Add(data);
+            return;
+        }
+
+        if (type == UnityType.Character)
+        {
+            this.source.Insert(data, step.Index);
+            return;
+        }
+        
+        int i = step.Index;
+        while (i < this.source.Count && this.source[i].Character != '\n')
+            i++;
+        
+        if (i >= this.source.Count)
+        {
+            this.source.Add(newline);
+            this.source.Add(data);
+            return;
+        }
+        
+        this.source.Insert(data, i);
+        this.source.Add(newline);
+    }
+
+    private void prepend(Data data)
+    {
+        var step = this.pointerStack.Peek();
+        var type = step.Type;
+
+        if (type == UnityType.All)
+        {
+            this.source.Insert(data, 0);
+            return;
+        }
+
+        if (type == UnityType.Character)
+        {
+            this.source.Insert(data, step.Index - 1);
+            return;
+        }
+        
+        int i = step.Index;
+        while (i >= 0 && this.source[i].Character != '\n')
+            i--;
+        
+        this.source.Insert(data, i);
+        this.source.Insert(newline, i);
+    }
+
+    public void Append(Token token)
+    {
+        var data = new Data()
+        {
+            Character = '\0',
+            Token = token
         };
-
-    IEnumerator IEnumerable.GetEnumerator()
-        => GetEnumerator();
-
-    private void next()
-    {
-        throw new NotImplementedException();
+        append(data);
     }
 
-    private void prev()
+    public void Append(Key baseKey)
     {
-        throw new NotImplementedException();
+        // TODO: get Index
+        Token token = new Token(baseKey, null, 0);
+        Append(token);
     }
 
-    private void reset()
+    public void Append(string str)
+    {
+        var step = this.pointerStack.Peek();
+        var type = step.Type;
+        var data = new Data[str.Length];
+        int n = 0;
+        foreach (var c in str)
+            data[n] = new Data()
+            {
+                Character = c,
+                Token = null
+            };
+
+        if (type == UnityType.All)
+        {
+            this.source.AddRange(data);
+            return;
+        }
+
+        if (type == UnityType.Character)
+        {
+            this.source.Insert(data, step.Index);
+            return;
+        }
+        
+        int i = step.Index;
+        while (i < this.source.Count && this.source[i].Character != '\n')
+            i++;
+        
+        if (i < this.source.Count)
+        {
+            this.source.Add(newline);
+            this.source.AddRange(data);
+            return;
+        }
+        
+        this.source.Insert(data, i);
+        this.source.Insert(newline, i);
+    }
+
+    public void Prepend(Token token)
+    {
+        var data = new Data()
+        {
+            Character = '\0',
+            Token = token
+        };
+        prepend(data);
+    }
+
+    public void Prepend(Key baseKey)
+    {
+        // TODO: get Index
+        Token token = new Token(baseKey, null, 0);
+        Prepend(token);
+    }
+
+    public void Prepend(string str)
+    {
+        var step = this.pointerStack.Peek();
+        var type = step.Type;
+        var data = new Data[str.Length];
+        int n = 0;
+        foreach (var c in str)
+            data[n] = new Data()
+            {
+                Character = c,
+                Token = null
+            };
+
+        if (type == UnityType.All)
+        {
+            this.source.AddRange(data);
+            return;
+        }
+
+        if (type == UnityType.Character)
+        {
+            this.source.Insert(data, step.Index);
+            return;
+        }
+        
+        int i = step.Index;
+        while (i < this.source.Count && this.source[i].Character != '\n')
+            i++;
+        
+        if (i < this.source.Count)
+        {
+            this.source.Add(newline);
+            this.source.AddRange(data);
+            return;
+        }
+        
+        this.source.Insert(data, i);
+        this.source.Insert(newline, i);
+    }
+
+    public void AppendNewline()
+        => append(newline);
+
+    public void AppendTab()
+        => append(tab);
+
+    public void PrependNewline()
+        => prepend(newline);
+
+    public void PrependTab()
+        => prepend(tab);
+
+    public void Break()
+    {
+        var step = this.pointerStack.Pop();
+        var parent = this.pointerStack.Peek();
+
+        if (parent.Type == UnityType.All && step.Type == UnityType.Line)
+        {
+            int start = getStartLineIndex(step);
+            this.source.Remove(start, -1);
+            this.pointerStack.Push(step);
+            return;
+        }
+        else if (parent.Type == UnityType.All && step.Type == UnityType.Character)
+        {
+            int start = step.Index;
+            this.source.Remove(start, -1);
+            this.pointerStack.Push(step);
+            return;
+        }
+        else if (parent.Type == UnityType.Line && step.Type == UnityType.Character)
+        {
+            int start = step.Index;
+            int end = getEndLineIndex(step);
+            this.source.Remove(start, end - start);
+            this.pointerStack.Push(step);
+            return;
+        }
+        
+        throw new Exception("Inconsistence in stack pointers.");
+    }
+
+    public void Continue()
+    {
+
+    }
+
+    public void Discard()
+    {
+
+    }
+
+    public object[] ToSources()
     {
         throw new NotImplementedException();
     }
 
     public override string ToString()
     {
-        throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// Return a array of texts splited by possible
-    /// inserted tokens.
-    /// </summary>
-    /// <returns>A object array of string and Token objects</returns>
-    public object[] ToSources()
-    {
-        throw new NotImplementedException();
+        StringBuilder sb = new StringBuilder();
+        foreach (var data in this.source)
+        {
+            if (data.Token is null)
+                sb.Append(data.Character);
+            else sb.Append(data.Token);
+        }
+        return sb.ToString();
     }
 
     public static Text FromFile(string path)

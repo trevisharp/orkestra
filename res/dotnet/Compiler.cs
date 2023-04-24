@@ -1,10 +1,7 @@
 using System;
 using System.Reflection;
 using System.Collections.Generic;
-
-#if DEBUG
 using static System.Console;
-#endif
 
 namespace Orkestra;
 
@@ -14,6 +11,8 @@ using SyntacticAnalysis;
 
 public abstract class Compiler
 {
+    public bool Verbose { get; set; }
+
     public void Compile(string sourceCode)
     {
         var lex = buildLexicalAnalyzer();
@@ -22,29 +21,32 @@ public abstract class Compiler
 
         var processedText = machine.ProcessAll(sourceCode);
 
-        #if DEBUG
-        WriteLine("Processed Text:");
-        WriteLine(processedText);
-        WriteLine();
-        #endif
+        if (Verbose)
+        {
+            WriteLine("Processed Text:");
+            WriteLine(processedText);
+            WriteLine();
+        }
 
-        var tokens = lex.Parse(processedText);
+        var tokens = lex.Parse(sourceCode);
 
-        #if DEBUG
-        WriteLine("Token List:");
-        foreach (var token in tokens)
-            Write($"{token} ");
-        WriteLine();
-        WriteLine();
-        #endif
+        if (Verbose)
+        {
+            WriteLine("Token List:");
+            foreach (var token in tokens)
+                Write($"{token} ");
+            WriteLine();
+            WriteLine();
+        }
 
         var tree = parser.Parse(tokens);
         
-        #if DEBUG
-        WriteLine("Syntax Tree:");
-        WriteLine(tree);
-        WriteLine();
-        #endif
+        if (Verbose)
+        {
+            WriteLine("Syntax Tree:");
+            WriteLine(tree);
+            WriteLine();
+        }
     }
 
     private ProcessingPackage buildProcessingMachine()

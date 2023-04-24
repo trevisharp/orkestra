@@ -6,69 +6,145 @@ namespace Orkestra.InternalStructure;
 
 internal class FastList<T> : IEnumerable<T>
 {
-    private LinkedList<FastListNode<T>> list = new();
+    private const int maxSize = 1024;
+    private LinkedList<List<T>> list = new();
+    private List<T> Last => list.Last.Value;
     private int count = 0;
 
+    public int Count => count;
+
     internal FastList()
-    {
-        list.AddLast(new FastListNode<T>());
-    }
+        => list.AddLast(new List<T>(maxSize));
 
-    private FastListNode<T> Last => list.Last.Value;
-
-    internal IEnumerable<LinkedListNode<FastListNode<T>>> Nodes
+    public T this[int index]
     {
         get
         {
-            var crr = list.First;
-            if (crr == null)
-                yield break;
-            yield return crr;
-            
-            while (crr != list.Last)
+            var node = list.First;
+            while (index > node.Value.Count)
             {
-                crr = crr.Next;
-                yield return crr;
+                index -= node.Value.Count;
+                node = node.Next;
             }
+            return node.Value[index];
         }
+        set
+        {
+            var node = list.First;
+            while (index > node.Value.Count)
+            {
+                index -= node.Value.Count;
+                node = node.Next;
+            }
+            node.Value[index] = value;
+        }
+    }
+    
+    private List<T> addNode()
+    {
+        var newNode = new List<T>();
+        list.AddLast(newNode);
+        return newNode;
     }
 
     internal void Add(T value)
     {
         count++;
 
-        if (Last.Add(value))
+        if (Last.Count < maxSize)
+        {
+            Last.Add(value);
             return;
+        }
         
-        list.AddLast(new FastListNode<T>());
+        var newNode = addNode();
+        newNode.Add(value);
     }
 
     internal void AddRange(T[] values)
     {
-        int added = Last.AddRange(values);
-        while (added < values.Length)
-        {
-            list.AddLast(new FastListNode<T>());
-            added += Last.AddRange(values);
-        }
-        count += added;
+        for (int i = 0; i < values.Length; i++)
+            this.Add(values[i]);
     }
     
     internal void AddRange(IEnumerable<T> values)
         => this.AddRange(values.ToArray());
     
-    internal void AddNode(T[] values)
-        => this.list.AddLast(new FastListNode<T>(values));
+    internal void Insert(T value, int index)
+    {
+        var node = this.list.First;
+        while (index > node.Value.Count)
+        {
+            index -= node.Value.Count;
+            node = node.Next;
+        }
+        var list = node.Value;
+        list.Insert(index, value);
+    }
 
-    internal void Replace(LinkedListNode<FastListNode<T>> node, T[] values)
-        => node.Value.Replace(values);
-    
-    internal void Append(LinkedListNode<FastListNode<T>> node, T[] values)
-        => list.AddAfter(node, new FastListNode<T>(values));
+    internal void Insert(T[] values, int index)
+    {
+        var node = this.list.First;
+        while (index > node.Value.Count)
+        {
+            index -= node.Value.Count;
+            node = node.Next;
+        }
+        var list = node.Value;
 
-    internal void Prepend(LinkedListNode<FastListNode<T>> node, T[] values)
-        => list.AddBefore(node, new FastListNode<T>(values));
-    
+        List<T> pre = new List<T>();
+        List<T> pos = new List<T>();
+        for (int i = 0; i < index; i++)
+            pre.Add(list[i]);
+        for (int i = index; i < list.Count; i++)
+            pos.Add(list[i]);
+        
+        int j = 0;
+        while (pre.Count < maxSize && j < values.Length)
+            pre.Add(values[j++]);
+        node.Value = pre;
+
+        var posNode = new LinkedListNode<List<T>>(pos);
+        this.list.AddAfter(node, posNode);
+
+        while (j < values.Length)
+        {
+            List<T> inner = new List<T>();
+            for (int i = 0; i < maxSize; i++)
+                inner.Add(values[j++]);
+            this.list.AddBefore(posNode, new LinkedListNode<List<T>>(inner));
+        }
+
+        this.count += values.Length;
+    }
+
+    internal void Remove(int start, int len)
+    {
+        if (len < 0)
+            len = this.count - start - len + 1;
+
+        var node = this.list.First;
+        while (start > node.Value.Count)
+        {
+            start -= node.Value.Count;
+            node = node.Next;
+        }
+
+        while (len > 0)
+        {
+            var list = node.Value;
+            int removed = list.Count - start;
+            if (removed > len)
+                removed = len;
+            list.RemoveRange(start, removed);
+            len -= removed;
+            this.count -= removed;
+
+            node = node.Next;
+            start = 0;
+        }
+    }
+
     public IEnumerator<T> GetEnumerator()
     {
         foreach (var node in list)
