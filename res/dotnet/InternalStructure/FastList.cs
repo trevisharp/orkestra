@@ -145,6 +145,13 @@ internal class FastList<T> : IEnumerable<T>
         }
     }
 
+    internal void Clear()
+    {
+        this.list.Clear();
+        list.AddLast(new List<T>(maxSize));
+    }
+    
+    
     public IEnumerator<T> GetEnumerator()
     {
         foreach (var node in list)

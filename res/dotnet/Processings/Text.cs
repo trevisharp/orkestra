@@ -100,14 +100,6 @@ public class Text
         this.pointerStack.Push(step);
     }
 
-    public string Current
-    {
-        get
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     public bool NextLine()
     {
         var step = this.pointerStack.Peek();
@@ -393,19 +385,50 @@ public class Text
     public void PrependTab()
         => prepend(tab);
 
+    private void removeUnity()
+    {
+        var step = this.pointerStack.Peek();
+
+        if (step.Type == UnityType.All)
+        {
+            this.source.Clear();
+            return;
+        }
+
+        if (step.Type == UnityType.Line)
+        {
+            int start = getStartLineIndex(step);
+            int end = getStartLineIndex(step);
+            this.source.Remove(start, end - start);
+            updateStep(start, UnityType.Line);
+            return;
+        }
+
+        if (step.Type == UnityType.Character)
+        {
+            int index = step.Index;
+            this.source.Remove(index, 1);
+            updateStep(index - 1, UnityType.Character);
+            return;
+        }
+    }
+
     public void Replace(string str)
     {
-        throw new NotImplementedException();
+        removeUnity();
+        Append(str);
     }
 
     public void Replace(Token token)
     {
-        throw new NotImplementedException();
+        removeUnity();
+        Append(token);
     }
 
     public void Replace(Key baseKey)
     {
-        throw new NotImplementedException();
+        removeUnity();
+        Append(baseKey);
     }
 
     public void Break()
@@ -471,6 +494,7 @@ public class Text
         return sb.ToString();
     }
 
+    
     public override string ToString()
     {
         if (this.pointerStack.Count == 0 || this.pointerStack.Peek().Type == UnityType.All)
