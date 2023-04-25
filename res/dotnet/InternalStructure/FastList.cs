@@ -21,7 +21,7 @@ internal class FastList<T> : IEnumerable<T>
         get
         {
             var node = list.First;
-            while (index > node.Value.Count)
+            while (index >= node.Value.Count)
             {
                 index -= node.Value.Count;
                 node = node.Next;
@@ -31,7 +31,7 @@ internal class FastList<T> : IEnumerable<T>
         set
         {
             var node = list.First;
-            while (index > node.Value.Count)
+            while (index >= node.Value.Count)
             {
                 index -= node.Value.Count;
                 node = node.Next;

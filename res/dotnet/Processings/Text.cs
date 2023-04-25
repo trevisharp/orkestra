@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Collections;
 using System.Collections.Generic;
@@ -44,7 +45,10 @@ public class Text
 
     private Text(string source)
     {
-        initFastList(source);
+        var newlineReplacedSource = source
+            .Replace("\r\n", "\n") // For Windows
+            .Replace("\r", "\n");  // For MAC version < X
+        initFastList(newlineReplacedSource);
         this.pointerStack = new Stack<ProcessStep>();
         addStep(-1, UnityType.All);
     }
@@ -55,7 +59,7 @@ public class Text
         while (i >= 0 && this.source[i].Character != '\n')
             i--;
         
-        return i + 1;
+        return i;
     }
 
     private int getEndLineIndex(ProcessStep step)
@@ -113,6 +117,12 @@ public class Text
         if (step.Type != UnityType.Line)
             throw new Exception("Invalid processing: Line processing need start in all processing.");
 
+        if (step.Index == -1) // dont started yet
+        {
+            updateStep(0, UnityType.Line);
+            return true;
+        }
+
         var end = getEndLineIndex(step);
 
         if (end == this.source.Count)
@@ -150,8 +160,8 @@ public class Text
 
         if (step.Type == UnityType.Line)
         {
-            addStep(step.Index, UnityType.Character);
-            return true;
+            addStep(step.Index - 1, UnityType.Character);
+            step = this.pointerStack.Peek();
         }
 
         if (step.Type != UnityType.Character)
@@ -162,7 +172,7 @@ public class Text
         if (index >= source.Count)
             return false;
         
-        if (source[index].Character == '\n')
+        if (index >= this.source.Count || this.source[index].Character == '\n')
             return false;
 
         updateStep(index, UnityType.Character);
@@ -399,8 +409,9 @@ public class Text
         {
             int start = getStartLineIndex(step);
             int end = getStartLineIndex(step);
-            this.source.Remove(start, end - start);
-            updateStep(start, UnityType.Line);
+            this.source.Remove(start, end - start + 1);
+            int newIndex = start - 1;
+            updateStep(newIndex, UnityType.Line);
             return;
         }
 
@@ -408,7 +419,8 @@ public class Text
         {
             int index = step.Index;
             this.source.Remove(index, 1);
-            updateStep(index - 1, UnityType.Character);
+            int newIndex = index - 1;
+            updateStep(newIndex, UnityType.Character);
             return;
         }
     }
@@ -464,41 +476,65 @@ public class Text
 
     public void Complete()
     {
-        throw new NotImplementedException();
+        
     }
 
     public void Continue()
     {
-        throw new NotImplementedException();
+        
     }
 
     public void Discard()
     {
-        throw new NotImplementedException();
+        removeUnity();
     }
 
     public object[] ToSources()
     {
-        throw new NotImplementedException();
+        List<object> data = new List<object>();
+        StringBuilder sb = null;
+        int index = 0;
+
+        while (index < this.source.Count)
+        {
+            sb = new StringBuilder();
+            while (this.source[index].Token is null)
+            {
+                sb.Append(this.source[index].Character);
+                index++;
+            }
+            data.Add(sb.ToString());
+            while (this.source[index].Token is not null)
+            {
+                data.Add(this.source[index].Token);
+                index++;
+            }
+        }
+
+        return data.ToArray();
     }
 
-    private string toString()
+    public string FullText()
     {
         StringBuilder sb = new StringBuilder();
         foreach (var data in this.source)
         {
             if (data.Token is null)
                 sb.Append(data.Character);
-            else sb.Append(data.Token);
+            else
+            {
+                sb.Append(" ");
+                sb.Append(data.Token);
+                sb.Append(" ");
+            }
         }
         return sb.ToString();
     }
 
-    
     public override string ToString()
     {
         if (this.pointerStack.Count == 0 || this.pointerStack.Peek().Type == UnityType.All)
-            return toString();
+            return FullText();
         
         var step = this.pointerStack.Peek();
         var type = step.Type;
@@ -515,7 +551,12 @@ public class Text
                 var data = this.source[i];
                 if (data.Token is null)
                     sb.Append(data.Character);
-                else sb.Append(data.Token);
+                else
+                {
+                    sb.Append(" ");
+                    sb.Append(data.Token);
+                    sb.Append(" ");
+                }
             }
             
             return sb.ToString();

@@ -90,7 +90,7 @@ while (text.NextLine())
             break;
         }
 
-        if (!text.Is("\t") && !text.Is("\n") && !text.Is(" "))
+        if (!text.Is("\t") && !text.Is("\n") && !text.Is(" ") && !text.Is("\r"))
         {
             emptyline = false;
         }
@@ -113,13 +113,16 @@ while (text.NextLine())
             }
             else
             {
-                continue;
+                text.Complete();
+                break;
             }
+
             if (!text.Is(tabulationtype))
             {
                 text.Complete();
                 break;
             }
+
             if (text.Is("\t"))
             {
                 current += 2;
@@ -128,6 +131,11 @@ while (text.NextLine())
             {
                 current += 1;
             }
+        }
+        else
+        {
+            text.Complete();
+            break;
         }
     }
     text.PopProcessing();
