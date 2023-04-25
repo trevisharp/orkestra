@@ -90,7 +90,7 @@ while (text.NextLine())
             break;
         }
 
-        if (!text.Is("\t") && !text.Is("\n") && !text.Is(" ") && !text.Is("\r"))
+        if (!text.Is("\t") && !text.Is("\n") && !text.Is(" "))
         {
             emptyline = false;
         }
