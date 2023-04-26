@@ -229,19 +229,16 @@ public class Text
             return;
         }
         
-        int i = step.Index;
-        while (i < this.source.Count && this.source[i].Character != '\n')
-            i++;
+        int end = getEndLineIndex(step);
         
-        if (i >= this.source.Count)
+        if (end >= this.source.Count)
         {
             this.source.Add(newline);
             this.source.Add(data);
             return;
         }
         
-        this.source.Insert(data, i);
-        this.source.Add(newline);
+        this.source.Insert(data, end);
     }
 
     private void prepend(Data data)
@@ -261,12 +258,8 @@ public class Text
             return;
         }
         
-        int i = step.Index;
-        while (i >= 0 && this.source[i].Character != '\n')
-            i--;
-        
-        this.source.Insert(data, i);
-        this.source.Insert(newline, i);
+        int index = getStartLineIndex(step);
+        this.source.Insert(data, index);
     }
 
     public void Append(Token token)
@@ -323,7 +316,6 @@ public class Text
         }
         
         this.source.Insert(data, i);
-        this.source.Insert(newline, i);
     }
 
     public void Prepend(Token token)
@@ -365,6 +357,7 @@ public class Text
         if (type == UnityType.Character)
         {
             this.source.Insert(data, step.Index);
+            updateStep(step.Index - data.Length, UnityType.Character);
             return;
         }
         
@@ -381,6 +374,7 @@ public class Text
         
         this.source.Insert(data, i);
         this.source.Insert(newline, i);
+        updateStep(step.Index - data.Length - 1, UnityType.Line);
     }
 
     public void AppendNewline()
@@ -484,6 +478,37 @@ public class Text
         
     }
 
+    public bool Skip()
+    {
+        var step = this.pointerStack.Peek();
+
+        switch (step.Type)
+        {
+            case UnityType.All:
+                this.pointerStack.Pop();
+                addStep(-1, UnityType.All);
+                return true;
+            
+            case UnityType.Line:
+                return NextLine();
+            
+            case UnityType.Character:
+                step = this.pointerStack.Pop();
+                var parent = this.pointerStack.Peek();
+                this.pointerStack.Push(step);
+
+                if (parent.Type == UnityType.All)
+                    return NextCharacter();
+                else if (parent.Type == UnityType.Line)
+                    return NextCharacterLine();
+                
+                return false;
+
+            default:
+                return false;    
+        }
+    }
+
     public void Discard()
     {
         removeUnity();
@@ -545,7 +570,13 @@ public class Text
             StringBuilder sb = new StringBuilder();
 
             var start = getStartLineIndex(step);
+            if (start == -1)
+                start = 0;
+            
             var end = getEndLineIndex(step);
+            if (end ==  this.source.Count)
+                end--;
+
             for (int i = start; i < end; i++)
             {
                 var data = this.source[i];

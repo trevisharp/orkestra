@@ -77,7 +77,7 @@ bool emptyline = true;
 string tabulationtype = "x";
 
 while (text.NextLine())
-{
+{   
     emptyline = true;
     current = 0;
     tabulationtype = "x";
@@ -107,8 +107,14 @@ while (text.NextLine())
     {
         if (tabulationtype == "x")
         {
-            if (text.Is("\t") || text.Is(" "))
+            if (text.Is("\t"))
             {
+                current += 2;
+                tabulationtype = text;
+            }
+            else if (text.Is(" "))
+            {
+                current += 1;
                 tabulationtype = text;
             }
             else
@@ -116,21 +122,14 @@ while (text.NextLine())
                 text.Complete();
                 break;
             }
-
-            if (!text.Is(tabulationtype))
-            {
-                text.Complete();
-                break;
-            }
-
-            if (text.Is("\t"))
-            {
-                current += 2;
-            }
-            else if (text.Is(" "))
-            {
-                current += 1;
-            }
+        }
+        else if (text.Is("\t"))
+        {
+            current += 2;
+        }
+        else if (text.Is(" "))
+        {
+            current += 1;
         }
         else
         {
@@ -140,24 +139,25 @@ while (text.NextLine())
     }
     text.PopProcessing();
 
-    if (current < level)
+    if (current > level)
     {
         level = current;
+        text.PrependNewline();
         text.Prepend(STARTBLOCK);
-        text.AppendNewline();
-    }
-
-    while (level > current)
-    {
-        level -= 2;
-        text.Append(ENDBLOCK);
-        text.AppendNewline();
+        text.Skip();
     }
 
     if (emptyline)
         continue;
     
     text.Append(ENDLINE);
+
+    while (current < level)
+    {
+        level -= 2;
+        text.AppendNewline();
+        text.Append(ENDBLOCK);
+    }
 }
 text.PopProcessing();
 text.Append(ENDFILE);
