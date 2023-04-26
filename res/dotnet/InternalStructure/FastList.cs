@@ -26,6 +26,8 @@ internal class FastList<T> : IEnumerable<T>
                 index -= node.Value.Count;
                 node = node.Next;
             }
+
+
             return node.Value[index];
         }
         set
@@ -72,6 +74,7 @@ internal class FastList<T> : IEnumerable<T>
     
     internal void Insert(T value, int index)
     {
+        this.count++;
         var node = this.list.First;
         while (index > node.Value.Count)
         {
@@ -132,6 +135,9 @@ internal class FastList<T> : IEnumerable<T>
 
         while (len > 0)
         {
+            if (node is null)
+                return;
+            
             var list = node.Value;
             int removed = list.Count - start;
             if (removed > len)
@@ -148,9 +154,9 @@ internal class FastList<T> : IEnumerable<T>
     internal void Clear()
     {
         this.list.Clear();
+        this.count = 0;
         list.AddLast(new List<T>(maxSize));
     }
-    
     
     public IEnumerator<T> GetEnumerator()
     {

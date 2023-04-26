@@ -77,7 +77,8 @@ bool emptyline = true;
 string tabulationtype = "x";
 
 while (text.NextLine())
-{   
+{
+processingLine:
     emptyline = true;
     current = 0;
     tabulationtype = "x";
@@ -155,12 +156,18 @@ while (text.NextLine())
     while (current < level)
     {
         level -= 2;
-        text.AppendNewline();
-        text.Append(ENDBLOCK);
+        text.PrependNewline();
+        text.Prepend(ENDBLOCK);
+        text.Skip();
     }
 }
 text.PopProcessing();
+while (level > 0)
+{
+    level -= 2;
+    text.Append(ENDBLOCK);
+    text.AppendNewline();
+}
 text.Append(ENDFILE);
-
 
 Console.WriteLine(text);
