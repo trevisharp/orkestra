@@ -5,49 +5,43 @@ processing all:
 	int level = 0
 	int current = 0
 	bool emptyline = true
-	char tabulationtype = 'x'
 
 	processing line:
 		emptyline = true
 		current = 0
-		tabulationtype = 'x'
 
 		processing character:
-			if character is "#":
-				break
+			if character is ""\35"":
+				discard
 			if character not is tab and character not is newline and character not is space:
 				emptyline = false
 		
 		if emptyline:
-			discard
+			skip
 		
 		processing character:
-			if tabulationtype is 'x':
-				if character is tab or character is space:
-					tabulationtype = character
-				else:
-					complete
-			
-			if character not is tabulationtype:
-				complete
-			
-			if character is tab:
-				current += 2
-			else if character is space:
-				current += 1
-		
-		if current > level + 2:
+            if character is tab:
+                current += 4
+            else if character is space:
+                current += 1
+            else:
+                break
+
+    	if current > level + 4:
 			throw TabulationError
 
 		if current > level:
 			level = current
-			prepend STARTBLOCK
-		
-		while level > current:
-			level -= 2
-			append ENDBLOCK
+			prepend newline STARTBLOCK
 		
 		append ENDLINE
+
+		while level > current:
+			level -= 4
+			prepend newline ENDBLOCK
+    while level > current:
+        level -= 4
+        prepend newline ENDBLOCK
 	append ENDFILE
 
 ##########################################################################################################
