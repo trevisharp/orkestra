@@ -1,78 +1,87 @@
 public class OrkestraCompiler : Compiler
 {
     // auto keys
-    Key key_ENDFILE = Key.CreateAutoKeyword("ENDFILE");
-    Key key_ENDLINE = Key.CreateAutoKeyword("ENDLINE");
-    Key key_STARTBLOCK = Key.CreateAutoKeyword("STARTBLOCK");
-    Key key_ENDBLOCK = Key.CreateAutoKeyword("ENDBLOCK");
+    Key kENDFILE = auto("ENDFILE");
+    Key kENDLINE = auto("ENDLINE");
+    Key kSTARTBLOCK = auto("STARTBLOCK");
+    Key kENDBLOCK = auto("ENDBLOCK");
 
     // processing keys
-    Key key_PROCESSING = key("PROCESSING", "processing");
+    Key kPROCESSING = key("PROCESSING", "processing");
     Key NEWLINE = key("NEWLINE", "newline");
-    Key key_TAB = key("TAB", "tab");
-    Key key_SPACE = key("SPACE", "space");
-    Key key_ALL = contextual("ALL", "all");
-    Key key_LINE = contextual("LINE", "line");
-    Key key_CHARACTER = contextual("CHARACTER", "character");
-    Key key_CONTINUE = contextual("CONTINUE", "continue");
-    Key key_SKIP = contextual("SKIP", "skip");
-    Key key_NEXT = contextual("NEXT", "next");
-    Key key_BREAK = contextual("BREAK", "break");
-    Key key_DISCARD = contextual("DISCARD", "discard");
-    Key key_APPEND = contextual("APPEND", "append");
-    Key key_PREPEND = contextual("PREPREND", "prepend");
-    Key key_REPLACE = contextual("REPLACE", "replace");
+    Key kTAB = key("TAB", "tab");
+    Key kSPACE = key("SPACE", "space");
+    Key kALL = contextual("all");
+    Key kLINE = contextual("line");
+    Key kCHARACTER = contextual("character");
+    Key kCONTINUE = contextual("continue");
+    Key kSKIP = contextual("skip");
+    Key kNEXT = contextual("next");
+    Key kBREAK = contextual("break");
+    Key kDISCARD = contextual("discard");
+    Key kAPPEND = contextual("append");
+    Key kPREPEND = contextual("prepend");
+    Key kREPLACE = contextual("replace");
     
     // type keys
-    Key key_INT = keyword("INT", "int");
-    Key key_BOOL = keyword("BOOL", "bool");
-    Key key_STRING = keyword("STRING", "string");
-    Key key_CHAR = keyword("CHAR", "char");
-    Key key_DECIMAL = keyword("DECIMAL", "decimal");
-    Key key_DOUBLE = keyword("DOUBLE", "double");
-    Key key_FLOAT = keyword("FLOAT", "float");
-    Key key_ANY = keyword("ANY", "any");
-    Key key_TUPLE = keyword("TUPLE", "tuple");
-    Key key_LIST = keyword("LIST", "list");
-    Key key_MAP = keyword("MAP", "map");
+    Key kINT = keyword("int");
+    Key kBOOL = keyword("bool");
+    Key kSTRING = keyword("string");
+    Key kCHAR = keyword("char");
+    Key kDECIMAL = keyword("decimal");
+    Key kDOUBLE = keyword("double");
+    Key kFLOAT = keyword("float");
+    Key kANY = keyword("any");
+    Key kTUPLE = keyword("tuple");
+    Key kLIST = keyword("list");
+    Key kMAP = keyword("map");
 
     // arithmetic keys
-    Key key_EQUAL = keyword("EQUAL", "=");
-    Key key_OPSUM = keyword("OPSUM", "\\+");
-    Key key_OPSUB = keyword("OPSUB", "\\-");
-    Key key_IS = keyword("IS", "is");
-    Key key_NOT = keyword("NOT", "not");
-    Key BIGGEREQUAL = keyword("BIGGEREQUAL", ">=");
-    Key SMALLEREQUAL = keyword("SMALLEREQUAL", "<=");
-    Key BIGGER = keyword("BIGGER", ">");
-    Key SMALLER = keyword("SMALLER", "<");
+    Key kEQUAL = keyword("EQUAL", "=");
+    Key kOPSUM = keyword("OPSUM", "\\+");
+    Key kOPSUB = keyword("OPSUB", "\\-");
+    Key kOPMUL = keyword("OPMUL", "\\*");
+    Key kOPDIV = keyword("OPDIV", "\\/");
+    Key kOPMOD = keyword("OPMOD", "\\%");
+    Key kOPPOW = keyword("OPPOW", "\\^");
+    Key kIS = keyword("is");
+    Key kIN = keyword("in");
+    Key kNOT = keyword("not");
+    Key kBIGGEREQUAL = keyword("BIGGEREQUAL", ">=");
+    Key kSMALLEREQUAL = keyword("SMALLEREQUAL", "<=");
+    Key kBIGGER = keyword("BIGGER", ">");
+    Key kSMALLER = keyword("SMALLER", "<");
+    Key kAND = keyword("and");
+    Key kOR = keyword("or");
+    Key kXOR = keyword("xor");
 
     // code flow keys
-    Key key_IF = keyword("IF", "if");
-    Key key_FOR = keyword("FOR", "for");
-    Key key_WHILE = keyword("WHILE", "while");
+    Key kIF = keyword("if");
+    Key kFOR = keyword("for");
+    Key kWHILE = keyword("while");
 
-
-    Key key_DOUBLEDOT = keyword("DOUBLEDOT", ":");
-    Key key_LEFTPARENTHESES = keyword("LEFTPARENTHESES", "\\(");
-    Key key_RIGHTPARENTHESES = keyword("RIGHTPARENTHESES", "\\)");
-    Key key_KEY = keyword("KEY", "key");
-    Key key_CONTEXTUAL = keyword("CONTEXTUAL", "contextual");
+    Key kDOUBLEDOT = keyword("DOUBLEDOT", ":");
+    Key kOPENPARENTHESES = keyword("OPENPARENTHESES", "\\(");
+    Key kCLOSEPARENTHESES = keyword("CLOSEPARENTHESES", "\\)");
+    Key kKEY = keyword("key");
+    Key kCONTEXTUAL = keyword("contextual");
+    Key kNULLVALUE = keyword("null");
 
     // value keys
-    Key key_INTVALUE = key("INTVALUE", "(\\+|\\-)?[0-9][0-9]*");
-    Key key_BOOLVALUE = key("BOOLVALUE", "(true)|(false)");
+    Key kINTVALUE = key("INTVALUE", "(\\+|\\-)?[0-9][0-9]*");
+    Key kBOOLVALUE = key("BOOLVALUE", "(true)|(false)");
 
+    Key kEXPRESSION = key("EXPRESSION", "\\/.*?\\/");
+    Key kID = identity("ID", "[A-Za-z_][A-Za-z0-9_]*");
 
-    Key key_EXPRESSION = key("EXPRESSION", "\\/.*?\\/");
-    Key key_ID = Key.CreateIdentity("ID", "[A-Za-z_][A-Za-z0-9_]*");
-
-    Rule rule_key;
-    Rule rule_identity;
-    Rule rule_start;
-    Rule rule_basetype;
-    Rule rule_type;
-    Rule rule_command;
+    Rule rKey;
+    Rule rIdentity;
+    Rule rStart;
+    Rule rBasetype;
+    Rule rType;
+    Rule rCommand;
+    Rule rData;
+    Rule rCondition;
 
     Processing processing1;
 
@@ -83,48 +92,85 @@ public class OrkestraCompiler : Compiler
 
     public OrkestraCompiler()
     {
-        rule_identity = Rule.CreateRule("identity",
-            SubRule.Create(key_ID)
+        rIdentity = rule("identity",
+            sub(kID)
         );
 
-        rule_basetype = Rule.CreateRule("basetyle", 
-            SubRule.Create(key_INT),
-            SubRule.Create(key_BOOL),
-            SubRule.Create(key_STRING),
-            SubRule.Create(key_CHAR),
-            SubRule.Create(key_DECIMAL),
-            SubRule.Create(key_DOUBLE),
-            SubRule.Create(key_FLOAT),
-            SubRule.Create(key_ANY)
+        rBasetype = rule("basetyle", 
+            sub(kINT),
+            sub(kBOOL),
+            sub(kSTRING),
+            sub(kCHAR),
+            sub(kDECIMAL),
+            sub(kDOUBLE),
+            sub(kFLOAT),
+            sub(kANY)
         );
 
-        rule_type = Rule.CreateRule("type",
-            SubRule.Create(rule_basetype)
+        rType = rule("type",
+            sub(rBasetype)
         );
-        rule_type.AddSubRules(
-            SubRule.Create(key_TUPLE, rule_type),
-            SubRule.Create(key_LIST, rule_type),
-            SubRule.Create(key_MAP, rule_basetype, rule_type),
-            SubRule.Create(key_TUPLE),
-            SubRule.Create(key_LIST),
-            SubRule.Create(key_MAP, rule_basetype),
-            SubRule.Create(rule_identity)
-        );
-
-        rule_command = new Rule.CreateRule(
-
+        rType.AddSubRules(
+            sub(kTUPLE, rType),
+            sub(kLIST, rType),
+            sub(kMAP, rBasetype, rType),
+            sub(kTUPLE),
+            sub(kLIST),
+            sub(kMAP, rBasetype),
+            sub(rIdentity)
         );
 
-
-        rule_key = Rule.CreateRule("key",
-            SubRule.Create(key_CONTEXTUAL, key_KEY, key_ID, key_EQUAL, key_EXPRESSION),
-            SubRule.Create(key_KEY, key_ID, key_EQUAL, key_EXPRESSION)
+        rData = rule("data");
+        rData.AddSubRules(
+            sub(rData, kOPSUM, rData),
+            sub(rData, kOPSUB, rData),
+            sub(rData, kOPMUL, rData),
+            sub(rData, kOPDIV, rData),
+            sub(rData, kOPMOD, rData),
+            sub(rData, kOPPOW, rData),
+            sub(kOPSUM, rData),
+            sub(kOPSUB, rData),
+            sub(kINTVALUE),
+            sub(kBOOLVALUE),
+            sub(kEXPRESSION),
+            sub(kNULLVALUE)
         );
 
-        rule_start = Rule.CreateStartRule("start");
-        rule_start.AddSubRules(
-            SubRule.Create(rule_key, rule_start),
-            SubRule.Create(rule_key)
+        rCondition = rule("condition",
+            sub(kBOOLVALUE),
+            sub(rData, kIS, rData),
+            sub(rData, kNOT, kIS, rData),
+            sub(rData, kIN, rData),
+            sub(rData, kSMALLER, rData),
+            sub(rData, kSMALLEREQUAL, rData),
+            sub(rData, kBIGGER, rData),
+            sub(rData, kBIGGEREQUAL, rData)
+        );
+        rCondition.AddSubRules(
+            sub(rCondition, kAND, rCondition),
+            sub(rCondition, kOR, rCondition),
+            sub(rCondition, kXOR, rCondition),
+            sub(kNOT, rCondition),
+            sub(kOPENPARENTHESES, rCondition, kCLOSEPARENTHESES)
+        );
+
+        rData.AddSubRules(
+            sub(rCondition)
+        );
+
+        rCommand = rule("command",
+            sub(rIdentity, kEQUAL, rData)
+        );
+
+        rKey = Rule.CreateRule("key",
+            sub(kCONTEXTUAL, kKEY, kID, kEQUAL, kEXPRESSION),
+            sub(kKEY, kID, kEQUAL, kEXPRESSION)
+        );
+
+        rStart = Rule.CreateStartRule("start");
+        rStart.AddSubRules(
+            sub(rKey, rStart),
+            sub(rKey)
         );
 
         processing1 = Processing.FromFunction(
@@ -184,17 +230,17 @@ public class OrkestraCompiler : Compiler
                     {
                         level = current;
                         text.PrependNewline();
-                        text.Prepend(key_STARTBLOCK);
+                        text.Prepend(kSTARTBLOCK);
                         text.Next();
                     }
                     
-                    text.Append(key_ENDLINE);
+                    text.Append(kENDLINE);
 
                     while (current < level)
                     {
                         level -= 4;
                         text.PrependNewline();
-                        text.Prepend(key_ENDBLOCK);
+                        text.Prepend(kENDBLOCK);
                         text.Next();
                     }
                 }
@@ -202,10 +248,10 @@ public class OrkestraCompiler : Compiler
                 while (level > 0)
                 {
                     level -= 4;
-                    text.Append(key_ENDBLOCK);
+                    text.Append(kENDBLOCK);
                     text.AppendNewline();
                 }
-                text.Append(key_ENDFILE);
+                text.Append(kENDFILE);
                 return text;
             }
         );
