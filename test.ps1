@@ -1,6 +1,6 @@
 clear
 cd src
 cd dotnet
-dotnet run
+dotnet run -- -v
 cd ..
 cd ..

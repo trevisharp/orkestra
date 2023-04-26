@@ -119,7 +119,9 @@ public class Text
     {
         var step = this.pointerStack.Peek();
         int end = getEndLineIndex(step);
-        this.source.Insert(data, end);
+        if (this.source[end].Character == '\n')
+            this.source.Insert(data, end);
+        else this.source.Insert(data, end + 1);
     }
 
     private void appendCharacter(Data data)
@@ -546,14 +548,25 @@ public class Text
             while (this.source[index].Token is null)
             {
                 sb.Append(this.source[index].Character);
+
                 index++;
+                if (index >= this.source.Count)
+                    break;
             }
             data.Add(sb.ToString());
+            if (index >= this.source.Count)
+                break;
+
             while (this.source[index].Token is not null)
             {
                 data.Add(this.source[index].Token);
+
                 index++;
+                if (index >= this.source.Count)
+                    break;
             }
+            if (index >= this.source.Count)
+                break;
         }
 
         return data.ToArray();

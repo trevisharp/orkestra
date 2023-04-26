@@ -15,6 +15,12 @@ public abstract class Compiler
 
     public void Compile(string sourceCode)
     {
+        if (Verbose)
+        {
+            WriteLine("Build started...");
+            WriteLine();
+        }
+
         var lex = buildLexicalAnalyzer();
         var parser = buildSyntacticAnalyzer();
         var machine = buildProcessingMachine();
@@ -28,7 +34,7 @@ public abstract class Compiler
             WriteLine();
         }
 
-        var tokens = lex.Parse(sourceCode);
+        var tokens = lex.Parse(processedText);
 
         if (Verbose)
         {
