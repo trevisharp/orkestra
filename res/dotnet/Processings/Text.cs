@@ -465,7 +465,7 @@ public class Text
         Append(baseKey);
     }
 
-    public void Break()
+    public void Discard()
     {
         var step = this.pointerStack.Pop();
         var parent = this.pointerStack.Peek();
@@ -496,17 +496,7 @@ public class Text
         throw new Exception("Inconsistence in stack pointers.");
     }
 
-    public void Complete()
-    {
-        
-    }
-
-    public void Continue()
-    {
-        
-    }
-
-    public bool Skip()
+    public bool Next()
     {
         var step = this.pointerStack.Peek();
 
@@ -537,7 +527,7 @@ public class Text
         }
     }
 
-    public void Discard()
+    public void Skip()
     {
         var step = this.pointerStack.Peek();
         removeUnity();
