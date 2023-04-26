@@ -111,6 +111,9 @@ while (text.NextLine())
         }
     }
     text.PopProcessing();
+    
+    if (current > level + 4)
+        ErrorQueue.Main.Enqueue(null);
 
     if (current > level)
     {
@@ -119,9 +122,6 @@ while (text.NextLine())
         text.Prepend(STARTBLOCK);
         text.Next();
     }
-
-    if (emptyline)
-        continue;
     
     text.Append(ENDLINE);
 

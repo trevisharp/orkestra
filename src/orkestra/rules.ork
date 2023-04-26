@@ -1,0 +1,230 @@
+include keys
+include processings
+
+###########################################################################################################
+############################################  Rule definition  ############################################
+
+rule basetype:
+	{INT STRING DECIMAL BOOL CHAR ANY}
+
+rule type:
+	basetype
+	TUPLE type
+	LIST type
+	MAP basetype type
+	TUPLE
+	LIST
+	MAP basetype
+	identity
+
+rule dataCollection:
+	{[data COMMA]} data
+	
+rule listvalue:
+	BRACKETS {dataCollection} BRACKETS_CLOSE
+
+rule mapkey:
+	data DOUBLEDOT data
+
+rule mapkeycollection:
+	mapkey COMMA ENDLINE mapkeycollection
+	mapkey COMMA mapkeycollection
+	mapkey ENDLINE
+	mapkey
+
+rule mapvalue:
+	BRACES ENDLINE mapkeycollection BRACES_CLOSE
+	BRACES mapkeycollection BRACES_CLOSE
+	BRACES ENDLINE BRACES_CLOSE
+	BRACES BRACES_CLOSE
+
+rule tuplevalue:
+	PARENTHESES {[data]} PARENTHESES_CLOSE
+
+rule collection:
+	listvalue
+	mapvalue
+	tuplevalue
+
+rule condition:
+	BOOLVALUE
+	data IS data
+	data NOT IS data
+	data IN data
+	data SMALLER data
+	data SMALLEREQUAL data
+	data BIGGER data
+	data BIGGEREQUAL data
+	condition AND condition
+	condition OR condition
+	condition XOR condition
+	NOT condition
+	PARENTHESES condition PARENTHESES_CLOSE
+	
+rule functionCall:
+	data PARENTHESES {dataCollection} PARENTHESES_CLOSE
+	
+rule indexer:
+	data BRACKETS data BRACKETS_CLOSE
+
+rule data:
+	data OPSUM data
+	data OPSUBTRACT data
+	data OPTIMES data
+	data OPDIVIDE data
+	data OPPOW data
+	data OPMODULE data
+	OPSUM data
+	OPSUBTRACT data
+	INTEGERVALUE
+	DOUBLEVALUE
+	STRINGVALUE
+	CHARVALUE
+	EXPRESSION
+	NULLVALUE
+	condition
+	functionCall
+	collection
+	indexer
+	data DOT identity
+	NEWLINE
+	SPACE
+	TAB
+	PARENTHESES data PARENTHESES_CLOSE
+	identity
+
+rule text:
+	[data]
+
+rule if:
+	IF condition DOUBLEDOT ENDLINE commandBlock
+
+rule elseif:
+	ELSE IF condition DOUBLEDOT ENDLINE commandBlock elseif
+	ELSE IF condition DOUBLEDOT ENDLINE commandBlock
+
+rule else:
+	ELSE DOUBLEDOT ENDLINE commandBlock
+
+rule ifstructure:
+	if
+	if else
+	if elseif
+	if elseif else
+
+rule operation:
+	{OPSUM OPSUBTRACT OPTIMES OPDIVIDE OPMODULE OPPOW}
+
+rule print:
+	PRINT text
+
+rule parse:
+	PARSE data
+
+rule variable:
+	identity
+	identity EQUAL data
+	type identity
+	type identity EQUAL data
+
+rule loop:
+	FOR identity IN collection DOUBLEDOT ENDLINE commandBlock
+	FOR type identity IN collection DOUBLEDOT ENDLINE commandBlock
+	WHILE condition DOUBLEDOT ENDLINE commandBlock
+
+rule throw:
+	THROW identity
+
+rule command:
+	functionCall ENDLINE
+	identity EQUAL data ENDLINE
+	identity operation EQUAL data ENDLINE
+	RETURN data ENDLINE
+	print ENDLINE
+	parse ENDLINE
+	BREAK ENDLINE
+	CONTINUE ENDLINE
+	variable ENDLINE
+	ifstructure
+	throw
+	loop
+
+rule commandBlock:
+	STARTBLOCK [command] ENDBLOCK
+
+rule processingCommand inherits command:
+	COMPLETE
+	DISCARD
+	APPEND text
+	PREPEND text
+	REPLACE text
+	processing
+
+rule processingCommandBlock:
+	STARTBLOCK [processingCommand] ENDBLOCK
+
+rule processing:
+	PROCESSING ALL DOUBLEDOT ENDLINE processingCommandBlock
+	PROCESSING LINE DOUBLEDOT ENDLINE processingCommandBlock
+	PROCESSING CHARACTER DOUBLEDOT ENDLINE processingCommandBlock
+
+rule key:
+	{CONTEXTUAL IDENTITY} {KEY KEYWORD} ID {(EQUAL EXPRESSION)} ENDLINE
+
+rule ruleelement:
+	[{IDENTITY identity}] ENDLINE
+
+rule rule:
+	RULE identity DOUBLEDOT ENDLINE STARTBLOCK [ruleelement] ENDBLOCK
+	RULE identity
+
+rule startrule:
+	START RULE DOUBLEDOT ENDLINE
+
+rule reference:
+	identity DOT reference
+	identity
+
+rule using:
+	USING reference ENDLINE
+
+rule include:
+	INCLUDE reference ENDLINE
+
+rule import:
+	IMPORT reference ENDLINE
+
+rule element:
+	[{key rule startrule variable function using include import error}]
+
+rule doctreevalue:
+	OPEN data
+
+rule paramcollection:
+	variable COMMA paramcollection
+	variable
+
+rule lambda:
+	LAMBDA data
+	LAMBDA command
+
+rule codedefinition:
+	ENDLINE commandBlock
+	lambda
+	ENDLINE STARTBLOCK lambda ENDBLOCK
+
+rule function:
+	FUNCTION identity PARENTHESES PARENTHESES_CLOSE codedefinition
+	FUNCTION identity PARENTHESES paramcollection PARENTHESES_CLOSE codedefinition
+	FUNCTION type identity PARENTHESES PARENTHESES_CLOSE codedefinition
+	FUNCTION type identity PARENTHESES paramcollection PARENTHESES_CLOSE codedefinition
+	FUNCTION identity PARENTHESES PARENTHESES_CLOSE ENDLINE
+	FUNCTION identity PARENTHESES paramcollection PARENTHESES_CLOSE ENDLINE
+	FUNCTION type identity PARENTHESES PARENTHESES_CLOSE ENDLINE
+	FUNCTION type identity PARENTHESES paramcollection PARENTHESES_CLOSE ENDLINE
+
+rule error:
+	ERROR identity
+
+start rule:
+	element {ENDFILE}
