@@ -55,6 +55,21 @@ public abstract class Compiler
         }
     }
 
+    protected static Key key(string name, string expression)
+        => Key.CreateKey(name, expression);
+
+    protected static Key keyword(string name, string expression)
+        => Key.CreateKeyword(name, expression);
+
+    protected static Key keyword(string name)
+        => keyword(name, name.ToLower());
+
+    protected static Key contextual(string name, string expression)
+        => Key.CreateContextual(name, expression);
+
+    protected static Key contextual(string name)
+        => contextual(name, name.ToLower());
+
     private ProcessingPackage buildProcessingMachine()
     {
         ProcessingPackage package = new ProcessingPackage();

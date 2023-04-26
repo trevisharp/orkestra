@@ -7,59 +7,72 @@ public class OrkestraCompiler : Compiler
     Key key_ENDBLOCK = Key.CreateAutoKeyword("ENDBLOCK");
 
     // processing keys
-    Key key_PROCESSING = Key.CreateKey("PROCESSING", "processing");
-    Key NEWLINE = Key.CreateKey("NEWLINE", "newline");
-    Key key_TAB = Key.CreateKey("TAB", "tab");
-    Key key_SPACE = Key.CreateKey("SPACE", "space");
-    Key key_ALL = Key.CreateContextual("ALL", "all");
-    Key key_LINE = Key.CreateContextual("LINE", "line");
-    Key key_CHARACTER = Key.CreateContextual("CHARACTER", "character");
-    Key key_CONTINUE = Key.CreateContextual("CONTINUE", "continue");
-    Key key_SKIP = Key.CreateContextual("SKIP", "skip");
-    Key key_NEXT = Key.CreateContextual("NEXT", "next");
-    Key key_BREAK = Key.CreateContextual("BREAK", "break");
-    Key key_DISCARD = Key.CreateContextual("DISCARD", "discard");
-    Key key_APPEND = Key.CreateContextual("APPEND", "append");
-    Key key_PREPEND = Key.CreateContextual("PREPREND", "prepend");
-    Key key_REPLACE = Key.CreateContextual("REPLACE", "replace");
+    Key key_PROCESSING = key("PROCESSING", "processing");
+    Key NEWLINE = key("NEWLINE", "newline");
+    Key key_TAB = key("TAB", "tab");
+    Key key_SPACE = key("SPACE", "space");
+    Key key_ALL = contextual("ALL", "all");
+    Key key_LINE = contextual("LINE", "line");
+    Key key_CHARACTER = contextual("CHARACTER", "character");
+    Key key_CONTINUE = contextual("CONTINUE", "continue");
+    Key key_SKIP = contextual("SKIP", "skip");
+    Key key_NEXT = contextual("NEXT", "next");
+    Key key_BREAK = contextual("BREAK", "break");
+    Key key_DISCARD = contextual("DISCARD", "discard");
+    Key key_APPEND = contextual("APPEND", "append");
+    Key key_PREPEND = contextual("PREPREND", "prepend");
+    Key key_REPLACE = contextual("REPLACE", "replace");
     
     // type keys
-    Key key_INT = Key.CreateKeyword("INT", "int");
-    Key key_BOOL = Key.CreateKeyword("BOOL", "bool");
+    Key key_INT = keyword("INT", "int");
+    Key key_BOOL = keyword("BOOL", "bool");
+    Key key_STRING = keyword("STRING", "string");
+    Key key_CHAR = keyword("CHAR", "char");
+    Key key_DECIMAL = keyword("DECIMAL", "decimal");
+    Key key_DOUBLE = keyword("DOUBLE", "double");
+    Key key_FLOAT = keyword("FLOAT", "float");
+    Key key_ANY = keyword("ANY", "any");
+    Key key_TUPLE = keyword("TUPLE", "tuple");
+    Key key_LIST = keyword("LIST", "list");
+    Key key_MAP = keyword("MAP", "map");
 
     // arithmetic keys
-    Key key_EQUAL = Key.CreateKeyword("EQUAL", "=");
-    Key key_OPSUM = Key.CreateKeyword("OPSUM", "\\+");
-    Key key_OPSUB = Key.CreateKeyword("OPSUB", "\\-");
-    Key key_IS = Key.CreateKeyword("IS", "is");
-    Key key_NOT = Key.CreateKeyword("NOT", "not");
-    Key BIGGEREQUAL = Key.CreateKeyword("BIGGEREQUAL", ">=");
-    Key SMALLEREQUAL = Key.CreateKeyword("SMALLEREQUAL", "<=");
-    Key BIGGER = Key.CreateKeyword("BIGGER", ">");
-    Key SMALLER = Key.CreateKeyword("SMALLER", "<");
+    Key key_EQUAL = keyword("EQUAL", "=");
+    Key key_OPSUM = keyword("OPSUM", "\\+");
+    Key key_OPSUB = keyword("OPSUB", "\\-");
+    Key key_IS = keyword("IS", "is");
+    Key key_NOT = keyword("NOT", "not");
+    Key BIGGEREQUAL = keyword("BIGGEREQUAL", ">=");
+    Key SMALLEREQUAL = keyword("SMALLEREQUAL", "<=");
+    Key BIGGER = keyword("BIGGER", ">");
+    Key SMALLER = keyword("SMALLER", "<");
 
     // code flow keys
-    Key key_IF = Key.CreateKeyword("IF", "if");
-    Key key_FOR = Key.CreateKeyword("FOR", "for");
-    Key key_WHILE = Key.CreateKeyword("WHILE", "while");
+    Key key_IF = keyword("IF", "if");
+    Key key_FOR = keyword("FOR", "for");
+    Key key_WHILE = keyword("WHILE", "while");
 
 
-    Key key_DOUBLEDOT = Key.CreateKeyword("DOUBLEDOT", ":");
-    Key key_LEFTPARENTHESES = Key.CreateKeyword("LEFTPARENTHESES", "\\(");
-    Key key_RIGHTPARENTHESES = Key.CreateKeyword("RIGHTPARENTHESES", "\\)");
-    Key key_KEY = Key.CreateKeyword("KEY", "key");
-    Key key_CONTEXTUAL = Key.CreateKeyword("CONTEXTUAL", "contextual");
+    Key key_DOUBLEDOT = keyword("DOUBLEDOT", ":");
+    Key key_LEFTPARENTHESES = keyword("LEFTPARENTHESES", "\\(");
+    Key key_RIGHTPARENTHESES = keyword("RIGHTPARENTHESES", "\\)");
+    Key key_KEY = keyword("KEY", "key");
+    Key key_CONTEXTUAL = keyword("CONTEXTUAL", "contextual");
 
     // value keys
-    Key key_INTVALUE = Key.CreateKey("INTVALUE", "(\\+|\\-)?[0-9][0-9]*");
-    Key key_BOOLVALUE = Key.CreateKey("BOOLVALUE", "(true)|(false)");
+    Key key_INTVALUE = key("INTVALUE", "(\\+|\\-)?[0-9][0-9]*");
+    Key key_BOOLVALUE = key("BOOLVALUE", "(true)|(false)");
 
 
-    Key key_EXPRESSION = Key.CreateKey("EXPRESSION", "\\/.*?\\/");
+    Key key_EXPRESSION = key("EXPRESSION", "\\/.*?\\/");
     Key key_ID = Key.CreateIdentity("ID", "[A-Za-z_][A-Za-z0-9_]*");
 
     Rule rule_key;
+    Rule rule_identity;
     Rule rule_start;
+    Rule rule_basetype;
+    Rule rule_type;
+    Rule rule_command;
 
     Processing processing1;
 
@@ -70,6 +83,39 @@ public class OrkestraCompiler : Compiler
 
     public OrkestraCompiler()
     {
+        rule_identity = Rule.CreateRule("identity",
+            SubRule.Create(key_ID)
+        );
+
+        rule_basetype = Rule.CreateRule("basetyle", 
+            SubRule.Create(key_INT),
+            SubRule.Create(key_BOOL),
+            SubRule.Create(key_STRING),
+            SubRule.Create(key_CHAR),
+            SubRule.Create(key_DECIMAL),
+            SubRule.Create(key_DOUBLE),
+            SubRule.Create(key_FLOAT),
+            SubRule.Create(key_ANY)
+        );
+
+        rule_type = Rule.CreateRule("type",
+            SubRule.Create(rule_basetype)
+        );
+        rule_type.AddSubRules(
+            SubRule.Create(key_TUPLE, rule_type),
+            SubRule.Create(key_LIST, rule_type),
+            SubRule.Create(key_MAP, rule_basetype, rule_type),
+            SubRule.Create(key_TUPLE),
+            SubRule.Create(key_LIST),
+            SubRule.Create(key_MAP, rule_basetype),
+            SubRule.Create(rule_identity)
+        );
+
+        rule_command = new Rule.CreateRule(
+
+        );
+
+
         rule_key = Rule.CreateRule("key",
             SubRule.Create(key_CONTEXTUAL, key_KEY, key_ID, key_EQUAL, key_EXPRESSION),
             SubRule.Create(key_KEY, key_ID, key_EQUAL, key_EXPRESSION)
