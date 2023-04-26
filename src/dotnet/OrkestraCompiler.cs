@@ -29,15 +29,32 @@ public class OrkestraCompiler : Compiler
 
     // arithmetic keys
     Key key_EQUAL = Key.CreateKeyword("EQUAL", "=");
+    Key key_OPSUM = Key.CreateKeyword("OPSUM", "\\+");
+    Key key_OPSUB = Key.CreateKeyword("OPSUB", "\\-");
+    Key key_IS = Key.CreateKeyword("IS", "is");
+    Key key_NOT = Key.CreateKeyword("NOT", "not");
+    Key BIGGEREQUAL = Key.CreateKeyword("BIGGEREQUAL", ">=");
+    Key SMALLEREQUAL = Key.CreateKeyword("SMALLEREQUAL", "<=");
+    Key BIGGER = Key.CreateKeyword("BIGGER", ">");
+    Key SMALLER = Key.CreateKeyword("SMALLER", "<");
 
+    // code flow keys
     Key key_IF = Key.CreateKeyword("IF", "if");
     Key key_FOR = Key.CreateKeyword("FOR", "for");
+    Key key_WHILE = Key.CreateKeyword("WHILE", "while");
+
+
     Key key_DOUBLEDOT = Key.CreateKeyword("DOUBLEDOT", ":");
     Key key_LEFTPARENTHESES = Key.CreateKeyword("LEFTPARENTHESES", "\\(");
     Key key_RIGHTPARENTHESES = Key.CreateKeyword("RIGHTPARENTHESES", "\\)");
-    Key key_INTVALUE = Key.CreateKey("INTVALUE", "(\\+|\\-)?[0-9][0-9]*");
     Key key_KEY = Key.CreateKeyword("KEY", "key");
     Key key_CONTEXTUAL = Key.CreateKeyword("CONTEXTUAL", "contextual");
+
+    // value keys
+    Key key_INTVALUE = Key.CreateKey("INTVALUE", "(\\+|\\-)?[0-9][0-9]*");
+    Key key_BOOLVALUE = Key.CreateKey("BOOLVALUE", "(true)|(false)");
+
+
     Key key_EXPRESSION = Key.CreateKey("EXPRESSION", "\\/.*?\\/");
     Key key_ID = Key.CreateIdentity("ID", "[A-Za-z_][A-Za-z0-9_]*");
 
