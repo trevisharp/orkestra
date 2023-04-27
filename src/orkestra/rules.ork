@@ -104,8 +104,8 @@ rule else:
 rule ifstructure:
 	if
 	if else
-	if elseif
-	if elseif else
+	if [elseif]
+	if [elseif] else
 
 rule operation:
 	{OPSUM OPSUBTRACT OPTIMES OPDIVIDE OPMODULE OPPOW}

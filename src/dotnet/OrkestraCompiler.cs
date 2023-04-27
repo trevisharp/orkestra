@@ -57,6 +57,7 @@ public class OrkestraCompiler : Compiler
 
     // code flow keys
     Key kIF = keyword("if");
+    Key kELSE = keyword("else");
     Key kFOR = keyword("for");
     Key kWHILE = keyword("while");
     Key kRETURN = keyword("return");
@@ -90,6 +91,7 @@ public class OrkestraCompiler : Compiler
     Rule rType;
     Rule rOperation;
     Rule rCommand;
+    Rule rCommandBlock_Temp1;
     Rule rData;
     Rule rCondition;
     Rule rDataCollection_Temp1;
@@ -102,6 +104,10 @@ public class OrkestraCompiler : Compiler
     Rule rTupleValue_Temp1;
     Rule rVariable;
     Rule rCommandBlock;
+    Rule rifStructure;
+    Rule rIf;
+    Rule rElse;
+    Rule rElseIf;
 
     Processing processing1;
 
@@ -242,8 +248,33 @@ public class OrkestraCompiler : Compiler
             sub(kCONTINUE, kENDLINE)
         );
 
+        rCommandBlock_Temp1 = rule("temp1commandblock",
+            sub(rCommand, rCommandBlock_Temp1),
+            sub(rCommand)
+        );
+
         rCommandBlock = rule("commandBlock",
-            sub(kSTARTBLOCK)
+            sub(kSTARTBLOCK, rCommandBlock_Temp1, kENDBLOCK)
+        );
+
+        rIf = rule("if",
+            sub(kIF, rCondition, kDOUBLEDOT, rCommandBlock),
+            sub(kIF, rCondition)
+        );
+
+        rElseIf = rule("elseif",
+            sub(kELSE, kIF, rCondition, kDOUBLEDOT, rCommandBlock),
+            sub(kELSE, kIF)
+        );
+
+        rElse = rule("else",
+            sub(kELSE, kDOUBLEDOT, rCommandBlock),
+            sub(kELSE)
+        );
+
+        rifStructure = rule("ifStrucuture",
+            sub(rIf),
+            sub(rIf, rElse)
         );
 
         rKey = Rule.CreateRule("key",
