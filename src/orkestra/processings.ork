@@ -1,9 +1,13 @@
-﻿using System.Linq;
+import errors
 
-string code = 
-@"
 ##########################################################################################################
 #######################################  Pre-processing definition  ######################################
+
+# auto keywords
+keyword ENDFILE
+keyword ENDLINE
+keyword STARTBLOCK
+keyword ENDBLOCK
 
 processing all:
 	int level = 0
@@ -47,9 +51,3 @@ processing all:
         level -= 4
         prepend newline ENDBLOCK
 	append ENDFILE
-";
-
-OrkestraCompiler compiler = new OrkestraCompiler();
-compiler.Verbose = args.Contains("-v") || args.Contains("--verbose");
-
-compiler.Compile(code);

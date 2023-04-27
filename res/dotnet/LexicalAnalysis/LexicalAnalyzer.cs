@@ -41,6 +41,20 @@ public class LexicalAnalyzer
         
         while (keys.Count > 0)
         {
+            if (keyIndex == keys.Count)
+            {       
+                if (crrMatch == null)
+                    yield break;
+
+                yield return createToken(crrKey, crrMatch, tokenCount++);
+
+                startIndex = crrMatch.Index + crrMatch.Value.Length;
+                minToken = int.MaxValue;
+                crrMatch = null;
+                crrKey = null;
+                keyIndex = 0;
+            }
+
             var match = getCurrentMatch(matches[keyIndex], startIndex);
             matches[keyIndex] = match;
 
@@ -48,10 +62,6 @@ public class LexicalAnalyzer
             {
                 keys.RemoveAt(keyIndex);
                 matches.RemoveAt(keyIndex);
-
-                if (keyIndex >= keys.Count)
-                    yield break;
-
                 continue;
             }
 
@@ -63,19 +73,6 @@ public class LexicalAnalyzer
             }
 
             keyIndex++;
-            if (keyIndex < keys.Count)
-                continue;
-            
-            if (crrMatch == null)
-                yield break;
-            
-            yield return createToken(crrKey, crrMatch, tokenCount++);
-
-            startIndex = crrMatch.Index + crrMatch.Value.Length;
-            minToken = int.MaxValue;
-            crrMatch = null;
-            crrKey = null;
-            keyIndex = 0;
         }
     }
 

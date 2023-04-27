@@ -50,16 +50,19 @@ public class Text
             .Replace("\r", "\n");  // For MAC version < X
         initFastList(newlineReplacedSource);
         this.pointerStack = new Stack<ProcessStep>();
-        addStep(-1, UnityType.All);
+        addStep(0, UnityType.All);
     }
 
     private int getStartLineIndex(ProcessStep step)
     {
-        int i = step.Index;
+        int i = step.Index - 1;
         while (i >= 0 && this.source[i].Character != '\n')
             i--;
         
-        return i;
+        if (i == 0)
+            return 0;
+        
+        return i + 1;
     }
 
     private int getEndLineIndex(ProcessStep step)
@@ -67,6 +70,9 @@ public class Text
         int i = step.Index;
         while (i < this.source.Count && this.source[i].Character != '\n')
             i++;
+        
+        if (i == this.source.Count)
+            i--;
         
         return i;
     }
@@ -104,6 +110,70 @@ public class Text
         this.pointerStack.Push(step);
     }
 
+    private void appendAll(Data data)
+    {
+        this.source.Add(data);
+    }
+
+    private void appendLine(Data data)
+    {
+        var step = this.pointerStack.Peek();
+        int end = getEndLineIndex(step);
+        if (this.source[end].Character == '\n')
+            this.source.Insert(data, end);
+        else this.source.Insert(data, end + 1);
+    }
+
+    private void appendCharacter(Data data)
+    {
+        var step = this.pointerStack.Peek();
+        this.source.Insert(data, step.Index + 1);
+    }
+
+    private void append(Data data)
+    {
+        var step = this.pointerStack.Peek();
+        var type = step.Type;
+
+        if (type == UnityType.All)
+            appendAll(data);
+        else if (type == UnityType.Line)
+            appendLine(data);
+        else if (type == UnityType.Character)
+            appendCharacter(data);
+    }
+
+    private void prependAll(Data data)
+    {
+        this.source.Insert(data, 0);
+    }
+
+    private void prependLine(Data data)
+    {
+        var step = this.pointerStack.Peek();
+        int index = getStartLineIndex(step);
+        this.source.Insert(data, index);
+    }
+
+    private void prependCharacter(Data data)
+    {
+        var step = this.pointerStack.Peek();
+        this.source.Insert(data, step.Index - 1);
+    }
+
+    private void prepend(Data data)
+    {
+        var step = this.pointerStack.Peek();
+        var type = step.Type;
+
+        if (type == UnityType.All)
+            prependAll(data);
+        else if (type == UnityType.Line)
+            prependLine(data);
+        else if (type == UnityType.Character)
+            prependCharacter(data);
+    }
+
     public bool NextLine()
     {
         var step = this.pointerStack.Peek();
@@ -117,15 +187,14 @@ public class Text
         if (step.Type != UnityType.Line)
             throw new Exception("Invalid processing: Line processing need start in all processing.");
 
-        if (step.Index == -1) // dont started yet
+        if (step.Index == -1) // Non-initialized yet
         {
             updateStep(0, UnityType.Line);
             return true;
         }
 
         var end = getEndLineIndex(step);
-
-        if (end == this.source.Count)
+        if (end + 1 >= this.source.Count)
             return false;
         
         updateStep(end + 1, UnityType.Line);
@@ -136,14 +205,20 @@ public class Text
     {
         var step = this.pointerStack.Peek();
 
-        if (step.Type == UnityType.All || step.Type == UnityType.Line)
+        if (step.Type == UnityType.All)
         {
             addStep(0, UnityType.Character);
             return true;
         }
 
         if (step.Type != UnityType.Character)
-            throw new Exception("Invalid processing: Character processing need start in all or line processing.");
+            throw new Exception("Invalid processing: Character processing need start in all processing.");
+
+        if (step.Index == -1) // Non-initialized yet
+        {
+            updateStep(0, UnityType.Line);
+            return true;
+        }
 
         int index = step.Index;
         index++;
@@ -160,19 +235,26 @@ public class Text
 
         if (step.Type == UnityType.Line)
         {
-            addStep(step.Index - 1, UnityType.Character);
-            step = this.pointerStack.Peek();
+            addStep(step.Index, UnityType.Character);
+            
+            if (step.Index == source.Count) //End Of File
+                return false;
+            
+            return true;
         }
 
         if (step.Type != UnityType.Character)
             throw new Exception("Invalid processing: Character processing need start in all or line processing.");
 
         int index = step.Index;
-        index++;
-        if (index >= source.Count)
+        if (index >= this.source.Count)
             return false;
         
-        if (index >= this.source.Count || this.source[index].Character == '\n')
+        if (this.source[index].Character == '\n')
+            return false;
+        
+        index++;
+        if (index >= this.source.Count)
             return false;
 
         updateStep(index, UnityType.Character);
@@ -210,63 +292,6 @@ public class Text
         return
             index < this.source.Count && 
             this.source[index].Character == character;
-    }
-
-    private void append(Data data)
-    {
-        var step = this.pointerStack.Peek();
-        var type = step.Type;
-
-        if (type == UnityType.All)
-        {
-            this.source.Add(data);
-            return;
-        }
-
-        if (type == UnityType.Character)
-        {
-            this.source.Insert(data, step.Index);
-            return;
-        }
-        
-        int i = step.Index;
-        while (i < this.source.Count && this.source[i].Character != '\n')
-            i++;
-        
-        if (i >= this.source.Count)
-        {
-            this.source.Add(newline);
-            this.source.Add(data);
-            return;
-        }
-        
-        this.source.Insert(data, i);
-        this.source.Add(newline);
-    }
-
-    private void prepend(Data data)
-    {
-        var step = this.pointerStack.Peek();
-        var type = step.Type;
-
-        if (type == UnityType.All)
-        {
-            this.source.Insert(data, 0);
-            return;
-        }
-
-        if (type == UnityType.Character)
-        {
-            this.source.Insert(data, step.Index - 1);
-            return;
-        }
-        
-        int i = step.Index;
-        while (i >= 0 && this.source[i].Character != '\n')
-            i--;
-        
-        this.source.Insert(data, i);
-        this.source.Insert(newline, i);
     }
 
     public void Append(Token token)
@@ -323,7 +348,6 @@ public class Text
         }
         
         this.source.Insert(data, i);
-        this.source.Insert(newline, i);
     }
 
     public void Prepend(Token token)
@@ -365,6 +389,7 @@ public class Text
         if (type == UnityType.Character)
         {
             this.source.Insert(data, step.Index);
+            updateStep(step.Index - data.Length, UnityType.Character);
             return;
         }
         
@@ -381,6 +406,7 @@ public class Text
         
         this.source.Insert(data, i);
         this.source.Insert(newline, i);
+        updateStep(step.Index - data.Length - 1, UnityType.Line);
     }
 
     public void AppendNewline()
@@ -410,8 +436,6 @@ public class Text
             int start = getStartLineIndex(step);
             int end = getStartLineIndex(step);
             this.source.Remove(start, end - start + 1);
-            int newIndex = start - 1;
-            updateStep(newIndex, UnityType.Line);
             return;
         }
 
@@ -443,7 +467,7 @@ public class Text
         Append(baseKey);
     }
 
-    public void Break()
+    public void Discard()
     {
         var step = this.pointerStack.Pop();
         var parent = this.pointerStack.Peek();
@@ -474,19 +498,42 @@ public class Text
         throw new Exception("Inconsistence in stack pointers.");
     }
 
-    public void Complete()
+    public bool Next()
     {
-        
+        var step = this.pointerStack.Peek();
+
+        switch (step.Type)
+        {
+            case UnityType.All:
+                this.pointerStack.Pop();
+                addStep(-1, UnityType.All);
+                return true;
+            
+            case UnityType.Line:
+                return NextLine();
+            
+            case UnityType.Character:
+                step = this.pointerStack.Pop();
+                var parent = this.pointerStack.Peek();
+                this.pointerStack.Push(step);
+
+                if (parent.Type == UnityType.All)
+                    return NextCharacter();
+                else if (parent.Type == UnityType.Line)
+                    return NextCharacterLine();
+                
+                return false;
+
+            default:
+                return false;    
+        }
     }
 
-    public void Continue()
+    public void Skip()
     {
-        
-    }
-
-    public void Discard()
-    {
+        var step = this.pointerStack.Peek();
         removeUnity();
+        updateStep(step.Index - 1, step.Type);
     }
 
     public object[] ToSources()
@@ -501,14 +548,25 @@ public class Text
             while (this.source[index].Token is null)
             {
                 sb.Append(this.source[index].Character);
+
                 index++;
+                if (index >= this.source.Count)
+                    break;
             }
             data.Add(sb.ToString());
+            if (index >= this.source.Count)
+                break;
+
             while (this.source[index].Token is not null)
             {
                 data.Add(this.source[index].Token);
+
                 index++;
+                if (index >= this.source.Count)
+                    break;
             }
+            if (index >= this.source.Count)
+                break;
         }
 
         return data.ToArray();
@@ -540,13 +598,17 @@ public class Text
         var type = step.Type;
         var index = step.Index;
 
+        if (step.Index == -1)
+            return null;
+
         if (type == UnityType.Line)
         {
             StringBuilder sb = new StringBuilder();
 
             var start = getStartLineIndex(step);
             var end = getEndLineIndex(step);
-            for (int i = start; i < end; i++)
+
+            for (int i = start; i <= end; i++)
             {
                 var data = this.source[i];
                 if (data.Token is null)

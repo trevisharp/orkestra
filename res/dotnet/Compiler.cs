@@ -1,4 +1,3 @@
-using System;
 using System.Reflection;
 using System.Collections.Generic;
 using static System.Console;
@@ -15,6 +14,12 @@ public abstract class Compiler
 
     public void Compile(string sourceCode)
     {
+        if (Verbose)
+        {
+            WriteLine("Build started...");
+            WriteLine();
+        }
+
         var lex = buildLexicalAnalyzer();
         var parser = buildSyntacticAnalyzer();
         var machine = buildProcessingMachine();
@@ -28,7 +33,7 @@ public abstract class Compiler
             WriteLine();
         }
 
-        var tokens = lex.Parse(sourceCode);
+        var tokens = lex.Parse(processedText);
 
         if (Verbose)
         {
@@ -48,6 +53,33 @@ public abstract class Compiler
             WriteLine();
         }
     }
+
+    protected static Key key(string name, string expression)
+        => Key.CreateKey(name, expression);
+
+    protected static Key keyword(string name, string expression)
+        => Key.CreateKeyword(name, expression);
+
+    protected static Key keyword(string expression)
+        => keyword(expression.ToUpper(), expression);
+
+    protected static Key contextual(string name, string expression)
+        => Key.CreateContextual(name, expression);
+
+    protected static Key contextual(string expression)
+        => contextual(expression.ToUpper(), expression);
+
+    protected static Key auto(string name)
+        => Key.CreateAutoKeyword(name);
+
+    protected static Key identity(string name, string expression)
+        => Key.CreateIdentity(name, expression);
+
+    protected static Rule rule(string name, params SubRule[] subRules)
+        => Rule.CreateRule(name, subRules);
+
+    protected static SubRule sub(params IRuleElement[] elements)
+        => SubRule.Create(elements);
 
     private ProcessingPackage buildProcessingMachine()
     {

@@ -1,0 +1,120 @@
+##########################################################################################################
+############################################  Key definition  ############################################
+
+# processing keywords
+keyword PROCESSING = /processing/
+keyword NEWLINE = /newline/
+keyword TAB = /tab/
+keyword SPACE = /space/
+contextual keyword ALL = /all/
+contextual keyword LINE = /line/
+contextual keyword CHARACTER = /character/
+contextual keyword BREAK = /break/
+contextual keyword DISCARD = /discard/
+contextual keyword COMPLETE = /complete/
+contextual keyword CONTINUE = /continue/
+contextual keyword APPEND = /append/
+contextual keyword PREPEND = /prepend/
+contextual keyword REPLACE = /replace/
+
+# keys keywords
+contextual keyword KEY = /key/
+contextual keyword KEYWORD = /keyword/
+contextual keyword CONTEXTUAL = /contextual/
+key EXPRESSION = //.*?//
+
+# rules keywords
+contextual keyword RULE = /rule/
+keyword START = /start/
+contextual keyword IDENTITY = /identity/
+keyword INHERITS = /inherits/
+
+# imports keywords
+contextual keyword IMPORT = /import/
+contextual keyword USING = /using/
+contextual keyword INCLUDE = /include/
+
+# data keywords
+keyword BRACES = /\{/
+keyword BRACES_CLOSE = /\}/
+keyword PARENTHESES = /\(/
+keyword PARENTHESES_CLOSE = /\)/
+keyword BRACKETS = /\[/
+keyword BRACKETS_CLOSE = /\]/
+keyword OPSUM = /\+/
+keyword OPSUBTRACT = /\-/
+keyword OPTIMES = /\*/
+keyword OPDIVIDE = /\//
+keyword OPPOW = /\^/
+keyword OPMODULE = /\%/
+keyword EQUAL = /\=/
+keyword DOUBLEDOT = /\:/
+keyword DOT = /\./
+keyword COMMA = /,/
+keyword IS = /is/
+keyword IN = /in/
+keyword NOT = /not/
+keyword BIGGEREQUAL = />=/
+keyword SMALLEREQUAL = /<=/
+keyword BIGGER = />/
+keyword SMALLER = /</
+keyword AND = /and/
+keyword OR = /or/
+keyword XOR = /xor/
+keyword INT = /int/
+keyword STRING = /string/
+keyword DECIMAL = /decimal/
+keyword BOOL = /bool/
+keyword CHAR = /char/
+keyword ANY = /any/
+keyword LIST = /list/
+keyword MAP = /map/
+keyword TUPLE = /tuple/
+key NULLVALUE = /null/
+key NEW = /new/
+
+# flow keywords
+contextual keyword IF = /if/
+contextual keyword ELSE = /else/
+contextual keyword FOR = /for/
+contextual keyword WHILE = /while/
+
+# value keywords
+identity key ID = /[A-Za-z_][A-Za-z_0-9]*/
+key STRINGVALUE = /\".*?\/
+key INTEGERVALUE = /[+-]?[0-9]+/
+key DOUBLEVALUE = /[+-]?[0-9]*"."[0-9]+/
+key CHARVALUE = /\'.\'/
+key BOOLVALUE = /[true|false]/
+
+# functions keywords
+contextual keyword FUNCTION = /function/
+contextual keyword PARSE = /parse/
+keyword RETURN = /return/
+keyword PRINT = />>/
+keyword LAMBDA = /=>/
+
+# errors keywords
+contextual keyword THROW = /throw/
+contextual keyword ERROR = /error/
+
+# temp keywords
+key OVERRIDE = /override/
+contextual key ENTITY = /enity/
+contextual key PARTIAL = /partial/
+contextual key FULL = /full/
+key THIS = /this/
+key BASE = /base/
+contextual key METHOD = /method/
+contextual key PROPERTY = /property/
+key READONLY = /readonly/
+key GET = /get/
+key SET = /set/
+key VALUE = /value/
+contextual key CONSTRUCTOR = /constructor/
+contextual key COMPILER = /compiler/
+contextual key FOLDER = /folder/
+contextual key FILE = /file/
+contextual key TITLE = /title/
+contextual key CONTENT = /content/
+key OPEN = /open/
