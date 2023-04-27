@@ -68,12 +68,7 @@ rule indexer:
 	data BRACKETS data BRACKETS_CLOSE
 
 rule data:
-	data OPSUM data
-	data OPSUBTRACT data
-	data OPTIMES data
-	data OPDIVIDE data
-	data OPPOW data
-	data OPMODULE data
+	data operation data
 	OPSUM data
 	OPSUBTRACT data
 	INTEGERVALUE
@@ -122,8 +117,6 @@ rule parse:
 	PARSE data
 
 rule variable:
-	identity
-	identity EQUAL data
 	type identity
 	type identity EQUAL data
 

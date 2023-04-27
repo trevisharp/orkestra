@@ -59,6 +59,8 @@ public class OrkestraCompiler : Compiler
     Key kIF = keyword("if");
     Key kFOR = keyword("for");
     Key kWHILE = keyword("while");
+    Key kRETURN = keyword("return");
+    Key kPRINT = keyword("print");
 
     // symbol keys
     Key kOPENPARENTHESES = keyword("OPENPARENTHESES", "\\(");
@@ -86,6 +88,7 @@ public class OrkestraCompiler : Compiler
     Rule rStart;
     Rule rBasetype;
     Rule rType;
+    Rule rOperation;
     Rule rCommand;
     Rule rData;
     Rule rCondition;
@@ -97,6 +100,8 @@ public class OrkestraCompiler : Compiler
     Rule rMapValue;
     Rule rTupleValue;
     Rule rTupleValue_Temp1;
+    Rule rVariable;
+    Rule rCommandBlock;
 
     Processing processing1;
 
@@ -135,14 +140,18 @@ public class OrkestraCompiler : Compiler
             sub(rIdentity)
         );
 
+        rOperation = rule("operation",
+            sub(kOPSUM),
+            sub(kOPSUB),
+            sub(kOPMUL),
+            sub(kOPDIV),
+            sub(kOPMOD),
+            sub(kOPPOW)
+        );
+
         rData = rule("data");
         rData.AddSubRules(
-            sub(rData, kOPSUM, rData),
-            sub(rData, kOPSUB, rData),
-            sub(rData, kOPMUL, rData),
-            sub(rData, kOPDIV, rData),
-            sub(rData, kOPMOD, rData),
-            sub(rData, kOPPOW, rData),
+            sub(rData, rOperation, rData),
             sub(kOPSUM, rData),
             sub(kOPSUB, rData),
             sub(kINTVALUE),
@@ -218,8 +227,23 @@ public class OrkestraCompiler : Compiler
             sub(kOPENPARENTHESES, rTupleValue_Temp1, kCLOSEPARENTHESES)
         );
 
+        rVariable = rule("variable",
+            sub(rType, rIdentity),
+            sub(rType, rIdentity, kEQUAL, rData)
+        );
+
         rCommand = rule("command",
-            sub(rIdentity, kEQUAL, rData)
+            sub(rIdentity, kEQUAL, rData, kENDLINE),
+            sub(rIdentity, rOperation, kEQUAL, rData, kENDLINE),
+            sub(rVariable, kENDLINE),
+            sub(kRETURN, rData, kENDLINE),
+            sub(kPRINT, rData, kENDLINE),
+            sub(kBREAK, kENDLINE),
+            sub(kCONTINUE, kENDLINE)
+        );
+
+        rCommandBlock = rule("commandBlock",
+            sub(kSTARTBLOCK)
         );
 
         rKey = Rule.CreateRule("key",
