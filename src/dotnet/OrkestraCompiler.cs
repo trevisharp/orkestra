@@ -60,14 +60,21 @@ public class OrkestraCompiler : Compiler
     Key kFOR = keyword("for");
     Key kWHILE = keyword("while");
 
-    Key kDOUBLEDOT = keyword("DOUBLEDOT", ":");
+    // symbol keys
     Key kOPENPARENTHESES = keyword("OPENPARENTHESES", "\\(");
     Key kCLOSEPARENTHESES = keyword("CLOSEPARENTHESES", "\\)");
+    Key kOPENBRACES = keyword("OPENBRACES", "\\{");
+    Key kCLOSEBRACES = keyword("CLOSEBRACES", "\\}");
+    Key kOPENBRACKETS = keyword("OPENBRACKETS", "\\[");
+    Key kCLOSEBRACKETS = keyword("CLOSEBRACKETS", "\\]");
+
+    Key kDOUBLEDOT = keyword("DOUBLEDOT", ":");
     Key kKEY = keyword("key");
     Key kCONTEXTUAL = keyword("contextual");
     Key kNULLVALUE = keyword("null");
 
     // value keys
+    Key kCOMMA = key("COMMA", ",");
     Key kINTVALUE = key("INTVALUE", "(\\+|\\-)?[0-9][0-9]*");
     Key kBOOLVALUE = key("BOOLVALUE", "(true)|(false)");
 
@@ -82,6 +89,14 @@ public class OrkestraCompiler : Compiler
     Rule rCommand;
     Rule rData;
     Rule rCondition;
+    Rule rDataCollection_Temp1;
+    Rule rDataCollection;
+    Rule rListValue;
+    Rule rMapKey;
+    Rule rMapKeyCollection;
+    Rule rMapValue;
+    Rule rTupleValue;
+    Rule rTupleValue_Temp1;
 
     Processing processing1;
 
@@ -153,9 +168,54 @@ public class OrkestraCompiler : Compiler
             sub(kNOT, rCondition),
             sub(kOPENPARENTHESES, rCondition, kCLOSEPARENTHESES)
         );
-
         rData.AddSubRules(
             sub(rCondition)
+        );
+
+        rDataCollection_Temp1 = rule("temp1datacollection");
+        rDataCollection_Temp1.AddSubRules(
+            sub(rData, kCOMMA, rDataCollection_Temp1),
+            sub(rData, kCOMMA)
+        );
+        rDataCollection = rule("dataCollection",
+            sub(rDataCollection_Temp1, rData),
+            sub(rData)
+        );
+
+        rListValue = rule("listValue",
+            sub(kOPENBRACKETS, rDataCollection, kCLOSEBRACKETS),
+            sub(kOPENBRACKETS, kCLOSEBRACKETS)
+        );
+
+        rMapKey = rule("mapKey",
+            sub(rData, kDOUBLEDOT, rData)
+        );
+
+        rMapKeyCollection = rule("mapKeyCollection",
+            sub(rMapKey, kENDLINE),
+            sub(rMapKey)
+        );
+        rMapKeyCollection.AddSubRules(
+            sub(rMapKey, kCOMMA, kENDLINE, rMapKeyCollection),
+            sub(rMapKey, kCOMMA, rMapKeyCollection)
+        );
+
+        rMapValue = rule("mapValue",
+            sub(kOPENBRACES, kENDLINE, kSTARTBLOCK, rMapKeyCollection, kENDBLOCK, kCLOSEBRACES),
+            sub(kOPENBRACES, kSTARTBLOCK, rMapKeyCollection, kENDBLOCK, kCLOSEBRACES),
+            sub(kOPENBRACES, kENDLINE, kCLOSEBRACES),
+            sub(kOPENBRACES, kCLOSEBRACES)
+        );
+
+        rTupleValue_Temp1 = rule("temp1tuplevalue");
+        rTupleValue_Temp1.AddSubRules(
+            sub(rData, rTupleValue_Temp1),
+            sub(rData)
+        );
+
+        rTupleValue = rule("tupleValue",
+            sub(kOPENPARENTHESES, kCLOSEPARENTHESES),
+            sub(kOPENPARENTHESES, rTupleValue_Temp1, kCLOSEPARENTHESES)
         );
 
         rCommand = rule("command",

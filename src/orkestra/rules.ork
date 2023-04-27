@@ -20,31 +20,31 @@ rule type:
 rule dataCollection:
 	{[data COMMA]} data
 	
-rule listvalue:
+rule listValue:
 	BRACKETS {dataCollection} BRACKETS_CLOSE
 
-rule mapkey:
+rule mapKey:
 	data DOUBLEDOT data
 
-rule mapkeycollection:
-	mapkey COMMA ENDLINE mapkeycollection
-	mapkey COMMA mapkeycollection
-	mapkey ENDLINE
-	mapkey
+rule mapKeycollection:
+	mapKey COMMA ENDLINE mapKeycollection
+	mapKey COMMA mapKeycollection
+	mapKey ENDLINE
+	mapKey
 
-rule mapvalue:
-	BRACES ENDLINE mapkeycollection BRACES_CLOSE
-	BRACES mapkeycollection BRACES_CLOSE
+rule mapValue:
+	BRACES ENDLINE mapKeycollection BRACES_CLOSE
+	BRACES mapKeycollection BRACES_CLOSE
 	BRACES ENDLINE BRACES_CLOSE
 	BRACES BRACES_CLOSE
 
-rule tuplevalue:
+rule tupleValue:
 	PARENTHESES {[data]} PARENTHESES_CLOSE
 
 rule collection:
-	listvalue
-	mapvalue
-	tuplevalue
+	listValue
+	mapValue
+	tupleValue
 
 rule condition:
 	BOOLVALUE
