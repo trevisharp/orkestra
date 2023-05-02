@@ -63,6 +63,9 @@ public class OrkestraCompiler : Compiler
     Key kRETURN = keyword("return");
     Key kPRINT = keyword("print");
 
+    // error keywrods
+    Key kTHROW = keyword("throw");
+
     // symbol keys
     Key kOPENPARENTHESES = keyword("OPENPARENTHESES", "\\(");
     Key kCLOSEPARENTHESES = keyword("CLOSEPARENTHESES", "\\)");
@@ -108,6 +111,7 @@ public class OrkestraCompiler : Compiler
     Rule rIf;
     Rule rElse;
     Rule rElseIf;
+    Rule rThorw;
 
     Processing processing1;
 
@@ -238,6 +242,10 @@ public class OrkestraCompiler : Compiler
             sub(rType, rIdentity, kEQUAL, rData)
         );
 
+        rThorw = rule("throw",
+            sub(kTHROW, rIdentity)
+        );
+
         rCommand = rule("command",
             sub(rIdentity, kEQUAL, rData, kENDLINE),
             sub(rIdentity, rOperation, kEQUAL, rData, kENDLINE),
@@ -245,7 +253,8 @@ public class OrkestraCompiler : Compiler
             sub(kRETURN, rData, kENDLINE),
             sub(kPRINT, rData, kENDLINE),
             sub(kBREAK, kENDLINE),
-            sub(kCONTINUE, kENDLINE)
+            sub(kCONTINUE, kENDLINE),
+            sub(rThorw, kENDLINE)
         );
 
         rCommandBlock_Temp1 = rule("temp1commandblock",
