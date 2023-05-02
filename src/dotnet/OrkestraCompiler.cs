@@ -111,7 +111,9 @@ public class OrkestraCompiler : Compiler
     Rule rIf;
     Rule rElse;
     Rule rElseIf;
+    Rule rElseIfCollection;
     Rule rThorw;
+    Rule rProcessingUnity;
 
     Processing processing1;
 
@@ -275,6 +277,11 @@ public class OrkestraCompiler : Compiler
             sub(kELSE, kIF, rCondition, kDOUBLEDOT, rCommandBlock),
             sub(kELSE, kIF)
         );
+        
+        rElseIfCollection = rule("elseIfCollection",
+            sub(rElseIf),
+            sub(rElseIf, rElseIfCollection)
+        );
 
         rElse = rule("else",
             sub(kELSE, kDOUBLEDOT, rCommandBlock),
@@ -283,7 +290,15 @@ public class OrkestraCompiler : Compiler
 
         rifStructure = rule("ifStrucuture",
             sub(rIf),
-            sub(rIf, rElse)
+            sub(rIf, rElseIfCollection),
+            sub(rIf, rElse),
+            sub(rIf, rElseIfCollection, rElse)
+        );
+
+        rProcessingUnity = rule("processingUnity",
+            sub(kALL),
+            sub(kLINE),
+            sub(kCHARACTER)
         );
 
         rKey = Rule.CreateRule("key",
