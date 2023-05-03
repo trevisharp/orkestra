@@ -4,8 +4,11 @@ using System.Collections.Generic;
 
 namespace Orkestra;
 
+using Projects;
+
 public abstract class CLI
 {
+    public Project Project { get; set; }
     public void Run(params string[] args)
     {
         if (args.Length > 0)
