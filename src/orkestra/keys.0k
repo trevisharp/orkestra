@@ -81,7 +81,7 @@ contextual keyword WHILE = /while/
 
 # value keywords
 identity key ID = /[A-Za-z_][A-Za-z_0-9]*/
-key STRINGVALUE = /\".*?\/
+key STRINGVALUE = /\".*?\"/
 key INTEGERVALUE = /[+-]?[0-9]+/
 key DOUBLEVALUE = /[+-]?[0-9]*"."[0-9]+/
 key CHARVALUE = /\'.\'/

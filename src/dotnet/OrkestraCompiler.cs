@@ -82,6 +82,7 @@ public class OrkestraCompiler : Compiler
     // value keys
     Key kCOMMA = key("COMMA", ",");
     Key kINTVALUE = key("INTVALUE", "(\\+|\\-)?[0-9][0-9]*");
+    Key kSTRINGVALUE = key("STRINGVALUE", "\".*?\"");
     Key kBOOLVALUE = key("BOOLVALUE", "(true)|(false)");
 
     Key kEXPRESSION = key("EXPRESSION", "\\/.*?\\/");
