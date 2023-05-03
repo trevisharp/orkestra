@@ -169,6 +169,7 @@ public class OrkestraCompiler : Compiler
             sub(kOPSUB, rData),
             sub(kINTVALUE),
             sub(kBOOLVALUE),
+            sub(kSTRINGVALUE),
             sub(kEXPRESSION),
             sub(kNULLVALUE)
         );
