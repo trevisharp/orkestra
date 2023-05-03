@@ -19,7 +19,7 @@ processing all:
 		current = 0
 
 		processing character:
-			if character is ""\35"":
+			if character is "\35":
 				discard
 			if character not is tab and character not is newline and character not is space:
 				emptyline = false

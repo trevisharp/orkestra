@@ -1,3 +1,17 @@
 include rules
+include configRules
 
-file OrkestraFile
+file OrkestraFile = *.0k
+
+file OrkestraConfig = *.0kproj
+
+folder OutFolder = /out
+
+project OrkestraProject = 
+    [[OrkestraFile]] files
+    OrkestraConfig config
+    OutFolder outFolder
+
+interface run:
+    parse config with orkestraConfig
+    parse files with orkestraCode

@@ -301,7 +301,7 @@ public class OrkestraCompiler : Compiler
             sub(kCHARACTER)
         );
 
-        rKey = Rule.CreateRule("key",
+        rKey = rule("key",
             sub(kCONTEXTUAL, kKEY, kID, kEQUAL, kEXPRESSION),
             sub(kKEY, kID, kEQUAL, kEXPRESSION)
         );

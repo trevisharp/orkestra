@@ -219,5 +219,5 @@ rule function:
 rule error:
 	ERROR identity
 
-start rule:
+rule orkestraCode:
 	element {ENDFILE}
