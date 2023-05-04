@@ -8,7 +8,7 @@ public class OrkestraCompiler : Compiler
 
     // processing keys
     Key kPROCESSING = key("PROCESSING", "processing");
-    Key NEWLINE = key("NEWLINE", "newline");
+    Key kNEWLINE = key("NEWLINE", "newline");
     Key kTAB = key("TAB", "tab");
     Key kSPACE = key("SPACE", "space");
     Key kALL = contextual("all");
@@ -115,6 +115,15 @@ public class OrkestraCompiler : Compiler
     Rule rElseIfCollection;
     Rule rThorw;
     Rule rProcessingUnity;
+    Rule rProcessingCommand;
+    Rule rCommandBlock_Temp1_ProcessingCommand;
+    Rule rCommandBlock_ProcessingCommand;
+    Rule rifStructure_ProcessingCommand;
+    Rule rIf_ProcessingCommand;
+    Rule rElse_ProcessingCommand;
+    Rule rElseIf_ProcessingCommand;
+    Rule rElseIfCollection_ProcessingCommand;
+    Rule rProcessing;
 
     Processing processing1;
 
@@ -129,7 +138,7 @@ public class OrkestraCompiler : Compiler
             sub(kID)
         );
 
-        rBasetype = rule("basetyle", 
+        rBasetype = rule("basetype", 
             sub(kINT),
             sub(kBOOL),
             sub(kSTRING),
@@ -171,7 +180,10 @@ public class OrkestraCompiler : Compiler
             sub(kBOOLVALUE),
             sub(kSTRINGVALUE),
             sub(kEXPRESSION),
-            sub(kNULLVALUE)
+            sub(kNULLVALUE),
+            sub(kNEWLINE),
+            sub(kTAB),
+            sub(kSPACE)
         );
 
         rCondition = rule("condition",
@@ -182,7 +194,8 @@ public class OrkestraCompiler : Compiler
             sub(rData, kSMALLER, rData),
             sub(rData, kSMALLEREQUAL, rData),
             sub(rData, kBIGGER, rData),
-            sub(rData, kBIGGEREQUAL, rData)
+            sub(rData, kBIGGEREQUAL, rData),
+            sub(rIdentity)
         );
         rCondition.AddSubRules(
             sub(rCondition, kAND, rCondition),
@@ -261,7 +274,8 @@ public class OrkestraCompiler : Compiler
             sub(rThorw, kENDLINE)
         );
 
-        rCommandBlock_Temp1 = rule("temp1commandblock",
+        rCommandBlock_Temp1 = rule("temp1commandblock");
+        rCommandBlock_Temp1.AddSubRules(
             sub(rCommand, rCommandBlock_Temp1),
             sub(rCommand)
         );
@@ -271,22 +285,23 @@ public class OrkestraCompiler : Compiler
         );
 
         rIf = rule("if",
-            sub(kIF, rCondition, kDOUBLEDOT, rCommandBlock),
+            sub(kIF, rCondition, kDOUBLEDOT, kENDLINE, rCommandBlock),
             sub(kIF, rCondition)
         );
 
         rElseIf = rule("elseif",
-            sub(kELSE, kIF, rCondition, kDOUBLEDOT, rCommandBlock),
+            sub(kELSE, kIF, rCondition, kDOUBLEDOT, kENDLINE, rCommandBlock),
             sub(kELSE, kIF)
         );
         
-        rElseIfCollection = rule("elseIfCollection",
+        rElseIfCollection = rule("elseIfCollection");
+        rElseIfCollection.AddSubRules(
             sub(rElseIf),
             sub(rElseIf, rElseIfCollection)
         );
 
         rElse = rule("else",
-            sub(kELSE, kDOUBLEDOT, rCommandBlock),
+            sub(kELSE, kDOUBLEDOT, kENDLINE, rCommandBlock),
             sub(kELSE)
         );
 
@@ -296,11 +311,76 @@ public class OrkestraCompiler : Compiler
             sub(rIf, rElse),
             sub(rIf, rElseIfCollection, rElse)
         );
+        rCommand.AddSubRules(
+            sub(rifStructure)
+        );
 
         rProcessingUnity = rule("processingUnity",
             sub(kALL),
             sub(kLINE),
             sub(kCHARACTER)
+        );
+        rData.AddSubRules(
+            sub(rProcessingUnity)
+        );
+
+        rProcessingCommand = rule("processingCommand",
+            sub(kAPPEND, rData, kENDLINE),
+            sub(kPREPEND, rData, kENDLINE),
+            sub(kDISCARD, kENDLINE),
+            sub(kSKIP, kENDLINE),
+            sub(kREPLACE, kENDLINE),
+            sub(kNEXT, kENDLINE)
+        );
+
+        rCommandBlock_Temp1_ProcessingCommand = rule("temp1commandBlockProcessingCommand");
+        rCommandBlock_Temp1_ProcessingCommand.AddSubRules(
+            sub(rProcessingCommand, rCommandBlock_Temp1_ProcessingCommand),
+            sub(rProcessingCommand)
+        );
+
+        rCommandBlock_ProcessingCommand = rule("commandBlockProcessingCommand",
+            sub(kSTARTBLOCK, rCommandBlock_Temp1_ProcessingCommand, kENDBLOCK)
+        );
+
+        rIf_ProcessingCommand = rule("ifProcessingCommand",
+            sub(kIF, rCondition, kDOUBLEDOT, kENDLINE, rCommandBlock_ProcessingCommand),
+            sub(kIF, rCondition)
+        );
+
+        rElseIf_ProcessingCommand = rule("elseifProcessingCommand",
+            sub(kELSE, kIF, rCondition, kDOUBLEDOT, kENDLINE, rCommandBlock_ProcessingCommand),
+            sub(kELSE, kIF)
+        );
+
+        rElse_ProcessingCommand = rule("elseProcessingCommand",
+            sub(kELSE, kDOUBLEDOT, kENDLINE, rCommandBlock),
+            sub(kELSE)
+        );
+        
+        rElseIfCollection_ProcessingCommand = rule("elseIfCollectionProcessingCommand");
+        rElseIfCollection_ProcessingCommand.AddSubRules(  
+            sub(rElseIf_ProcessingCommand),
+            sub(rElseIf_ProcessingCommand, rElseIfCollection_ProcessingCommand)
+        );
+
+        rifStructure_ProcessingCommand = rule("ifStrucutureProcessingCommand",
+            sub(rIf_ProcessingCommand),
+            sub(rIf_ProcessingCommand, rElseIfCollection_ProcessingCommand),
+            sub(rIf_ProcessingCommand, rElse_ProcessingCommand),
+            sub(rIf_ProcessingCommand, rElseIfCollection_ProcessingCommand, rElse_ProcessingCommand)
+        );
+
+        rProcessingCommand.AddSubRules(
+            sub(rIdentity, kEQUAL, rData, kENDLINE),
+            sub(rIdentity, rOperation, kEQUAL, rData, kENDLINE),
+            sub(rVariable, kENDLINE),
+            sub(kRETURN, rData, kENDLINE),
+            sub(kPRINT, rData, kENDLINE),
+            sub(kBREAK, kENDLINE),
+            sub(kCONTINUE, kENDLINE),
+            sub(rThorw, kENDLINE),
+            sub(rifStructure_ProcessingCommand)
         );
 
         rKey = rule("key",
@@ -308,8 +388,17 @@ public class OrkestraCompiler : Compiler
             sub(kKEY, kID, kEQUAL, kEXPRESSION)
         );
 
+        rProcessing = rule("processing",
+            sub(kPROCESSING, rProcessingUnity, kDOUBLEDOT, kENDLINE, rCommandBlock_ProcessingCommand),
+            sub(kPROCESSING, rProcessingUnity, kDOUBLEDOT, kENDLINE)
+        );
+        rProcessingCommand.AddSubRules(
+            sub(rProcessing)
+        );
+
         rStart = Rule.CreateStartRule("start");
         rStart.AddSubRules(
+            sub(rOperation, rStart),
             sub(rKey, rStart),
             sub(rKey)
         );
