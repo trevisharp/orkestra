@@ -7,10 +7,10 @@ public class SymphonyCompiler : Compiler
     Key kENDBLOCK = auto("ENDBLOCK");
 
     // processing keys
-    Key kPROCESSING = key("PROCESSING", "processing");
-    Key kNEWLINE = key("NEWLINE", "newline");
-    Key kTAB = key("TAB", "tab");
-    Key kSPACE = key("SPACE", "space");
+    Key kPROCESSING = keyword("PROCESSING", "processing");
+    Key kNEWLINE = keyword("NEWLINE", "newline");
+    Key kTAB = keyword("TAB", "tab");
+    Key kSPACE = keyword("SPACE", "space");
     Key kALL = contextual("all");
     Key kLINE = contextual("line");
     Key kCHARACTER = contextual("character");
