@@ -113,6 +113,7 @@ public class SymphonyCompiler : Compiler
     Rule rElse;
     Rule rElseIf;
     Rule rElseIfCollection;
+    Rule rWhile;
     Rule rThorw;
     Rule rProcessingUnity;
     Rule rProcessingCommand;
@@ -123,6 +124,7 @@ public class SymphonyCompiler : Compiler
     Rule rElse_ProcessingCommand;
     Rule rElseIf_ProcessingCommand;
     Rule rElseIfCollection_ProcessingCommand;
+    Rule rWhile_ProcessingCommand;
     Rule rProcessing;
 
     Processing processing1;
@@ -315,6 +317,10 @@ public class SymphonyCompiler : Compiler
             sub(rifStructure)
         );
 
+        rWhile = rule("while",
+            sub(kWHILE, rCondition, kDOUBLEDOT, kENDLINE, rCommandBlock)
+        );
+
         rProcessingUnity = rule("processingUnity",
             sub(kALL),
             sub(kLINE),
@@ -371,6 +377,10 @@ public class SymphonyCompiler : Compiler
             sub(rIf_ProcessingCommand, rElseIfCollection_ProcessingCommand, rElse_ProcessingCommand)
         );
 
+        rWhile_ProcessingCommand = rule("whileProcessingCommand",
+            sub(kWHILE, rCondition, kDOUBLEDOT, kENDLINE, rCommandBlock_ProcessingCommand)
+        );
+
         rProcessingCommand.AddSubRules(
             sub(rIdentity, kEQUAL, rData, kENDLINE),
             sub(rIdentity, rOperation, kEQUAL, rData, kENDLINE),
@@ -380,7 +390,8 @@ public class SymphonyCompiler : Compiler
             sub(kBREAK, kENDLINE),
             sub(kCONTINUE, kENDLINE),
             sub(rThorw, kENDLINE),
-            sub(rifStructure_ProcessingCommand)
+            sub(rifStructure_ProcessingCommand),
+            sub(rWhile_ProcessingCommand)
         );
 
         rKey = rule("key",
