@@ -1,0 +1,17 @@
+include rules
+include configRules
+
+file SymphonyFile = *.sy
+
+file SymphonyConfig = *.syproj
+
+folder OutFolder = /out
+
+project SymphonyProject = 
+    [[SymphonyFile]] files
+    SymphonyConfig config
+    OutFolder outFolder
+
+interface run:
+    parse config with SymphonyConfig
+    parse files with SymphonyCode

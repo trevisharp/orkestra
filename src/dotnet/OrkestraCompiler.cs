@@ -1,4 +1,4 @@
-public class OrkestraCompiler : Compiler
+public class SymphonyCompiler : Compiler
 {
     // auto keys
     Key kENDFILE = auto("ENDFILE");
@@ -132,7 +132,7 @@ public class OrkestraCompiler : Compiler
         Title = "TabulationError"
     };
 
-    public OrkestraCompiler()
+    public SymphonyCompiler()
     {
         rIdentity = rule("identity",
             sub(kID)

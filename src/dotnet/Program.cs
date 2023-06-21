@@ -49,7 +49,7 @@ processing all:
 	append ENDFILE
 ";
 
-OrkestraCompiler compiler = new OrkestraCompiler();
+SymphonyCompiler compiler = new SymphonyCompiler();
 compiler.Verbose = args.Contains("-v") || args.Contains("--verbose");
 
 compiler.Compile(code);

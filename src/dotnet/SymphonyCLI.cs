@@ -1,4 +1,4 @@
-public class OrkestraCLI : CLI
+public class SymphonyCLI : CLI
 {
     void run()
     {

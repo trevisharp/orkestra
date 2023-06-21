@@ -8,7 +8,7 @@ dotnet build -c Release
 
 cd ..\..\src\dotnet\
 Write-Host ""
-Write-Host "Executando Orkestra Lang" -ForegroundColor Blue
+Write-Host "Executando Symphony Lang" -ForegroundColor Blue
 Write-Host ""
 if ($args.Length -ne 0) {
     dotnet run -c $args[0]
