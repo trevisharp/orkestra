@@ -101,9 +101,9 @@ public abstract class Compiler
         return lexicalAnalyzer;
     }
 
-    private SyntacticAnalyzer buildSyntacticAnalyzer()
+    private ISyntacticAnalyzer buildSyntacticAnalyzer()
     {
-        SyntacticAnalyzer syntacticAnalyzer = new SyntacticAnalyzer();
+        DFSSyntacticAnalyzer syntacticAnalyzer = new DFSSyntacticAnalyzer();
 
         foreach (var rule in getFields<Rule>())
         {

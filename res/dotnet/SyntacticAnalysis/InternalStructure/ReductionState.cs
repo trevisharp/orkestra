@@ -7,4 +7,5 @@ public record ReductionState(
     StackLinkedListNode CurrentNode,
     IEnumerable<SubRule> Attempts,
     List<IEnumerator<IRuleElement>> Iterators,
-    StackLinkedListNode ReverseParameter);
+    StackLinkedListNode ReverseParameter
+);

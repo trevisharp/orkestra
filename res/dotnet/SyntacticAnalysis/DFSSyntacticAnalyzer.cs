@@ -5,7 +5,7 @@ namespace Orkestra.SyntacticAnalysis;
 using InternalStructure;
 using LexicalAnalysis;
 
-public class SyntacticAnalyzer
+public class DFSSyntacticAnalyzer : ISyntacticAnalyzer
 {
     public Rule StartRule { get; set; }
 

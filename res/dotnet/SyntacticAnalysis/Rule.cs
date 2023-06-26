@@ -29,7 +29,6 @@ public record Rule : IRuleElement
 
         foreach (var subRule in subRules)
             subRule.Parent = this;
-
     }
     
     public static Rule CreateRule(string name, params SubRule[] subRules)
