@@ -1,4 +1,4 @@
-namespace Orkestra.LexicalAnalysis;
+namespace Orkestra;
 
 using SyntacticAnalysis;
 

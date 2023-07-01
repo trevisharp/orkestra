@@ -1,4 +1,6 @@
-using System;
+/* Author:  Leonardo Trevisan Silio
+ * Date:    30/06/2023
+ */
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -6,11 +8,17 @@ namespace Orkestra.LexicalAnalysis;
 
 using Processings;
 
-public class LexicalAnalyzer
+/// <summary>
+/// Default Lexical Analyzer based in System.Text.RegularExpressions.
+/// </summary>
+public class DefaultLexicalAnalyzer : ILexicalAnalyzer
 {
-    public List<Key> Keys { get; private set; } = new List<Key>();
-    public void Add(Key key) 
-        => this.Keys.Add(key);
+    private List<Key> keys = new List<Key>();
+
+    public IEnumerable<Key> Keys => this.keys;
+
+    public void AddKeys(IEnumerable<Key> keys)
+        => this.keys.AddRange(keys);
 
     public IEnumerable<Token> Parse(Text text)
     {
@@ -21,13 +29,13 @@ public class LexicalAnalyzer
                 yield return tk;
             else if (source is string str)
             {
-                foreach (var token in this.Parse(str))
+                foreach (var token in parse(str))
                     yield return token;
             }
         }
     }
 
-    public IEnumerable<Token> Parse(string code)
+    private IEnumerable<Token> parse(string code)
     {
         int startIndex = 0;
         int keyIndex = 0;
@@ -35,7 +43,7 @@ public class LexicalAnalyzer
         int tokenCount = 0;
         Match crrMatch = null;
         Key crrKey = null;
-        List<Key> keys = new List<Key>(this.Keys);
+        List<Key> keys = new List<Key>(this.keys);
         
         var matches = getRegexMatchList(keys, code);
         

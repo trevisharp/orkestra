@@ -1,15 +1,25 @@
+/* Author:  Leonardo Trevisan Silio
+ * Date:    30/06/2023
+ */
 using System.Reflection;
 using System.Collections.Generic;
+
 using static System.Console;
 
 namespace Orkestra;
 
+using Providers;
 using Processings;
 using LexicalAnalysis;
 using SyntacticAnalysis;
 
+/// <summary>
+/// A base class for all compiler created with Orkestra framework.
+/// </summary>
 public abstract class Compiler
 {
+    public IAlgorithmGroupProvider Provider { get; set; }
+
     public bool Verbose { get; set; }
 
     public void Compile(string sourceCode)
@@ -91,19 +101,18 @@ public abstract class Compiler
         return package;
     }
 
-    private LexicalAnalyzer buildLexicalAnalyzer()
+    private ILexicalAnalyzer buildLexicalAnalyzer()
     {
-        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer();
+        var lexicalAnalyzer = Provider.ProvideLexicalAnalyzer();
 
-        foreach (var key in getFields<Key>())
-            lexicalAnalyzer.Add(key);
+        lexicalAnalyzer.AddKeys(getFields<Key>());
 
         return lexicalAnalyzer;
     }
 
     private ISyntacticAnalyzer buildSyntacticAnalyzer()
     {
-        DFSSyntacticAnalyzer syntacticAnalyzer = new DFSSyntacticAnalyzer();
+        var syntacticAnalyzer = Provider.ProvideSyntacticAnalyzer();
 
         foreach (var rule in getFields<Rule>())
         {

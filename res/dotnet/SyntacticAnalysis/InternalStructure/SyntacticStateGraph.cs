@@ -27,6 +27,38 @@ public class SyntacticStateGraph
         return result;
     }
 
+    private ExpressionTree depthFirstSearch()
+    {
+        var stack = new Stack<ReductionState>();
+        stack.Push(createState());
+
+        while (stack.Count > 0)
+        {
+            if (TokenList.Count() == 3)
+                break;
+            
+            var crrState = stack.Pop();
+            var nexts = computeNext(crrState)
+                .ToArray();
+
+            if (nexts.Length == 0)
+            {
+                tryReverse(crrState.ReverseParameter);
+                continue;
+            }
+            
+            foreach (var next in nexts)
+                stack.Push(next);
+        }
+
+        var header = TokenList.FirstOrDefault();
+        var main = header.Next;
+        
+        ExpressionTree tree = new ExpressionTree();
+        tree.Root = main.Value;
+        return tree;
+    }
+
     //TODO: correct this without use Disconnect to improve
     //      the performance
     private INode buildTree(StackLinkedListNode node)
@@ -161,37 +193,5 @@ public class SyntacticStateGraph
             throw new System.NotImplementedException();
         }
         reverseNode.Disconnect();
-    }
-
-    private ExpressionTree depthFirstSearch()
-    {
-        var stack = new Stack<ReductionState>();
-        stack.Push(createState());
-
-        while (stack.Count > 0)
-        {
-            if (TokenList.Count() == 3)
-                break;
-            
-            var crrState = stack.Pop();
-            var nexts = computeNext(crrState)
-                .ToArray();
-
-            if (nexts.Length == 0)
-            {
-                tryReverse(crrState.ReverseParameter);
-                continue;
-            }
-            
-            foreach (var next in nexts)
-                stack.Push(next);
-        }
-
-        var header = TokenList.FirstOrDefault();
-        var main = header.Next;
-        
-        ExpressionTree tree = new ExpressionTree();
-        tree.Root = main.Value;
-        return tree;
     }
 }
