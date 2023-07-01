@@ -1,9 +1,15 @@
+/* Author:  Leonardo Trevisan Silio
+ * Date:    01/07/2023
+ */
 using System.Collections.Generic;
 
 namespace Orkestra.Processings;
 
 using Packages;
 
+/// <summary>
+/// A package of processing functions.
+/// </summary>
 public class ProcessingPackage : Package<Processing>
 {
     private List<Processing> processings = new List<Processing>();

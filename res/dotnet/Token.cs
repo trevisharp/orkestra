@@ -1,7 +1,13 @@
-﻿namespace Orkestra;
+﻿/* Author:  Leonardo Trevisan Silio
+ * Date:    30/06/2023
+ */
+namespace Orkestra;
 
 using SyntacticAnalysis;
 
+/// <summary>
+/// Represents a Token data output from lexical analisys.
+/// </summary>
 public record Token : INode
 {
     public Token(Key key, string value, int index)

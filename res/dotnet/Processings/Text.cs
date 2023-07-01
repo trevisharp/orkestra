@@ -1,14 +1,14 @@
+/* Author:  Leonardo Trevisan Silio
+ * Date:    01/07/2023
+ */
+
 using System;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Collections;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace Orkestra.Processings;
 
-using LexicalAnalysis;
 using InternalStructure;
 
 /// <summary>

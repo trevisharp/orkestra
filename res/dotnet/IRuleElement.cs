@@ -1,4 +1,4 @@
-namespace Orkestra.SyntacticAnalysis;
+namespace Orkestra;
 
 public interface IRuleElement
 {
