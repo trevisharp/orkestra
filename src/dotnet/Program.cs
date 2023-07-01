@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-string code = 
+﻿string code = 
 @"
 ##########################################################################################################
 #######################################  Pre-processing definition  ######################################
@@ -49,7 +47,4 @@ processing all:
 	append ENDFILE
 ";
 
-SymphonyCompiler compiler = new SymphonyCompiler();
-compiler.Verbose = args.Contains("-v") || args.Contains("--verbose");
-
-compiler.Compile(code);
+OrkestraApp.Compile(code);

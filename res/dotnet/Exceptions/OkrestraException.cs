@@ -6,7 +6,4 @@ using System;
 namespace Orkestra.Exceptions;
 
 [Serializable]
-public class OrkestraException : Exception
-{
-    
-}
+public class OrkestraException : Exception { }
