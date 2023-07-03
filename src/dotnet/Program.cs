@@ -1,4 +1,6 @@
-﻿Key she = Key.CreateKeyword("SHE", "she");
+﻿using System.Linq;
+
+Key she = Key.CreateKeyword("SHE", "she");
 Key eats = Key.CreateKeyword("EATS", "eats");
 Key a = Key.CreateKeyword("A", "a");
 Key fish = Key.CreateKeyword("FISH", "fish");
@@ -55,7 +57,7 @@ analyzer.Add(start);
 
 var input = "she eats a fish with a fork";
 
-var tokens = lex.Parse(input);
+var tokens = lex.Parse(input).ToArray();
 
 var tree = analyzer.Parse(tokens);
 
