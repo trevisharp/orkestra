@@ -1,8 +1,14 @@
+/* Author:  Leonardo Trevisan Silio
+ * Date:    03/07/2023
+ */
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Orkestra.SyntacticAnalysis;
+namespace Orkestra;
 
+/// <summary>
+/// A record that represents a sub sintactycal rule. 
+/// </summary>
 public record SubRule : IRuleElement
 {
     private List<IRuleElement> ruleTokens;

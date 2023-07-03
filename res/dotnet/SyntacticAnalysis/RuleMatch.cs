@@ -1,9 +1,13 @@
+/* Author:  Leonardo Trevisan Silio
+ * Date:    03/07/2023
+ */
 using System.Collections.Generic;
 
 namespace Orkestra.SyntacticAnalysis;
 
-using LexicalAnalysis;
-
+/// <summary>
+/// A record that represents a match of tokens by a rule.
+/// </summary>
 public record RuleMatch : INode
 {
     public RuleMatch(SubRule subRule)

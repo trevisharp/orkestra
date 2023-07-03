@@ -1,7 +1,14 @@
+/* Author:  Leonardo Trevisan Silio
+ * Date:    03/07/2023
+ */
 using System.Collections.Generic;
 
-namespace Orkestra.SyntacticAnalysis;
+namespace Orkestra;
 
+/// <summary>
+/// A record that represents a set of rules with same name.
+/// </summary>
+/// <value></value>
 public record Rule : IRuleElement
 {
     private List<SubRule> subRules;
