@@ -1,7 +1,6 @@
 /* Author:  Leonardo Trevisan Silio
  * Date:    01/07/2023
  */
-
 using System;
 using System.IO;
 using System.Text;

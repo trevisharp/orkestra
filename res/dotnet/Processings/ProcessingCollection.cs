@@ -1,19 +1,17 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    01/07/2023
+ * Date:    03/07/2023
  */
 using System.Collections.Generic;
 
 namespace Orkestra.Processings;
 
-using Packages;
-
 /// <summary>
 /// A package of processing functions.
 /// </summary>
-public class ProcessingPackage : Package<Processing>
+public class ProcessingCollection
 {
     private List<Processing> processings = new List<Processing>();
-    public override IEnumerable<Processing> Elements => processings;
+    public IEnumerable<Processing> Elements => processings;
 
     public void Add(Processing processing)
         => this.processings.Add(processing);

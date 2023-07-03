@@ -91,9 +91,9 @@ public abstract class Compiler
     protected static SubRule sub(params IRuleElement[] elements)
         => SubRule.Create(elements);
 
-    private ProcessingPackage buildProcessingMachine()
+    private ProcessingCollection buildProcessingMachine()
     {
-        ProcessingPackage package = new ProcessingPackage();
+        ProcessingCollection package = new ProcessingCollection();
 
         foreach (var process in getFields<Processing>())
             package.Add(process);

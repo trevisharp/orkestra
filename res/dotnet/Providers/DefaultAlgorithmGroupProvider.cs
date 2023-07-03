@@ -15,5 +15,5 @@ public class DefaultAlgorithmGroupProvider : IAlgorithmGroupProvider
         => new DefaultLexicalAnalyzer();
 
     public ISyntacticAnalyzer ProvideSyntacticAnalyzer()
-        => null;
+        => new DFSSyntacticAnalyzer();
 }

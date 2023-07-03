@@ -1,4 +1,6 @@
-using System.Linq;
+/* Author:  Leonardo Trevisan Silio
+ * Date:    03/06/2023
+ */
 using System.Reflection;
 using System.Collections.Generic;
 
@@ -9,6 +11,7 @@ using Projects;
 public abstract class CLI
 {
     public Project Project { get; set; }
+    
     public void Run(params string[] args)
     {
         if (args.Length > 0)

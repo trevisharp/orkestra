@@ -47,4 +47,4 @@ processing all:
 	append ENDFILE
 ";
 
-OrkestraApp.Compile(code);
+OrkestraApp.Compile(code, args);

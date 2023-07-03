@@ -1,7 +1,11 @@
+/* Author:  Leonardo Trevisan Silio
+ * Date:    03/06/2023
+ */
 namespace Orkestra;
 
-using SyntacticAnalysis;
-
+/// <summary>
+/// Represents a Key for syntactical analisys.
+/// </summary>
 public record Key : IRuleElement
 {
     private Key(string name, string expression, 
