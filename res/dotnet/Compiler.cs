@@ -30,12 +30,8 @@ public abstract class Compiler
             WriteLine();
         }
 
-        var lex = buildLexicalAnalyzer();
-        var parser = buildSyntacticAnalyzer();
         var machine = buildProcessingMachine();
-
         var processedText = machine.ProcessAll(sourceCode);
-
         if (Verbose)
         {
             WriteLine("Processed Text:");
@@ -43,8 +39,8 @@ public abstract class Compiler
             WriteLine();
         }
 
+        var lex = buildLexicalAnalyzer();
         var tokens = lex.Parse(processedText);
-
         if (Verbose)
         {
             WriteLine("Token List:");
@@ -54,8 +50,8 @@ public abstract class Compiler
             WriteLine();
         }
 
+        var parser = buildSyntacticAnalyzer();
         var tree = parser.Parse(tokens);
-        
         if (Verbose)
         {
             WriteLine("Syntax Tree:");
