@@ -3,7 +3,6 @@ using System.Collections.Generic;
 namespace Orkestra.SyntacticAnalysis;
 
 using InternalStructure;
-using LexicalAnalysis;
 
 public class DFSSyntacticAnalyzer : ISyntacticAnalyzer
 {

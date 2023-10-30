@@ -44,7 +44,7 @@ Rule start = Rule.CreateStartRule("S",
 	SubRule.Create(np, vp)
 );
 
-var analyzer = new ChomskyCYKSyntacticAnalyzer();
+var analyzer = new DFSSyntacticAnalyzer();
 analyzer.StartRule = start;
 analyzer.Add(det);
 analyzer.Add(n);
