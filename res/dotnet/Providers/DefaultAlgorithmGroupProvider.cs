@@ -15,5 +15,5 @@ public class DefaultAlgorithmGroupProvider : IAlgorithmGroupProvider
         => new DefaultLexicalAnalyzer();
 
     public ISyntacticAnalyzerBuilder ProvideSyntacticAnalyzerBuilder()
-        => new LR0SyntacticAnalyzerBuilder();
+        => new LR1SyntacticAnalyzerBuilder();
 }
