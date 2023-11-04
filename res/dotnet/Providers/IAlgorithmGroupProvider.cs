@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    30/06/2023
+ * Date:    04/11/2023
  */
 namespace Orkestra.Providers;
 
@@ -19,5 +19,5 @@ public interface IAlgorithmGroupProvider
     /// <summary>
     /// Provide a syntactical analyzer.
     /// </summary>
-    ISyntacticAnalyzer ProvideSyntacticAnalyzer();
+    ISyntacticAnalyzerBuilder ProvideSyntacticAnalyzerBuilder();
 }

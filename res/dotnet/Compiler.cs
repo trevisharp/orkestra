@@ -108,16 +108,22 @@ public abstract class Compiler
 
     private ISyntacticAnalyzer buildSyntacticAnalyzer()
     {
-        var syntacticAnalyzer = Provider.ProvideSyntacticAnalyzer();
+        var builder = Provider.ProvideSyntacticAnalyzerBuilder();
+        var loaded = builder.LoadCache();
 
+        if (loaded)
+            return builder.Build();
+        
         foreach (var rule in getFields<Rule>())
         {
             if (rule.IsStartRule)
-                syntacticAnalyzer.StartRule = rule;
-            syntacticAnalyzer.Add(rule);
+                builder.StartRule = rule;
+            builder.Add(rule);
         }
+        builder.Load();
+        builder.SaveCache();
 
-        return syntacticAnalyzer;
+        return builder.Build();
     }
 
     private IEnumerable<T> getFields<T>()

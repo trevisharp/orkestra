@@ -4,16 +4,30 @@ namespace Orkestra.SyntacticAnalysis;
 
 using InternalStructure;
 
-public class DFSSyntacticAnalyzer : ISyntacticAnalyzer
+public class LR0SyntacticAnalyzer : ISyntacticAnalyzer
 {
     public Rule StartRule { get; set; }
 
     public List<Rule> Rules { get; private set; } = new List<Rule>();
     public void Add(Rule rule) => this.Rules.Add(rule);
 
+    public void Load()
+    {
+        
+    }
+
+    public void LoadCache()
+    {
+        
+    }
+
+    public void SaveCache()
+    {
+        
+    }
+
     public ExpressionTree Parse(IEnumerable<Token> tokens)
     {
-        SyntacticStateGraph graph = new SyntacticStateGraph(tokens, this.Rules);
-        return graph.DepthFirstSearch();
+        throw new System.NotImplementedException();
     }
 }

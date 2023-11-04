@@ -44,7 +44,7 @@ Rule start = Rule.CreateStartRule("S",
 	SubRule.Create(np, vp)
 );
 
-var analyzer = new LRSyntacticAnalyzer();
+var analyzer = new LR0SyntacticAnalyzer();
 analyzer.StartRule = start;
 analyzer.Add(det);
 analyzer.Add(n);

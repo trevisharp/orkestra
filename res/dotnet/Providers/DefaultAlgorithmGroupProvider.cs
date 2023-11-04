@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    30/06/2023
+ * Date:    04/11/2023
  */
 namespace Orkestra.Providers;
 
@@ -14,6 +14,6 @@ public class DefaultAlgorithmGroupProvider : IAlgorithmGroupProvider
     public ILexicalAnalyzer ProvideLexicalAnalyzer()
         => new DefaultLexicalAnalyzer();
 
-    public ISyntacticAnalyzer ProvideSyntacticAnalyzer()
-        => new DFSSyntacticAnalyzer();
+    public ISyntacticAnalyzerBuilder ProvideSyntacticAnalyzerBuilder()
+        => new LR0SyntacticAnalyzerBuilder();
 }
