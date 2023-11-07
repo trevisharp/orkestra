@@ -1,5 +1,8 @@
-using static System.Console;
+/* Author:  Leonardo Trevisan Silio
+ * Date:    07/11/2023
+ */
 using Color = System.ConsoleColor;
+using static System.Console;
 
 namespace Orkestra;
 
