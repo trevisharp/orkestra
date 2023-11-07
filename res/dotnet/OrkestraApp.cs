@@ -1,8 +1,7 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    30/06/2023
+ * Date:    7/11/2023
  */
 using System;
-using System.Linq;
 using System.Reflection;
 
 namespace Orkestra;
@@ -24,6 +23,8 @@ public static class OrkestraApp
     {
         try
         {
+            configureVerbose(args);
+
             var compiler = getConfiguredCompiler(args);
             compiler.Compile(sourceCode);
         }
@@ -36,17 +37,36 @@ public static class OrkestraApp
             throw new UnexpectedException(ex);
         }
     }
+    
+    private static void configureVerbose(string[] args)
+    {
+        Verbose.VerboseLevel = 0;
+        for (int i = 0; i < args.Length; i++)
+        {
+            var arg = args[i];
+            if (arg != "-v" && arg != "--verbose")
+                continue;
+            
+            Verbose.VerboseLevel = 1;
+            if (++i >= args.Length)
+                break;
+            
+            arg = args[i];
+            if (int.TryParse(arg, out int level))
+                Verbose.VerboseLevel = level;
+            else if (arg == "max")
+                Verbose.VerboseLevel = int.MaxValue;
+        }
+
+    }
 
     private static Compiler getConfiguredCompiler(string[] args)
     {
         var types = getAssemplyTypes();
-
         var compiler = getCompiler(types);
-        compiler.Verbose = args.Contains("-v") || args.Contains("--verbose");
 
         var provider = getProvider(types);
         compiler.Provider = provider;
-
         return compiler;
     }
 

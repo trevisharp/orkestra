@@ -4,9 +4,9 @@
 using System.Reflection;
 using System.Collections.Generic;
 
-using static System.Console;
-
 namespace Orkestra;
+
+using static Verbose;
 
 using Providers;
 using Processings;
@@ -20,44 +20,35 @@ public abstract class Compiler
 {
     public IAlgorithmGroupProvider Provider { get; set; }
 
-    public bool Verbose { get; set; }
-
     public void Compile(string sourceCode)
     {
-        if (Verbose)
-        {
-            WriteLine("Build started...");
-            WriteLine();
-        }
+        Info("Build started...");
+        NewLine();
 
+        Info("Preprocessing started...", 1);
         var machine = buildProcessingMachine();
         var processedText = machine.ProcessAll(sourceCode);
-        if (Verbose)
-        {
-            WriteLine("Processed Text:");
-            WriteLine(processedText);
-            WriteLine();
-        }
+        Success("Preprocessing completed!", 1);
+        Content("Processed Text:", 2);
+        Content(processedText, 2);
+        NewLine();
 
+        Info("Lexical Analysis started...", 1);
         var lex = buildLexicalAnalyzer();
         var tokens = lex.Parse(processedText);
-        if (Verbose)
-        {
-            WriteLine("Token List:");
-            foreach (var token in tokens)
-                Write($"{token} ");
-            WriteLine();
-            WriteLine();
-        }
+        Success("Lexical Analysis completed!", 1);
+        Content("Token List:", 2);
+        foreach (var token in tokens)
+            InlineContent(token, 2);
+        NewLine();
 
+        Info("Syntacic Analysis started...", 1);
         var parser = buildSyntacticAnalyzer();
         var tree = parser.Parse(tokens);
-        if (Verbose)
-        {
-            WriteLine("Syntax Tree:");
-            WriteLine(tree);
-            WriteLine();
-        }
+        Success("Syntacic Analysis completed!", 1);
+        Content("Processed Text:", 2);
+        Content(processedText, 2);
+        NewLine();
     }
 
     protected static Key key(string name, string expression)
