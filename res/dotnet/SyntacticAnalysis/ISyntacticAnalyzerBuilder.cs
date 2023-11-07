@@ -1,6 +1,8 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    04/11/2023
+ * Date:    07/11/2023
  */
+using System.Collections.Generic;
+
 namespace Orkestra.SyntacticAnalysis;
 
 /// <summary>
@@ -27,7 +29,7 @@ public interface ISyntacticAnalyzerBuilder
     /// <summary>
     /// Load data from rules to speedup parsing.
     /// </summary>
-    void Load();
+    void Load(IEnumerable<Key> key);
 
     /// <summary>
     /// Save cache data for speedup future parsings, if exist.

@@ -18,13 +18,30 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
     public void Add(Rule rule)
         => this.rules.Add(rule);
 
-    public void Load()
+    public void Load(IEnumerable<Key> keys)
     {
+        int index = 0;
+        var dict = new Dictionary<IRuleElement, int>();
+        foreach (var rule in this.rules)
+            dict.Add(rule, ++index);
+        
+        foreach (var key in keys)
+            dict.Add(key, ++index);
+        
         var sb = this.Rules
             .SelectMany(r => r.SubRules)
             .ToArray();
         
-        
+        foreach (var rule in sb)
+        {
+            Verbose.Info($"""
+                {rule.Parent.Name} -> {
+                    string.Join(' ', rule.RuleTokens
+                        .Select(t => t.KeyName)
+                    )
+                }
+            """);
+        }
     }
 
     public ISyntacticAnalyzer Build()
@@ -34,7 +51,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
 
     public bool LoadCache()
     {
-        throw new System.NotImplementedException();
+        return false;
     }
 
     public void SaveCache()

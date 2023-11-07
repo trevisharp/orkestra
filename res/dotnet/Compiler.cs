@@ -43,7 +43,7 @@ public abstract class Compiler
         NewLine();
 
         Info("Syntacic Analysis started...", 1);
-        var parser = buildSyntacticAnalyzer();
+        var parser = buildSyntacticAnalyzer(null);
         var tree = parser.Parse(tokens);
         Success("Syntacic Analysis completed!", 1);
         Content("Processed Text:", 2);
@@ -97,7 +97,7 @@ public abstract class Compiler
         return lexicalAnalyzer;
     }
 
-    private ISyntacticAnalyzer buildSyntacticAnalyzer()
+    private ISyntacticAnalyzer buildSyntacticAnalyzer(IEnumerable<Key> keys)
     {
         var builder = Provider.ProvideSyntacticAnalyzerBuilder();
         var loaded = builder.LoadCache();
@@ -111,7 +111,7 @@ public abstract class Compiler
                 builder.StartRule = rule;
             builder.Add(rule);
         }
-        builder.Load();
+        builder.Load(keys);
         builder.SaveCache();
 
         return builder.Build();
