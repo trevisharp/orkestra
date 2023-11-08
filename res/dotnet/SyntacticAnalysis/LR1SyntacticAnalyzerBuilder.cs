@@ -20,27 +20,65 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
 
     public void Load(IEnumerable<Key> keys)
     {
-        int index = 0;
         var dict = new Dictionary<IRuleElement, int>();
-        foreach (var rule in this.rules)
+
+        int index = 0;
+        foreach (var rule in rules)
             dict.Add(rule, ++index);
         
+        int rulesEnd = index;
         foreach (var key in keys)
             dict.Add(key, ++index);
         
         var sb = this.Rules
-            .SelectMany(r => r.SubRules)
+            .SelectMany(r => r.SubRules);
+        
+        const int extraData = 2;
+        var prods = sb
+            .Select(r => {
+                int left = dict[r.Parent];
+                int size = r.RuleTokens.Count();
+                var data = new int[size + extraData];
+
+                data[0] = left;
+                int i = 1;
+                foreach (var right in r.RuleTokens)
+                    data[i++] = dict[right];
+                data[i] = 1;
+
+                return data;
+            })
+            .Prepend(new int[] { 0, dict[StartRule], 0})
             .ToArray();
         
-        foreach (var rule in sb)
+        List<List<int>> states = new();
+
+        List<int> state = new();
+        state.Add(0);
+        closure(state);
+
+        foreach (var rule in state.Select(x => prods[x]))
         {
-            Verbose.Info($"""
-                {rule.Parent.Name} -> {
-                    string.Join(' ', rule.RuleTokens
-                        .Select(t => t.KeyName)
-                    )
+            Verbose.Info($"{rule[0]} -> {string.Join(' ', rule.Skip(1))}");
+        }
+
+        void closure(List<int> state)
+        {
+            for (int i = 0; i < state.Count; i++)
+            {
+                var production = prods[state[i]];
+                var dot = production[^1];
+                var crr = production[dot];
+
+                for (int j = 0; j < prods.Length; j++)
+                {
+                    var prod = prods[j];
+                    if (prod[0] != crr)
+                        continue;
+                    
+                    state.Add(j);
                 }
-            """);
+            }
         }
     }
 

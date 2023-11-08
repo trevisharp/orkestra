@@ -34,7 +34,8 @@ public abstract class Compiler
         NewLine();
 
         Info("Lexical Analysis started...", 1);
-        var lex = buildLexicalAnalyzer();
+        var keys = getKeys();
+        var lex = buildLexicalAnalyzer(keys);
         var tokens = lex.Parse(processedText);
         Success("Lexical Analysis completed!", 1);
         Content("Token List:", 2);
@@ -43,7 +44,7 @@ public abstract class Compiler
         NewLine();
 
         Info("Syntacic Analysis started...", 1);
-        var parser = buildSyntacticAnalyzer(null);
+        var parser = buildSyntacticAnalyzer(keys);
         var tree = parser.Parse(tokens);
         Success("Syntacic Analysis completed!", 1);
         Content("Processed Text:", 2);
@@ -87,12 +88,15 @@ public abstract class Compiler
 
         return package;
     }
+    
+    private IEnumerable<Key> getKeys()
+        => getFields<Key>();
 
-    private ILexicalAnalyzer buildLexicalAnalyzer()
+    private ILexicalAnalyzer buildLexicalAnalyzer(IEnumerable<Key> keys)
     {
         var lexicalAnalyzer = Provider.ProvideLexicalAnalyzer();
 
-        lexicalAnalyzer.AddKeys(getFields<Key>());
+        lexicalAnalyzer.AddKeys(keys);
 
         return lexicalAnalyzer;
     }
