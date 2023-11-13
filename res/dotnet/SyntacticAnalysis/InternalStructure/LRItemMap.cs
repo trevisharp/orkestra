@@ -4,12 +4,13 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 
 using State = System.Collections.Generic.List<int>;
 
 namespace Orkestra.SyntacticAnalysis.InternalStructure;
 
+using System.Runtime.Intrinsics.Arm;
 using Orkestra.InternalStructure;
 
 internal class LRItemMap
@@ -21,6 +22,11 @@ internal class LRItemMap
     const int moveSizeof = 4;
     const int tokenCountSizeof = 5;
     const int tokensSizeof = 6;
+
+    HashSet<int> itemHash;
+    FastList<int> itemBuffer;
+    Dictionary<IRuleElement, int> elementMap;
+    int rulesLastIndex;
 
     public LRItemMap(
         List<Rule> rules,
@@ -46,6 +52,8 @@ internal class LRItemMap
             .SelectMany(r => r.SubRules);
         
         this.itemBuffer = new FastList<int>();
+        this.itemHash = new HashSet<int>();
+
         foreach (var r in subRules)
         {
             // rule
@@ -81,8 +89,4 @@ internal class LRItemMap
     {
         
     }
-
-    FastList<int> itemBuffer;
-    Dictionary<IRuleElement, int> elementMap;
-    int rulesLastIndex;
 }
