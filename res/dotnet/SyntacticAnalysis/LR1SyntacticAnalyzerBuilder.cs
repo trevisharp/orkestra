@@ -20,44 +20,17 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
 
     public void Load(IEnumerable<Key> keys)
     {
-        var dict = new Dictionary<IRuleElement, int>();
-
-        int index = 0;
-        foreach (var rule in rules)
-            dict.Add(rule, ++index);
-        
-        int rulesEnd = index;
-        foreach (var key in keys)
-            dict.Add(key, ++index);
-        
-        var sb = this.Rules
-            .SelectMany(r => r.SubRules);
-        
-        const int extraData = 2;
-        var prods = sb
-            .Select(r => {
-                int left = dict[r.Parent];
-                int size = r.RuleTokens.Count();
-                var data = new int[size + extraData];
-
-                data[0] = left;
-                int i = 1;
-                foreach (var right in r.RuleTokens)
-                    data[i++] = dict[right];
-                data[i] = 1;
-
-                return data;
-            })
-            .Prepend(new int[] { 0, dict[StartRule], 1})
-            .ToList();
+        LRItemMap items = new LRItemMap(
+            rules, keys.ToList(), this.StartRule
+        );
         
         List<List<int>> states = new();
         extend(new() { 0 });
 
-        foreach (var rule in states[0].Select(x => prods[x]))
-        {
-            Verbose.Info($"{rule[0]} -> {string.Join(' ', rule.Skip(1))}");
-        }
+        // foreach (var rule in states[0].Select(x => prods[x]))
+        // {
+        //     Verbose.Info($"{rule[0]} -> {string.Join(' ', rule.Skip(1))}");
+        // }
 
         void closure(List<int> state)
         {
