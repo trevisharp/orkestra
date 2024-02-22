@@ -121,7 +121,7 @@ public class SyntacticStateGraph
          List<SubRule> newAttempts)
     {
         return new ReductionState(
-            state.InitialNode, 
+            state.InitialNode,
             newCurrent.Next, 
             newAttempts, 
             newIterators,
