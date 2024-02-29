@@ -1,11 +1,12 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    30/06/2023
+ * Date:    27/02/2024
  */
 using System.Collections.Generic;
 
 namespace Orkestra.LexicalAnalysis;
 
 using Processings;
+using SyntacticAnalysis;
 
 /// <summary>
 /// Base interface pro all lexical analyzer algorithms
