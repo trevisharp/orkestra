@@ -7,6 +7,7 @@ using System.Collections.Generic;
 namespace Orkestra.SyntacticAnalysis;
 
 using InternalStructure;
+using Orkestra.InternalStructure;
 
 public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
 {
@@ -37,6 +38,8 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
     Dictionary<IRuleElement, int> elementMap;
     Dictionary<int, IRuleElement> indexMap;
     Dictionary<int, IEnumerable<SubRule>> subRuleMap;
+
+
     public void Load(IEnumerable<Key> keys)
     {
         int ruleCount = rules.Count();
@@ -63,6 +66,6 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
             this.indexMap.Add(keyIndex, key);
         }
 
-        
+        using FastBuffer<int> pool = new();
     }
 }
