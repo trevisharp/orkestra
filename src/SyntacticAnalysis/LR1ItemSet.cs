@@ -39,6 +39,27 @@ public class LR1ItemSet
     /// </summary>
     Dictionary<int, List<int>> ruleItemMap;
 
+    /// <summary>
+    /// The map to item from another item moving the
+    /// current character one position.
+    /// </summary>
+    Dictionary<int, int> moveItemMap;
+
+    /// <summary>
+    /// The pair item with a lookAhead.
+    /// </summary>
+    Dictionary<int, (int item, int lookAhead)> lookAheadMap;
+
+    /// <summary>
+    /// next lookahed map index.
+    /// </summary>
+    int nextLookAheadMap = 0;
+
+    /// <summary>
+    /// The reverse of lookAheadMap.
+    /// </summary>
+    Dictionary<(int item, int lookAhead), int> revlookAheadMap;
+
     public LR1ItemSet(
         Key[] keys,
         Rule[] rules,
@@ -79,12 +100,16 @@ public class LR1ItemSet
             foreach (var sb in rule.SubRules)
             {
                 var tokens = sb.RuleTokens.ToArray();
-                var ruleSize = tokens.Length;
-                var item = pool.Rent(ruleSize + 2);
+                var itemSize = tokens.Length + 2;
+                var item = pool.Rent(itemSize);
                 item[0] = ruleIndex;
                 item[1] = 0;
-                for (int i = 2; i < item.Length; i++)
-                    item[i] = elementMap[tokens[i - 2]];
+                for (int i = 2; i < itemSize; i++)
+                {
+                    var token = tokens[i - 2];
+                    var tokenId = elementMap[token];
+                    item[i] = tokenId;
+                }
                 itemMap.Add(itemIndex, item);
                 itemIndex++;
             }
@@ -98,16 +123,49 @@ public class LR1ItemSet
         itemMap.Add(0, goal);
         ruleItemMap.Add(0, [0]);
 
-        Dictionary<int, int> moveItemMap = new();
+        this.moveItemMap = new();
+        this.lookAheadMap = new ();
+        this.revlookAheadMap = new ();
+    }
 
-        Stack<List<(int item, int ahead)>> stack = new();
-        stack.Append([(0, -1)]);
-        while(stack.Count > 0)
-        {
-            var state = stack.Pop();
+    public int GetGoal()
+        => 0;
+    
+    public int GetEOF()
+        => -1;
+    
+    public int MakeLookAhead(int itemId, int lookAheadId)
+    {
+        var element = (itemId, lookAheadId);
+        if (revlookAheadMap.ContainsKey(element))
+            return revlookAheadMap[element];
+        
+        int key = ++nextLookAheadMap;
+        lookAheadMap.Add(key, element);
+        revlookAheadMap.Add(element, key);
+        return key;
+    }
 
-            
-        }
+    public int GetPureItem(int laItemId)
+    {
+        var laItem = lookAheadMap[laItemId];
+        return laItem.item;
+    }
 
+    public int GetCurrentElement(int itemId)
+    {
+        var item = itemMap[itemId];
+        var crrElement = item[1] + 2;
+        if (crrElement >= item.Length)
+            return -1;
+        return item[crrElement];
+    }
+
+    public bool IsRule(int elementId)
+        => elementId > keyLastIndex;
+
+    public List<int> GetPureElementsByRule(int ruleId)
+    {
+        
     }
 }
