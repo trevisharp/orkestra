@@ -11,5 +11,27 @@ Console.WriteLine("Hello, World!");
 
 public class BasicSampleCompiler : Compiler
 {
-    Key kSUB = 
+    Key kSUB = keyword("SUB", "\\-");
+    Key kMUL = keyword("MUL", "\\*");
+    Key kIDENT = key("IDENT", "[0-9]+");
+
+    Rule rExp;
+    Rule rTerm;
+    Rule rFactor;
+
+    public BasicSampleCompiler()
+    {
+        rFactor = rule("factor",
+            sub(kIDENT)
+        );
+        
+        rTerm = rule("term",
+            sub(rFactor)
+        );
+        rTerm.AddSubRules(
+            sub(rFactor, kMUL, rTerm)
+        );
+
+        
+    }
 }
