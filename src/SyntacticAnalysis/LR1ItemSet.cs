@@ -165,7 +165,5 @@ public class LR1ItemSet
         => elementId > keyLastIndex;
 
     public List<int> GetPureElementsByRule(int ruleId)
-    {
-        
-    }
+        => ruleItemMap[ruleId];
 }
