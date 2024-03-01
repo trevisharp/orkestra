@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 namespace Orkestra.LexicalAnalysis;
 
 using Processings;
+using SyntacticAnalysis;
 
 /// <summary>
 /// Default Lexical Analyzer based in System.Text.RegularExpressions.

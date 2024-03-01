@@ -8,6 +8,7 @@ using System.Collections.Generic;
 
 namespace Orkestra.Processings;
 
+using SyntacticAnalysis;
 using InternalStructure;
 
 /// <summary>
