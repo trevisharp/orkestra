@@ -45,11 +45,11 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
 
         var goal = set.GetGoal();
         var eof = set.GetEOF();
-        var el = set.MakeLookAhead(goal, eof);
+        var initEl = set.MakeLookAhead(goal, eof);
 
-        List<int> s0 = [ el ];
+        List<int> s0 = [ initEl ];
         var queue = new Queue<int>();
-        queue.Enqueue(el);
+        queue.Enqueue(initEl);
 
         while (queue.Count > 0)
         {
@@ -59,7 +59,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
             if (!set.IsRule(element))
                 continue;
             
-            
+
         }
     }
 }

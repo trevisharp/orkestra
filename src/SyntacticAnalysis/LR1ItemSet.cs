@@ -128,12 +128,21 @@ public class LR1ItemSet
         this.revlookAheadMap = new ();
     }
 
+    /// <summary>
+    /// Get goal item ID.
+    /// </summary>
     public int GetGoal()
         => 0;
     
+    /// <summary>
+    /// Get EOF lookAhead ID.
+    /// </summary>
     public int GetEOF()
         => -1;
     
+    /// <summary>
+    /// Make a item with lookahead
+    /// </summary>
     public int MakeLookAhead(int itemId, int lookAheadId)
     {
         var element = (itemId, lookAheadId);
@@ -145,13 +154,19 @@ public class LR1ItemSet
         revlookAheadMap.Add(element, key);
         return key;
     }
-
+    
+    /// <summary>
+    /// Get the id of a item with lookahead.
+    /// </summary>
     public int GetPureItem(int laItemId)
     {
         var laItem = lookAheadMap[laItemId];
         return laItem.item;
     }
 
+    /// <summary>
+    /// Get the id of element in current position of a item. 
+    /// </summary>
     public int GetCurrentElement(int itemId)
     {
         var item = itemMap[itemId];
@@ -161,9 +176,15 @@ public class LR1ItemSet
         return item[crrElement];
     }
 
+    /// <summary>
+    /// Get if a element is a rule.
+    /// </summary>
     public bool IsRule(int elementId)
         => elementId > keyLastIndex;
 
+    /// <summary>
+    /// Get all pure items that expando from a rule.
+    /// </summary>
     public List<int> GetPureElementsByRule(int ruleId)
         => ruleItemMap[ruleId];
 }
