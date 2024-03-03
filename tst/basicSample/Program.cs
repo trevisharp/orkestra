@@ -1,13 +1,6 @@
-﻿global using System;
+﻿using Orkestra;
 
-using Orkestra;
-using Orkestra.LexicalAnalysis;
-using Orkestra.SyntacticAnalysis;
-using Orkestra.Processings;
-using Orkestra.Errors;
-
-// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+OrkestraApp.Compile("80 * 3 - 40 * 4 - 8000");
 
 public class BasicSampleCompiler : Compiler
 {
@@ -21,17 +14,17 @@ public class BasicSampleCompiler : Compiler
 
     public BasicSampleCompiler()
     {
-        rFactor = rule("factor",
-            sub(kIDENT)
-        );
+        rFactor = rule("factor");
+        rFactor.AddSubRules(sub(kIDENT));
         
-        rTerm = rule("term",
+        rTerm = rule("term");
+        rTerm.AddSubRules(
+            sub(rFactor, kMUL, rTerm),
             sub(rFactor)
         );
-        rTerm.AddSubRules(
-            sub(rFactor, kMUL, rTerm)
-        );
-
         
+        rExp = Rule.CreateStartRule("expr");
+        rExp.AddSubRules(sub(rTerm, kSUB, rExp));
+        rExp.AddSubRules(sub(rTerm));
     }
 }
