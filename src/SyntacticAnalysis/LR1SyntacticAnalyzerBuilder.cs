@@ -3,6 +3,8 @@
  */
 using System.Linq;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
+using System.Runtime.InteropServices;
 
 namespace Orkestra.SyntacticAnalysis;
 
@@ -55,11 +57,23 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         {
             var laItem = queue.Dequeue();
             var item = set.GetPureItem(laItem);
+            var lookAhead = set.GetLookAhead(laItem);
             var element = set.GetCurrentElement(item);
             if (!set.IsRule(element))
                 continue;
             
-
+            var nexts = set.GetPureElementsByRule(element);
+            foreach (var next in nexts)
+            {
+                var newlaItem = set.MakeLookAhead(next, lookAhead);
+                if (s0.Contains(newlaItem))
+                    continue;
+                
+                s0.Add(newlaItem);
+                queue.Enqueue(newlaItem);
+            }
         }
+
+        System.Console.WriteLine(s0.Count);
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Orkestra;
 
-OrkestraApp.Compile("80 * 3 - 40 * 4 - 8000");
+OrkestraApp.Compile("80 * 3 - 40 * 4 - 8000", "-v", "max");
 
 public class BasicSampleCompiler : Compiler
 {

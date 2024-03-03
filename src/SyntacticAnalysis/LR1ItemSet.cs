@@ -111,6 +111,7 @@ public class LR1ItemSet
                     item[i] = tokenId;
                 }
                 itemMap.Add(itemIndex, item);
+                itemRules.Add(itemIndex);
                 itemIndex++;
             }
             ruleItemMap.Add(ruleIndex, itemRules);
@@ -162,6 +163,15 @@ public class LR1ItemSet
     {
         var laItem = lookAheadMap[laItemId];
         return laItem.item;
+    }
+
+    /// <summary>
+    /// Get the id of a lookahead.
+    /// </summary>
+    public int GetLookAhead(int laItemId)
+    {
+        var laItem = lookAheadMap[laItemId];
+        return laItem.lookAhead;
     }
 
     /// <summary>
