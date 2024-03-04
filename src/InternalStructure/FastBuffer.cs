@@ -1,3 +1,6 @@
+/* Author:  Leonardo Trevisan Silio
+ * Date:    04/03/2024
+ */
 using System;
 using System.Buffers;
 using System.Collections.Generic;
@@ -13,10 +16,10 @@ internal class FastBuffer<T> : IDisposable
 
     public T[] Rent(int size)
     {
-        var pool = ArrayPool<T>.Shared;
-        var buffer = pool.Rent(size);
-        buffers.Add(buffer);
-        return buffer;
+        // var pool = ArrayPool<T>.Shared;
+        // var buffer = pool.Rent(size);
+        // buffers.Add(buffer);
+        return new T[size];
     }
 
     public void Return(T[] buffer)

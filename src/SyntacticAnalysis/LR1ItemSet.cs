@@ -1,3 +1,6 @@
+/* Author:  Leonardo Trevisan Silio
+ * Date:    04/03/2024
+ */
 using System.Linq;
 using System.Collections.Generic;
 
@@ -75,7 +78,8 @@ public class LR1ItemSet
         int keyCount = keys.Length;
         int indexSize = ruleCount + keyCount;
         this.indexMap = new (indexSize);
-        this.firstSet = new(indexSize);
+        this.firstSet = new(indexSize + 1);
+        firstSet[-1] = [-1];
         
         int index = 0;
         this.elementMap = new (indexSize);
@@ -231,6 +235,19 @@ public class LR1ItemSet
         if (crrElement >= item.Length)
             return -1;
         return item[crrElement];
+    }
+
+    /// <summary>
+    /// Get the id of next element in current position of a item. 
+    /// </summary>
+    public int GetNextElement(int itemId)
+    {
+        var item = itemMap[itemId];
+        var crrElement = item[1] + 2;
+        var nxtElement = crrElement + 1;
+        if (nxtElement >= item.Length)
+            return -1;
+        return item[nxtElement];
     }
 
     /// <summary>

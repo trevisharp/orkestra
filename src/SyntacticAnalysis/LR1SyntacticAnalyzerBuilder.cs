@@ -1,10 +1,8 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    04/11/2023
+ * Date:    04/03/2024
  */
 using System.Linq;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
-using System.Runtime.InteropServices;
 
 namespace Orkestra.SyntacticAnalysis;
 
@@ -63,9 +61,14 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
                 continue;
             
             var nexts = set.GetPureElementsByRule(element);
+            var nextEl = set.GetNextElement(item);
             foreach (var next in nexts)
             {
-                foreach (var fstLA in set.GetFirstSet(element))
+                var firstSet = 
+                    nextEl == -1 && lookAhead != -1 ?
+                    [-1, lookAhead] :
+                    set.GetFirstSet(nextEl);
+                foreach (var fstLA in firstSet)
                 {
                     var newlaItem = set.CreateLookAheadItem(next, fstLA);
                     if (s0.Contains(newlaItem))
@@ -76,7 +79,5 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
                 }
             }
         }
-
-        System.Console.WriteLine(s0.Count);
     }
 }
