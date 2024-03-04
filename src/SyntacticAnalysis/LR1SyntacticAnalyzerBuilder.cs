@@ -47,7 +47,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
 
         var goal = set.GetGoal();
         var eof = set.GetEOF();
-        var initEl = set.MakeLookAhead(goal, eof);
+        var initEl = set.CreateLookAheadItem(goal, eof);
 
         List<int> s0 = [ initEl ];
         var queue = new Queue<int>();
@@ -65,12 +65,15 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
             var nexts = set.GetPureElementsByRule(element);
             foreach (var next in nexts)
             {
-                var newlaItem = set.MakeLookAhead(next, lookAhead);
-                if (s0.Contains(newlaItem))
-                    continue;
-                
-                s0.Add(newlaItem);
-                queue.Enqueue(newlaItem);
+                foreach (var fstLA in set.GetFirstSet(element))
+                {
+                    var newlaItem = set.CreateLookAheadItem(next, fstLA);
+                    if (s0.Contains(newlaItem))
+                        continue;
+                    
+                    s0.Add(newlaItem);
+                    queue.Enqueue(newlaItem);
+                }
             }
         }
 

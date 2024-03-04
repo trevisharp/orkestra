@@ -40,6 +40,11 @@ public class LR1ItemSet
     Dictionary<int, List<int>> ruleItemMap;
 
     /// <summary>
+    /// The first set of elements.
+    /// </summary>
+    Dictionary<int, List<int>> firstSet;
+
+    /// <summary>
     /// The map to item from another item moving the
     /// current character one position.
     /// </summary>
@@ -70,6 +75,7 @@ public class LR1ItemSet
         int keyCount = keys.Length;
         int indexSize = ruleCount + keyCount;
         this.indexMap = new (indexSize);
+        this.firstSet = new(indexSize);
         
         int index = 0;
         this.elementMap = new (indexSize);
@@ -78,6 +84,7 @@ public class LR1ItemSet
             var keyIndex = ++index;
             elementMap.Add(key, keyIndex);
             indexMap.Add(keyIndex, key);
+            firstSet.Add(keyIndex, [keyIndex]);
         }
         this.keyLastIndex = index;
 
@@ -86,6 +93,7 @@ public class LR1ItemSet
             var ruleIndex = ++index;
             elementMap.Add(rule, ruleIndex);
             indexMap.Add(ruleIndex, rule);
+            firstSet.Add(ruleIndex, []);
         }
 
         pool = new();
@@ -125,8 +133,47 @@ public class LR1ItemSet
         ruleItemMap.Add(0, [0]);
 
         this.moveItemMap = new();
-        this.lookAheadMap = new ();
-        this.revlookAheadMap = new ();
+        this.lookAheadMap = new();
+        this.revlookAheadMap = new();
+
+        bool hasChange = true;
+        while (hasChange)
+        {
+            hasChange = false;
+            foreach (var rule in rules)
+            {
+                var ruleId = elementMap[rule];
+                var set = firstSet[ruleId];
+                foreach (var sub in rule.SubRules)
+                {
+                    var fst = sub.RuleTokens.First();
+                    var fstId = elementMap[fst];
+                    var otherSet = firstSet[fstId];
+                    foreach (var el in otherSet)
+                    {
+                        if (set.Contains(el))
+                            continue;
+                        
+                        set.Add(el);
+                        hasChange = true;
+                    }
+                }
+            }
+        }
+
+        // foreach (var pair in firstSet)
+        // {
+        //     System.Console.Write(
+        //         indexMap[pair.Key].KeyName
+        //     );
+        //     System.Console.Write(" = {");
+        //     foreach (var item in pair.Value)
+        //     {
+        //         System.Console.Write(indexMap[item].KeyName);
+        //         System.Console.Write(", ");
+        //     }
+        //     System.Console.WriteLine("}");
+        // }
     }
 
     /// <summary>
@@ -144,7 +191,7 @@ public class LR1ItemSet
     /// <summary>
     /// Make a item with lookahead
     /// </summary>
-    public int MakeLookAhead(int itemId, int lookAheadId)
+    public int CreateLookAheadItem(int itemId, int lookAheadId)
     {
         var element = (itemId, lookAheadId);
         if (revlookAheadMap.ContainsKey(element))
@@ -197,4 +244,10 @@ public class LR1ItemSet
     /// </summary>
     public List<int> GetPureElementsByRule(int ruleId)
         => ruleItemMap[ruleId];
+
+    /// <summary>
+    /// Get the first set items from a rule.
+    /// </summary>
+    public List<int> GetFirstSet(int elementId)
+        => firstSet[elementId];
 }
