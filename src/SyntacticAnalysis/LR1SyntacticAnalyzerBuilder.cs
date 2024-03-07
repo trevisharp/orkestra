@@ -47,9 +47,15 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         var eof = set.GetEOF();
         var initEl = set.CreateLookAheadItem(goal, eof);
 
-        List<int> s0 = [ initEl ];
+        List<int> s0 = closure([ initEl ], set);
+        
+    }
+
+    private List<int> closure(List<int> state, LR1ItemSet set)
+    {
         var queue = new Queue<int>();
-        queue.Enqueue(initEl);
+        foreach (var item in state)
+            queue.Enqueue(item);
 
         while (queue.Count > 0)
         {
@@ -71,13 +77,15 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
                 foreach (var fstLA in firstSet)
                 {
                     var newlaItem = set.CreateLookAheadItem(next, fstLA);
-                    if (s0.Contains(newlaItem))
+                    if (state.Contains(newlaItem))
                         continue;
                     
-                    s0.Add(newlaItem);
+                    state.Add(newlaItem);
                     queue.Enqueue(newlaItem);
                 }
             }
         }
+
+        return state;
     }
 }
