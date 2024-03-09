@@ -20,6 +20,10 @@ public class LR1ItemSet
     /// are rule indexes.
     /// </summary>
     int keyLastIndex;
+    /// <summary>
+    /// The last index of rule on elementMap.
+    /// </summary>
+    int ruleLastIndex;
 
     /// <summary>
     /// Reverse dicitionary of elementMap.
@@ -35,6 +39,11 @@ public class LR1ItemSet
     /// The index map from LR1Itens and int identities.
     /// </summary>
     Dictionary<int, int[]> itemMap;
+
+    /// <summary>
+    /// The next index of itemMap dicitionary.
+    /// </summary>
+    int itemMapNextIndex = 0;
 
     /// <summary>
     /// The relation between elementMap's rule index and
@@ -99,12 +108,13 @@ public class LR1ItemSet
             indexMap.Add(ruleIndex, rule);
             firstSet.Add(ruleIndex, []);
         }
+        this.ruleLastIndex = index;
 
         pool = new();
         this.itemMap = [];
         this.ruleItemMap = new();
 
-        int itemIndex = 1;
+        itemMapNextIndex = 1;
         foreach (var rule in rules)
         {
             var ruleIndex = elementMap[rule];
@@ -122,9 +132,9 @@ public class LR1ItemSet
                     var tokenId = elementMap[token];
                     item[i] = tokenId;
                 }
-                itemMap.Add(itemIndex, item);
-                itemRules.Add(itemIndex);
-                itemIndex++;
+                itemMap.Add(itemMapNextIndex, item);
+                itemRules.Add(itemMapNextIndex);
+                itemMapNextIndex++;
             }
             ruleItemMap.Add(ruleIndex, itemRules);
         }
@@ -267,4 +277,26 @@ public class LR1ItemSet
     /// </summary>
     public List<int> GetFirstSet(int elementId)
         => firstSet[elementId];
+    
+    public int GetElementsLength()
+        => ruleLastIndex + 1;
+    
+    public int GetMovedItem(int item)
+    {
+        if (moveItemMap.ContainsKey(item))
+            return moveItemMap[item];
+            
+        var itemData = itemMap[item];
+        var size = itemData.Length;
+
+        var newItemData = pool.Rent(size);
+        for (int i = 0; i < size; i++)
+            newItemData[i] = itemData[i];
+        
+        newItemData[1]++;
+        int itemIndex = itemMapNextIndex;
+        itemMap.Add(itemIndex, newItemData);
+        itemMapNextIndex++;
+        return itemIndex;
+    }
 }

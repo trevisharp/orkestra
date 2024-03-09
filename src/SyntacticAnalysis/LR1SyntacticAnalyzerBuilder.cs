@@ -3,6 +3,7 @@
  */
 using System.Linq;
 using System.Collections.Generic;
+using System;
 
 namespace Orkestra.SyntacticAnalysis;
 
@@ -48,7 +49,26 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         var initEl = set.CreateLookAheadItem(goal, eof);
 
         List<int> s0 = closure([ initEl ], set);
-        
+        List<List<int>> states = [ s0 ];
+        Queue<List<int>> queue = new Queue<List<int>>();
+        queue.Enqueue(s0);
+
+        while (queue.Count > 0)
+        {
+            var crr = queue.Dequeue();
+            var elements = set.GetElementsLength();
+
+            for (int el = 0; el < elements; el++)
+            {
+                var newState = goTo(crr, el);
+                if (newState.Count == 0)
+                    continue;
+                
+                closure(newState, set);
+                states.Add(newState);
+                queue.Enqueue(newState);
+            }
+        }
     }
 
     private List<int> closure(List<int> state, LR1ItemSet set)
@@ -86,6 +106,24 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
             }
         }
 
+        return state;
+    }
+
+    private List<int> goTo(List<int> state, int el)
+    {
+        List<int> newState = new List<int>();
+        foreach (var laItem in state)
+        {
+            var item = set.GetPureItem(laItem);
+            var lookAhead = set.GetLookAhead(laItem);
+            var element = set.GetNextElement(item);
+            if (element != el)
+                continue;
+            
+            var movedItem = set.GetMovedItem(item);
+            var newlaItem = set.CreateLookAheadItem(movedItem, lookAhead);
+            newState.Add(newlaItem);
+        }
         return state;
     }
 }
