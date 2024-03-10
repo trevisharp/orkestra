@@ -43,6 +43,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
             rules.ToArray(),
             StartRule
         );
+        List<int[]> gotoTable = new List<int[]>();
 
         var goal = set.GetGoal();
         var eof = set.GetEOF();
@@ -52,36 +53,68 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         List<List<int>> states = [ s0 ];
         List<int> initStateHashes = [ getHash([ initEl ]) ];
         List<int> stateHashes = [ getHash(s0) ];
+        Dictionary<int, int> hashStateId = new Dictionary<int, int>();
         Queue<List<int>> queue = new Queue<List<int>>();
         queue.Enqueue(s0);
 
-        show(s0);
+        var elementCount = set.GetElementsLength();
         while (queue.Count > 0)
         {
             var crr = queue.Dequeue();
-            var elements = set.GetElementsLength();
+            var stateRow = new int[elementCount];
+            gotoTable.Add(stateRow);
 
-            for (int el = 0; el < elements; el++)
+            for (int el = 0; el < elementCount; el++)
             {
                 var newState = goTo(crr, el);
                 if (newState.Count == 0)
                     continue;
+                int stateId = gotoTable.Count + queue.Count;
                 
                 var newHash = getHash(newState);
                 if (initStateHashes.Contains(newHash))
+                {
+                    stateRow[el] = hashStateId[newHash];
                     continue;
+                }
                 initStateHashes.Add(newHash);
+                hashStateId.Add(newHash, stateId);
                 
                 closure(newState, set);
                 newHash = getHash(newState);
                 if (stateHashes.Contains(newHash))
+                {
+                    stateRow[el] = hashStateId[newHash];
                     continue;
+                }
                 stateHashes.Add(newHash);
+                if (!hashStateId.ContainsKey(newHash))
+                    hashStateId.Add(newHash, stateId);
 
                 states.Add(newState);
                 queue.Enqueue(newState);
-                show(newState);
+                stateRow[el] = stateId;
             }
+        }
+    }
+
+    private void show(List<int[]> gotoTable)
+    {
+        var elementCount = set.GetElementsLength();
+        Console.WriteLine();
+        Console.Write("State\t|");
+        for (int i = 0; i < elementCount; i++)
+            Console.Write(
+                set.GetElementString(i) + "\t|"
+            );
+        Console.WriteLine();
+        int id = 0;
+        foreach (var row in gotoTable)
+        {
+            Console.Write($"{id++}\t|");
+            foreach (var gt in row)
+                Console.Write($"{gt}\t|");
+            Console.WriteLine();
         }
     }
 
