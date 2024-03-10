@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    04/03/2024
+ * Date:    10/03/2024
  */
 using System.Linq;
 using System.Collections.Generic;
@@ -50,10 +50,12 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
 
         List<int> s0 = closure([ initEl ], set);
         List<List<int>> states = [ s0 ];
-        List<int> stateHashes = [ getHash([ initEl ]) ];
+        List<int> initStateHashes = [ getHash([ initEl ]) ];
+        List<int> stateHashes = [ getHash(s0) ];
         Queue<List<int>> queue = new Queue<List<int>>();
         queue.Enqueue(s0);
 
+        show(s0);
         while (queue.Count > 0)
         {
             var crr = queue.Dequeue();
@@ -66,15 +68,31 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
                     continue;
                 
                 var newHash = getHash(newState);
+                if (initStateHashes.Contains(newHash))
+                    continue;
+                initStateHashes.Add(newHash);
+                
+                closure(newState, set);
+                newHash = getHash(newState);
                 if (stateHashes.Contains(newHash))
                     continue;
                 stateHashes.Add(newHash);
-                
-                closure(newState, set);
+
                 states.Add(newState);
                 queue.Enqueue(newState);
+                show(newState);
             }
         }
+    }
+
+    private void show(List<int> list)
+    {
+        Console.WriteLine("{ " +
+            list
+                .Select(set.GetLookAheadItemString)
+                .Aggregate("", (acc, crr) => $"{acc}, {crr}")
+            + " }"
+        );
     }
 
     private int getHash(List<int> list)
@@ -132,6 +150,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
             }
         }
 
+        state.Sort();
         return state;
     }
 
@@ -142,7 +161,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         {
             var item = set.GetPureItem(laItem);
             var lookAhead = set.GetLookAhead(laItem);
-            var element = set.GetNextElement(item);
+            var element = set.GetCurrentElement(item);
             if (element != el)
                 continue;
             
@@ -150,6 +169,6 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
             var newlaItem = set.CreateLookAheadItem(movedItem, lookAhead);
             newState.Add(newlaItem);
         }
-        return state;
+        return newState;
     }
 }

@@ -1,7 +1,8 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    04/03/2024
+ * Date:    10/03/2024
  */
 using System.Linq;
+using System.Text;
 using System.Collections.Generic;
 
 namespace Orkestra.SyntacticAnalysis;
@@ -296,7 +297,56 @@ public class LR1ItemSet
         newItemData[1]++;
         int itemIndex = itemMapNextIndex;
         itemMap.Add(itemIndex, newItemData);
+        moveItemMap.Add(item, itemIndex);
         itemMapNextIndex++;
         return itemIndex;
     }
+
+    /// <summary>
+    /// Get LookAhead Item as String.
+    /// </summary>
+    public string GetLookAheadItemString(int laItemId)
+    {
+        var sb = new StringBuilder();
+        var laItem = lookAheadMap[laItemId];
+
+        var itemId = laItem.item;
+        var lookAheadId = laItem.lookAhead;
+
+        var item = itemMap[itemId];
+        var rule = 
+            item[0] == 0 ? "Goal" :
+            indexMap[item[0]].KeyName;
+        sb.Append($"[ {rule} -> ");
+
+        for (int i = 2; i < item.Length; i++)
+        {
+            if (i - 2 == item[1])
+                sb.Append("•");
+            
+            var elName = 
+                item[i] == 0 ? "Goal" :
+                indexMap[item[i]].KeyName;
+            sb.Append($" {elName}");
+        }
+        
+        var lookAhead = lookAheadId switch
+        {
+            -1 => "EOF",
+            0  => "Goal",
+            _  => indexMap[lookAheadId].KeyName
+        };
+        sb.Append($", {lookAhead} ]");
+        return sb.ToString();
+    }
+    
+    /// <summary>
+    /// Get Element as String.
+    /// </summary>
+    public string GetElementString(int element)
+        => element switch
+        {
+            0 => "Goal",
+            _ => indexMap[element].KeyName
+        };
 }
