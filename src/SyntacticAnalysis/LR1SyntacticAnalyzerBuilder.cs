@@ -50,6 +50,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
 
         List<int> s0 = closure([ initEl ], set);
         List<List<int>> states = [ s0 ];
+        List<int> stateHashes = [ getHash([ initEl ]) ];
         Queue<List<int>> queue = new Queue<List<int>>();
         queue.Enqueue(s0);
 
@@ -64,11 +65,36 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
                 if (newState.Count == 0)
                     continue;
                 
+                var newHash = getHash(newState);
+                if (stateHashes.Contains(newHash))
+                    continue;
+                stateHashes.Add(newHash);
+                
                 closure(newState, set);
                 states.Add(newState);
                 queue.Enqueue(newState);
             }
         }
+    }
+
+    private int getHash(List<int> list)
+    {
+        int hash = 0,
+            last = 1,
+            secondToLast = 1,
+            pow = 1;
+        
+        foreach (var element in list)
+        {
+            var mod = element * last * secondToLast % 1024;
+            hash += mod * pow;
+
+            pow *= 31;
+            secondToLast = last;
+            last = element;
+        }
+
+        return hash;
     }
 
     private List<int> closure(List<int> state, LR1ItemSet set)
