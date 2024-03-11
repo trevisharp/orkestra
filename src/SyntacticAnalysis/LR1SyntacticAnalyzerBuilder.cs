@@ -96,6 +96,10 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
                 stateRow[el] = stateId;
             }
         }
+
+        var side = elementCount + 1;
+        var table = new int[side * side];
+        
     }
 
     private void show(List<int[]> gotoTable)
