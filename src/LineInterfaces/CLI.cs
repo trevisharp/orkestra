@@ -3,13 +3,10 @@
  */
 using System;
 using System.Reflection;
-using System.Collections.Generic;
 
 using static System.Console;
 
-namespace Orkestra;
-
-using Projects;
+namespace Orkestra.LineInterfaces;
 
 /// <summary>
 /// Represents a command line interface implementation.
@@ -18,6 +15,7 @@ public abstract class CLI
 {
     public virtual string Header => "Running iteractive command line interface...";
 
+    [IgnoreCommand]
     public void Run(params string[] args)
     {
         if (args.Length == 0)
@@ -29,6 +27,7 @@ public abstract class CLI
         call(args);
     }
 
+    [IgnoreCommand]
     private void startContinuousCLI()
     {
         Verbose.Info(Header);
@@ -51,24 +50,31 @@ public abstract class CLI
                 break;
             
             if (args[0].ToLower() == "clear")
+            {
                 Clear();
+                continue;
+            }
             
             call(args);
         }
     }
 
+    [IgnoreCommand]
     private void call(string[] args)
     {
         try
         {
-            call(args[0], args[1..]);
+            call(args[0], args.Length > 1 ? args[1..] : []);
         }
         catch (Exception ex)
         {
             Verbose.Error(ex.Message);
+
+            help();
         }
     }
 
+    [IgnoreCommand]
     private void call(string command, string[] otherArgs)
     {
         command = command.ToLower();
@@ -78,6 +84,10 @@ public abstract class CLI
             if (method.Name.ToLower() != command)
                 continue;
             
+            var ignore = method.GetCustomAttribute<IgnoreCommandAttribute>();
+            if (ignore is not null)
+                continue;
+            
             var parameters = getParameters(
                 method.GetParameters(), otherArgs
             );
@@ -85,9 +95,12 @@ public abstract class CLI
             return;
         }
 
-        help();
+        throw new MissingMethodException(
+            "Missing commmand."
+        );
     }
 
+    [IgnoreCommand]
     private object[] getParameters(ParameterInfo[] parameterInfos, string[] args)
     {
         int parameterIndex = 0;
@@ -95,6 +108,17 @@ public abstract class CLI
 
         foreach (var parameter in parameterInfos)
         {
+            if (parameterIndex >= args.Length)
+            {
+                if (!parameter.HasDefaultValue)
+                    throw new InvalidOperationException(
+                        $"Missing parameter named '{parameter.Name}' of type '{parameter.ParameterType.Name}'."
+                    );
+
+                parameters[parameterIndex] = parameter.DefaultValue;
+                continue;
+            }
+
             var value = args[parameterIndex];
             parameters[parameterIndex] =
                 parameter.ParameterType.Name switch
@@ -103,6 +127,7 @@ public abstract class CLI
                     "Single" => float.TryParse(value, out float result) ? result : throw getException(parameter, value),
                     _ => value
                 };
+            parameterIndex++;
         }
 
         return parameters;
@@ -115,12 +140,38 @@ public abstract class CLI
         }
     }
 
-    protected virtual void help()
+    protected virtual void help(string command = "")
     {
+        bool isDetailed = command != string.Empty;
+
+        var cliType = this.GetType();
+        foreach (var method in cliType.GetRuntimeMethods())
+        {
+            if (method.DeclaringType != cliType)
+                continue;
+
+            var ignore = method.GetCustomAttribute<IgnoreCommandAttribute>();
+            if (ignore is not null)
+                continue;
+            
+            if (isDetailed && command.ToLower() != method.Name.ToLower())
+                continue;
+
+            var commandName = method.Name.ToLower();
+            var helpMessage = 
+                isDetailed ?
+                method.GetCustomAttribute<DetailedHelpMessageAttribute>()?.Message :
+                method.GetCustomAttribute<HelpMessageAttribute>()?.Message;
+
+            Verbose.Info(
+                helpMessage is not null ?
+                $"{commandName} - {helpMessage}" :
+                commandName
+             );
+        }
+
         Verbose.Info("help - Open this help screen.");
         Verbose.Info("clear - Clear the screen if the continuous CLI is opened.");
         Verbose.Info("exit - Exit of the continuous CLI is opened.");
-
-        
     }
 }

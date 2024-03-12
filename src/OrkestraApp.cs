@@ -8,6 +8,7 @@ namespace Orkestra;
 
 using Providers;
 using Exceptions;
+using Orkestra.LineInterfaces;
 
 /// <summary>
 /// Main Orkestra class framework.
@@ -38,6 +39,26 @@ public static class OrkestraApp
         }
     }
     
+    /// <summary>
+    /// Run the Command Line Interface of this application.
+    /// </summary>
+    public static void Run(params string[] args)
+    {
+        try
+        {
+            var cli = getConfiguredCLI();
+            cli.Run(args);
+        }
+        catch (OrkestraException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new UnexpectedException(ex);
+        }
+    }
+
     private static void configureVerbose(string[] args)
     {
         Verbose.VerboseLevel = 0;
@@ -58,6 +79,27 @@ public static class OrkestraApp
                 Verbose.VerboseLevel = int.MaxValue;
         }
 
+    }
+
+    private static CLI getConfiguredCLI()
+    {
+        var types = getAssemplyTypes();
+        foreach (var type in types)
+        {
+            if (type.BaseType != typeof(CLI))
+                continue;
+            
+            var constructor = getEmptyConstructor(type);
+            
+            if (constructor is null)
+                throw new NoConstructorException();
+            
+            var cli = constructor.Invoke([]) as CLI;
+
+            return cli;
+        }
+        
+        throw new NoCLIExceptionsException();
     }
 
     private static Compiler getConfiguredCompiler(string[] args)
