@@ -6,7 +6,7 @@ namespace Orkestra;
 /// <summary>
 /// Represents a Key for syntactical analisys.
 /// </summary>
-public record Key : IRuleElement
+public record Key : ISyntaticElement
 {
     private Key(string name, string expression, 
         bool contextual, bool identity, bool keyword, bool auto)

@@ -6,7 +6,7 @@ namespace Orkestra;
 /// <summary>
 /// Represents a named element that can be used in a rule.
 /// </summary>
-public interface IRuleElement
+public interface ISyntaticElement
 {
     string KeyName { get; }
 }

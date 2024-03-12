@@ -2,8 +2,8 @@ namespace Orkestra;
 
 using SyntacticAnalysis;
 
-public interface INode
+public interface IMatch
 {
-    bool Is(IRuleElement token);
-    IRuleElement Element { get; }
+    bool Is(ISyntaticElement token);
+    ISyntaticElement Element { get; }
 }

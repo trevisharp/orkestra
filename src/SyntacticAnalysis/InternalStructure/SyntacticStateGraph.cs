@@ -13,7 +13,7 @@ public class SyntacticStateGraph
     public List<Rule> RuleList { get; private set; }
     public AttemptDictionary Dictionary { get; private set; }
 
-    public SyntacticStateGraph(IEnumerable<INode> tokens, IEnumerable<Rule> rules)
+    public SyntacticStateGraph(IEnumerable<IMatch> tokens, IEnumerable<Rule> rules)
     {
         this.TokenList = new StackLinkedList(tokens);
         this.RuleList = new List<Rule>(rules);
@@ -61,7 +61,7 @@ public class SyntacticStateGraph
 
     //TODO: correct this without use Disconnect to improve
     //      the performance
-    private INode buildTree(StackLinkedListNode node)
+    private IMatch buildTree(StackLinkedListNode node)
     {
         if (node == null)
             return null;
@@ -106,7 +106,7 @@ public class SyntacticStateGraph
         StackLinkedListNode reverse = null)
     {
         var attempts = Dictionary.GetAttempts(initial.Value);
-        List<IEnumerator<IRuleElement>> firstItList = attempts
+        List<IEnumerator<ISyntaticElement>> firstItList = attempts
             .Select(sb => sb.RuleTokens.GetEnumerator())
             .ToList();
         var state = new ReductionState(
@@ -117,7 +117,7 @@ public class SyntacticStateGraph
     private ReductionState nextState(
         ReductionState state, 
         StackLinkedListNode newCurrent, 
-        List<IEnumerator<IRuleElement>> newIterators,
+        List<IEnumerator<ISyntaticElement>> newIterators,
          List<SubRule> newAttempts)
     {
         return new ReductionState(

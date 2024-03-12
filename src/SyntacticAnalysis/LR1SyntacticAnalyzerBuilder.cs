@@ -4,6 +4,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using System.Reflection.Metadata;
 
 namespace Orkestra.SyntacticAnalysis;
 
@@ -97,9 +98,22 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
             }
         }
 
+        const int accept = int.MaxValue / 2;
+        const int shift = int.MaxValue / 4;
+        const int reduce = int.MaxValue / 8;
         var side = elementCount + 1;
+        ISyntaticElement[] elements = set.GetElements().ToArray();
+
         var table = new int[side * side];
-        
+
+        foreach (var state in states)
+        {
+            foreach (var item in state)
+            {
+                var pitem = set.GetPureItem(item);
+
+            }
+        }
     }
 
     private void show(List<int[]> gotoTable)

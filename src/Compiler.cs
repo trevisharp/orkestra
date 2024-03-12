@@ -76,7 +76,7 @@ public abstract class Compiler
     protected static Rule rule(string name, params SubRule[] subRules)
         => Rule.CreateRule(name, subRules);
 
-    protected static SubRule sub(params IRuleElement[] elements)
+    protected static SubRule sub(params ISyntaticElement[] elements)
         => SubRule.Create(elements);
 
     private ProcessingCollection buildProcessingMachine()

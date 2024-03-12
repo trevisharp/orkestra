@@ -8,7 +8,7 @@ using LexicalAnalysis;
 public class StackLinkedList : IEnumerable<StackLinkedListNode>
 {
     private StackLinkedListNode root = null;
-    public StackLinkedList(IEnumerable<INode> buffer)
+    public StackLinkedList(IEnumerable<IMatch> buffer)
     {
         StackLinkedListNode header = new StackLinkedListNode();
         header.Value = null;
@@ -30,7 +30,7 @@ public class StackLinkedList : IEnumerable<StackLinkedListNode>
 
     public void Reduce(
         StackLinkedListNode initialNode, 
-        INode inner,
+        IMatch inner,
         StackLinkedListNode finalNode)
     {
         StackLinkedListNode innerNode = new StackLinkedListNode();

@@ -7,7 +7,11 @@ namespace Orkestra.SyntacticAnalysis;
 
 using InternalStructure;
 
-public class LR1SyntacticAnalyzer : ISyntacticAnalyzer
+public class LR1SyntacticAnalyzer(
+    int side,
+    int[] table,
+    ISyntaticElement[] elements
+) : ISyntacticAnalyzer
 {
     public ExpressionTree Parse(IEnumerable<Token> tokens)
     {

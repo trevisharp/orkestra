@@ -8,12 +8,12 @@ using LexicalAnalysis;
 public class AttemptDictionary
 {
     private List<Rule> RuleList = null;
-    private Dictionary<IRuleElement, SubRule[]> dict = new Dictionary<IRuleElement, SubRule[]>();
+    private Dictionary<ISyntaticElement, SubRule[]> dict = new Dictionary<ISyntaticElement, SubRule[]>();
 
     public AttemptDictionary(IEnumerable<Rule> rules)
         => this.RuleList = new List<Rule>(rules);
 
-    private IEnumerable<SubRule> findSubRules(INode node)
+    private IEnumerable<SubRule> findSubRules(IMatch node)
     {
         if (node == null)
             yield break;
@@ -28,7 +28,7 @@ public class AttemptDictionary
         }
     }
 
-    public IEnumerable<SubRule> GetAttempts(INode node)
+    public IEnumerable<SubRule> GetAttempts(IMatch node)
     {
         // foreach (var key in dict.Keys)
         // {

@@ -6,12 +6,12 @@ using LexicalAnalysis;
 
 public class ExpressionTree
 {
-    public INode Root { get; set; }
+    public IMatch Root { get; set; }
 
     public override string ToString()
         => toString(Root, string.Empty);
 
-    private string toString(INode node, string tabulation)
+    private string toString(IMatch node, string tabulation)
     {
         if (node is Token token)
             return tabulation + token.Key.Name + "\n";

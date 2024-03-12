@@ -9,15 +9,14 @@ namespace Orkestra;
 /// A record that represents a set of rules with same name.
 /// </summary>
 /// <value></value>
-public record Rule : IRuleElement
+public record Rule : ISyntaticElement
 {
     private List<SubRule> subRules;
 
     private Rule(string name, bool startRule, SubRule[] subRules)
     {
         this.Name = name;
-        this.subRules = new List<SubRule>();
-        this.subRules.AddRange(subRules);
+        this.subRules = [ ..subRules ];
         this.IsStartRule = startRule;
 
         foreach (var subRule in subRules)

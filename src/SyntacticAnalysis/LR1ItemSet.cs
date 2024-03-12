@@ -14,7 +14,7 @@ public class LR1ItemSet
     /// <summary>
     /// The map to int from key or rule elements.
     /// </summary>
-    Dictionary<IRuleElement, int> elementMap;
+    Dictionary<ISyntaticElement, int> elementMap;
 
     /// <summary>
     /// The last index of keys on elementMap. Index higher than keyLastIndex
@@ -29,7 +29,7 @@ public class LR1ItemSet
     /// <summary>
     /// Reverse dicitionary of elementMap.
     /// </summary>
-    Dictionary<int, IRuleElement> indexMap;
+    Dictionary<int, ISyntaticElement> indexMap;
 
     /// <summary>
     /// The pool of buffer for items.
@@ -281,6 +281,16 @@ public class LR1ItemSet
     
     public int GetElementsLength()
         => ruleLastIndex + 1;
+    
+    /// <summary>
+    /// Return a collections of all IRuleElements.
+    /// </summary>
+    public IEnumerable<ISyntaticElement> GetElements()
+    {
+        var len = GetElementsLength();
+        for (int i = 0; i < len; i++)
+            yield return indexMap[i];
+    }
     
     public int GetMovedItem(int item)
     {

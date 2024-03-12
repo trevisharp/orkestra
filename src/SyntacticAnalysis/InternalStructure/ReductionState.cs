@@ -6,6 +6,6 @@ public record ReductionState(
     StackLinkedListNode InitialNode,
     StackLinkedListNode CurrentNode,
     IEnumerable<SubRule> Attempts,
-    List<IEnumerator<IRuleElement>> Iterators,
+    List<IEnumerator<ISyntaticElement>> Iterators,
     StackLinkedListNode ReverseParameter
 );

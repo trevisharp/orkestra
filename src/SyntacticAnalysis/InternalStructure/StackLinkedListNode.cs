@@ -19,7 +19,7 @@ public class StackLinkedListNode
     public Stack<StackLinkedListNode> PreviousStack { get; set; }
     public StackLinkedListNode Previous => PreviousStack.Peek();
 
-    public INode Value { get; set; }
+    public IMatch Value { get; set; }
 
     public void Connect(StackLinkedListNode node)
     {

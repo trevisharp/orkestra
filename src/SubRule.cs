@@ -9,21 +9,20 @@ namespace Orkestra;
 /// <summary>
 /// A record that represents a sub sintactycal rule. 
 /// </summary>
-public record SubRule : IRuleElement
+public record SubRule : ISyntaticElement
 {
-    private List<IRuleElement> ruleTokens;
-    private SubRule(IRuleElement[] tokens)
+    private List<ISyntaticElement> ruleTokens;
+    private SubRule(ISyntaticElement[] tokens)
     {
-        ruleTokens = new List<IRuleElement>();
-        ruleTokens.AddRange(tokens);
+        ruleTokens = [ ..tokens];
     }
 
-    public IEnumerable<IRuleElement> RuleTokens => this.ruleTokens;
+    public IEnumerable<ISyntaticElement> RuleTokens => this.ruleTokens;
     public Rule Parent { get; set; } = null;
 
     public string KeyName => Parent.Name + "." + ruleTokens.First().KeyName;
 
-    public static SubRule Create(params IRuleElement[] tokens)
+    public static SubRule Create(params ISyntaticElement[] tokens)
         => new SubRule(tokens);
 
     public override string ToString()

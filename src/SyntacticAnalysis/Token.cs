@@ -6,11 +6,11 @@ namespace Orkestra.SyntacticAnalysis;
 /// <summary>
 /// Represents a Token data output from lexical analisys.
 /// </summary>
-public record Token(Key Key, string Value, int Index) : INode
+public record Token(Key Key, string Value, int Index) : IMatch
 {
-    public IRuleElement Element => Key;
+    public ISyntaticElement Element => Key;
 
-    public bool Is(IRuleElement token)
+    public bool Is(ISyntaticElement token)
         => token is Key key && key == this.Key;
 
     public override string ToString()
