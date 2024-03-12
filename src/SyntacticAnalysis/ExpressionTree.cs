@@ -1,29 +1,45 @@
+/* Author:  Leonardo Trevisan Silio
+ * Date:    04/11/2023
+ */
 using System.Text;
+using System.Collections.Generic;
 
 namespace Orkestra.SyntacticAnalysis;
 
-using LexicalAnalysis;
-
-public class ExpressionTree
+/// <summary>
+/// A tree o syntax match.
+/// </summary>
+public class ExpressionTree(
+    ExpressionMatch match,
+    List<ExpressionTree> children
+)
 {
-    public IMatch Root { get; set; }
+    public readonly ExpressionMatch Match = match;
+    public readonly List<ExpressionTree> Children = children;
 
     public override string ToString()
-        => toString(Root, string.Empty);
-
-    private string toString(IMatch node, string tabulation)
     {
-        if (node is Token token)
-            return tabulation + token.Key.Name + "\n";
-        else if (node is RuleMatch match)
+        var sb = new StringBuilder();
+        char[] tabData = [ '|', '\t', '|', '\t', '|', '\t', '|', '\t'];
+        toString(this, 0);
+        return sb.ToString();
+
+        void toString(
+            ExpressionTree node,
+            int tabulation)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.Append(tabulation + match.SubRule.Parent.Name + "\n");
-            tabulation += "|\t";
-            foreach (var child in match.Children)
-                sb.Append(toString(child, tabulation));
-            return sb.ToString();
+            int i = 0;
+            while (i + 8 < tabulation) {
+                sb.Append(tabData, 0, 8);
+                i += 8;
+            }
+            sb.Append(tabData, 0, tabulation - i);
+            
+            sb.AppendLine(node.Match.Element.Name);
+            tabulation += 2;
+
+            foreach (var child in this.Children)
+                toString(child, tabulation);
         }
-        return "";
     }
 }
