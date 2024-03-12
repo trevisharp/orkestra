@@ -1,6 +1,16 @@
 ﻿using Orkestra;
+using Orkestra.LineInterfaces;
 
-OrkestraApp.Compile("80 * 3 - 40 * 4 - 8000", "-v", "max");
+OrkestraApp.Run(args);
+
+public class BasicSampleCLI : CLI
+{
+    [HelpMessage("Test the language with the prompt '80 * 3 - 40 * 4 - 8000' with max verbose level")]
+    void test()
+    {
+        OrkestraApp.Compile("80 * 3 - 40 * 4 - 8000", "-v", "max");
+    }
+}
 
 public class BasicSampleCompiler : Compiler
 {
