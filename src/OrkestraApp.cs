@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    7/11/2023
+ * Date:    12/03/2024
  */
 using System;
 using System.Reflection;
@@ -28,9 +28,9 @@ public static class OrkestraApp
             var compiler = getConfiguredCompiler(args);
             compiler.Compile(sourceCode);
         }
-        catch (OrkestraException ex)
+        catch (OrkestraException)
         {
-            throw ex;
+            throw;
         }
         catch (Exception ex)
         {
