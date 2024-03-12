@@ -10,7 +10,7 @@ using InternalStructure;
 public class LR1SyntacticAnalyzer(
     int side,
     int[] table,
-    ISyntaticElement[] elements
+    ISyntacticElement[] elements
 ) : ISyntacticAnalyzer
 {
     public ExpressionTree Parse(IEnumerable<Token> tokens)

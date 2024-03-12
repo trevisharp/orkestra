@@ -102,7 +102,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         const int shift = int.MaxValue / 4;
         const int reduce = int.MaxValue / 8;
         var side = elementCount + 1;
-        ISyntaticElement[] elements = set.GetElements().ToArray();
+        ISyntacticElement[] elements = set.GetElements().ToArray();
 
         var table = new int[side * side];
 

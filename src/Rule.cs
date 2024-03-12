@@ -9,7 +9,7 @@ namespace Orkestra;
 /// A record that represents a set of rules with same name.
 /// </summary>
 /// <value></value>
-public record Rule : ISyntaticElement
+public record Rule : ISyntacticElement
 {
     private List<SubRule> subRules;
 
@@ -26,8 +26,6 @@ public record Rule : ISyntaticElement
     public string Name { get; set; }
     public bool IsStartRule { get; set; }
     public IEnumerable<SubRule> SubRules => subRules;
-
-    public string KeyName => Name;
 
     public void AddSubRules(params SubRule[] subRules)
     {

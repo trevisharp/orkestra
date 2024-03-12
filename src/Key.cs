@@ -6,7 +6,7 @@ namespace Orkestra;
 /// <summary>
 /// Represents a Key for syntactical analisys.
 /// </summary>
-public record Key : ISyntaticElement
+public record Key : ISyntacticElement
 {
     private Key(string name, string expression, 
         bool contextual, bool identity, bool keyword, bool auto)
@@ -40,8 +40,6 @@ public record Key : ISyntaticElement
     public bool IsIdentity { get; private set; }
     public bool IsKeyword { get; private set; }
     public bool IsAuto { get; private set; }
-
-    public string KeyName => Name;
 
     public override string ToString()
         => $"K:{Name}";

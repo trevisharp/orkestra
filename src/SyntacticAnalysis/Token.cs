@@ -8,9 +8,9 @@ namespace Orkestra.SyntacticAnalysis;
 /// </summary>
 public record Token(Key Key, string Value, int Index) : IMatch
 {
-    public ISyntaticElement Element => Key;
+    public ISyntacticElement Element => Key;
 
-    public bool Is(ISyntaticElement token)
+    public bool Is(ISyntacticElement token)
         => token is Key key && key == this.Key;
 
     public override string ToString()

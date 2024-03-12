@@ -14,7 +14,7 @@ public class LR1ItemSet
     /// <summary>
     /// The map to int from key or rule elements.
     /// </summary>
-    Dictionary<ISyntaticElement, int> elementMap;
+    Dictionary<ISyntacticElement, int> elementMap;
 
     /// <summary>
     /// The last index of keys on elementMap. Index higher than keyLastIndex
@@ -29,7 +29,7 @@ public class LR1ItemSet
     /// <summary>
     /// Reverse dicitionary of elementMap.
     /// </summary>
-    Dictionary<int, ISyntaticElement> indexMap;
+    Dictionary<int, ISyntacticElement> indexMap;
 
     /// <summary>
     /// The pool of buffer for items.
@@ -285,7 +285,7 @@ public class LR1ItemSet
     /// <summary>
     /// Return a collections of all IRuleElements.
     /// </summary>
-    public IEnumerable<ISyntaticElement> GetElements()
+    public IEnumerable<ISyntacticElement> GetElements()
     {
         var len = GetElementsLength();
         for (int i = 0; i < len; i++)
@@ -326,7 +326,7 @@ public class LR1ItemSet
         var item = itemMap[itemId];
         var rule = 
             item[0] == 0 ? "Goal" :
-            indexMap[item[0]].KeyName;
+            indexMap[item[0]].Name;
         sb.Append($"[ {rule} -> ");
 
         for (int i = 2; i < item.Length; i++)
@@ -336,7 +336,7 @@ public class LR1ItemSet
             
             var elName = 
                 item[i] == 0 ? "Goal" :
-                indexMap[item[i]].KeyName;
+                indexMap[item[i]].Name;
             sb.Append($" {elName}");
         }
         
@@ -344,7 +344,7 @@ public class LR1ItemSet
         {
             -1 => "EOF",
             0  => "Goal",
-            _  => indexMap[lookAheadId].KeyName
+            _  => indexMap[lookAheadId].Name
         };
         sb.Append($", {lookAhead} ]");
         return sb.ToString();
@@ -357,6 +357,6 @@ public class LR1ItemSet
         => element switch
         {
             0 => "Goal",
-            _ => indexMap[element].KeyName
+            _ => indexMap[element].Name
         };
 }
