@@ -101,6 +101,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         const int accept = int.MaxValue / 2;
         const int shift = int.MaxValue / 4;
         const int reduce = int.MaxValue / 8;
+        const int keymod = int.MaxValue / 16;
         var side = elementCount + 1;
         ISyntacticElement[] elements = set.GetElements().ToArray();
 
