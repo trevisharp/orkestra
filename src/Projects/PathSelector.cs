@@ -6,10 +6,9 @@ using System.Collections.Generic;
 namespace Orkestra.Projects;
 
 /// <summary>
-/// Represents a collection of compile actions,
-/// tree processing and output generation.
+/// A object to select files to be processed.
 /// </summary>
-public class Project : List<CompileAction>
+public abstract class PathSelector
 {
-    
+    public abstract IEnumerable<string> GetFiles(string baseFile);
 }
