@@ -16,7 +16,7 @@ namespace Orkestra.Projects;
 public class Project<T>
     where T : Project<T>, new()
 {
-    public static void Compile(string[] args)
+    public static void Compile(params string[] args)
     {
         var prj = new T();
         prj.StartCompilation(args);

@@ -4,60 +4,15 @@
 using System;
 using System.Reflection;
 
-namespace Orkestra;
+namespace Orkestra.InternalStructure;
 
 using Providers;
 using Exceptions;
-using Orkestra.LineInterfaces;
+using LineInterfaces;
 
-/// <summary>
-/// Main Orkestra class framework.
-/// </summary>
-public static class OrkestraApp
+internal class ReflectionHelper
 {
-    /// <summary>
-    /// Compile a code based in a compiler class inside this assembly.
-    /// </summary>
-    /// <param name="sourceCode">The code to be compiled.</param>
-    /// <param name="args">The compiler arguments.</param>
-    public static void Compile(string sourceCode, params string[] args)
-    {
-        try
-        {
-            var compiler = getConfiguredCompiler(args);
-            compiler.Compile(sourceCode);
-        }
-        catch (OrkestraException)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            throw new UnexpectedException(ex);
-        }
-    }
-    
-    /// <summary>
-    /// Run the Command Line Interface of this application.
-    /// </summary>
-    public static void Run(params string[] args)
-    {
-        try
-        {
-            var cli = getConfiguredCLI();
-            cli.Run(args);
-        }
-        catch (OrkestraException)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            throw new UnexpectedException(ex);
-        }
-    }
-
-    private static CLI getConfiguredCLI()
+        private static CLI getConfiguredCLI()
     {
         var types = getAssemplyTypes();
         foreach (var type in types)
@@ -188,4 +143,5 @@ public static class OrkestraApp
 
         return null;
     }
+
 }
