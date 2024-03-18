@@ -16,10 +16,10 @@ namespace Orkestra.Projects;
 public class Project<T>
     where T : Project<T>, new()
 {
-    public static void Compile()
+    public static void Compile(string[] args)
     {
         var prj = new T();
-        prj.StartCompilation();
+        prj.StartCompilation(args);
     }
 
     List<CompileAction> actions = new();
@@ -31,7 +31,7 @@ public class Project<T>
     /// <summary>
     /// Start compile process.
     /// </summary>
-    public void StartCompilation()
+    public void StartCompilation(string[] args)
     {
         var dir = Environment.CurrentDirectory;
         ConcurrentQueue<CompilerOutput> results = new();

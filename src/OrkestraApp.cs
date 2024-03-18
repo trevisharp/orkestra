@@ -59,28 +59,6 @@ public static class OrkestraApp
         }
     }
 
-    private static void configureVerbose(string[] args)
-    {
-        Verbose.VerboseLevel = 0;
-        for (int i = 0; i < args.Length; i++)
-        {
-            var arg = args[i];
-            if (arg != "-v" && arg != "--verbose")
-                continue;
-            
-            Verbose.VerboseLevel = 1;
-            if (++i >= args.Length)
-                break;
-            
-            arg = args[i];
-            if (int.TryParse(arg, out int level))
-                Verbose.VerboseLevel = level;
-            else if (arg == "max")
-                Verbose.VerboseLevel = int.MaxValue;
-        }
-
-    }
-
     private static CLI getConfiguredCLI()
     {
         var types = getAssemplyTypes();
