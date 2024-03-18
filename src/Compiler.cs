@@ -1,6 +1,7 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    07/11/2023
+ * Date:    18/03/2024
  */
+using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
 
@@ -20,8 +21,9 @@ public abstract class Compiler
 {
     public IAlgorithmGroupProvider Provider { get; set; }
 
-    public void Compile(string sourceCode)
+    public ExpressionTree Compile(string filePath)
     {
+        var sourceCode = File.ReadAllText(filePath);
         Info("Build started...");
         NewLine();
 
@@ -50,6 +52,8 @@ public abstract class Compiler
         Content("Processed Text:", 2);
         Content(processedText, 2);
         NewLine();
+
+        return tree;
     }
 
     protected static Key key(string name, string expression)
