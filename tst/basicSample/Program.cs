@@ -7,9 +7,9 @@ OrkestraApp.Run(args);
 public class BasicSampleCLI : CLI
 {
     [HelpMessage("Run app")]
-    void run(string[] args)
+    void run(params string[] args)
     {
-        BasicSampleProject.Compile();
+        BasicSampleProject.Compile(args);
     }
 }
 
