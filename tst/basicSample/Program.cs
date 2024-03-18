@@ -2,7 +2,7 @@
 using Orkestra.LineInterfaces;
 using Orkestra.Projects;
 
-OrkestraApp.Run(args);
+CLI.Run(args);
 
 public class BasicSampleCLI : CLI
 {

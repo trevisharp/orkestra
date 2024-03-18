@@ -9,15 +9,24 @@ using static System.Console;
 
 namespace Orkestra.LineInterfaces;
 
+using InternalStructure;
+
 /// <summary>
 /// Represents a command line interface implementation.
 /// </summary>
 public abstract class CLI
 {
+    [IgnoreCommand]
+    public static void Run(params string[] args)
+    {
+        var cli = ReflectionHelper.GetConfiguredCLI();
+        cli.reciveCommand(args);
+    }
+
     public virtual string Header => "Running iteractive command line interface...";
 
     [IgnoreCommand]
-    public void Run(params string[] args)
+    private void reciveCommand(params string[] args)
     {
         if (args.Length == 0)
         {

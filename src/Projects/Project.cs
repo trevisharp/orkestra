@@ -9,6 +9,8 @@ using System.Collections.Concurrent;
 
 namespace Orkestra.Projects;
 
+using InternalStructure;
+
 /// <summary>
 /// Represents a collection of compile actions,
 /// tree processing and output generation.
@@ -26,7 +28,10 @@ public class Project<T>
     
     public void Add<C>(PathSelector selector)
         where C : Compiler, new()
-        => actions.Add(new(selector, new C()));
+        => actions.Add(new(
+            selector, 
+            ReflectionHelper.GetConfiguredCompiler<C>()
+        ));
     
     /// <summary>
     /// Start compile process.

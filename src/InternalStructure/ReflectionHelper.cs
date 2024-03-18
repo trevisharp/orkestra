@@ -12,7 +12,7 @@ using LineInterfaces;
 
 internal class ReflectionHelper
 {
-        private static CLI getConfiguredCLI()
+    internal static CLI GetConfiguredCLI()
     {
         var types = getAssemplyTypes();
         foreach (var type in types)
@@ -33,13 +33,15 @@ internal class ReflectionHelper
         throw new NoCLIExceptionsException();
     }
 
-    private static Compiler getConfiguredCompiler(string[] args)
+    internal static Compiler GetConfiguredCompiler<T>()
+        where T : Compiler, new()
     {
         var types = getAssemplyTypes();
-        var compiler = getCompiler(types);
-
         var provider = getProvider(types);
+
+        var compiler = new T();
         compiler.Provider = provider;
+        
         return compiler;
     }
 
@@ -130,7 +132,7 @@ internal class ReflectionHelper
 
         return compiler;
     }
-
+    
     private static ConstructorInfo getEmptyConstructor(Type type)
     {
         var constructors = type.GetConstructors();
@@ -143,5 +145,4 @@ internal class ReflectionHelper
 
         return null;
     }
-
 }
