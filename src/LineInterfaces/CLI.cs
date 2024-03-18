@@ -1,8 +1,9 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    12/03/2024
+ * Date:    18/03/2024
  */
 using System;
 using System.Reflection;
+using System.Collections.Generic;
 
 using static System.Console;
 
@@ -104,11 +105,25 @@ public abstract class CLI
     private object[] getParameters(ParameterInfo[] parameterInfos, string[] args)
     {
         int parameterIndex = 0;
+        int argsIndex = 0;
         var parameters = new object[parameterInfos.Length];
 
         foreach (var parameter in parameterInfos)
         {
-            if (parameterIndex >= args.Length)
+            if (parameter.ParameterType == typeof(string[]))
+            {
+                List<string> data = new List<string>();
+                while (argsIndex < args.Length)
+                {
+                    data.Add(args[argsIndex]);
+                    argsIndex++;
+                }
+                parameters[parameterIndex] = data.ToArray();
+                parameterIndex++;
+                continue;
+            }
+            
+            if (argsIndex >= args.Length)
             {
                 if (!parameter.HasDefaultValue)
                     throw new InvalidOperationException(
@@ -119,7 +134,7 @@ public abstract class CLI
                 continue;
             }
 
-            var value = args[parameterIndex];
+            var value = args[argsIndex];
             parameters[parameterIndex] =
                 parameter.ParameterType.Name switch
                 {
@@ -127,6 +142,7 @@ public abstract class CLI
                     "Single" => float.TryParse(value, out float result) ? result : throw getException(parameter, value),
                     _ => value
                 };
+            argsIndex++;
             parameterIndex++;
         }
 
