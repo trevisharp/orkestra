@@ -1,14 +1,25 @@
 ﻿using Orkestra;
 using Orkestra.LineInterfaces;
+using Orkestra.Projects;
 
 OrkestraApp.Run(args);
 
 public class BasicSampleCLI : CLI
 {
-    [HelpMessage("Test the language with the prompt '80 * 3 - 40 * 4 - 8000' with max verbose level")]
-    void test()
+    [HelpMessage("Run app")]
+    void run(string[] args)
     {
-        OrkestraApp.Compile("80 * 3 - 40 * 4 - 8000", "-v", "max");
+        BasicSampleProject.Compile();
+    }
+}
+
+public class BasicSampleProject : Project<BasicSampleProject>
+{
+    public BasicSampleProject()
+    {
+        Add<BasicSampleCompiler>(
+            new FileSelector("*.mylang")
+        );
     }
 }
 
