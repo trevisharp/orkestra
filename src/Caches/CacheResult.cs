@@ -12,9 +12,9 @@ namespace Orkestra.Caches;
 /// Return if a Cache hit the data or not and return the store object. 
 /// </summary>
 public record CacheResult<T>(
-    bool IsHit, Nullable<T> Object
+    bool IsHit, T Object
 )
 {
     public static CacheResult<T> Hit(T obj) => new (true, obj);
-    public readonly static CacheResult<T> Miss = new(false, null);
+    public readonly static CacheResult<T> Miss = new(false, default(T));
 }
