@@ -19,6 +19,11 @@ public abstract class Cache<T>
     public abstract Task<CacheResult<T>> TryGet(string filePath);
     
     /// <summary>
+    /// Set the data of cache.
+    /// </summary>
+    public abstract Task Set(string filePath, T obj);
+    
+    /// <summary>
     /// Open a json data from a cache of a file based in cacheId and return a object of type T.
     /// </summary>
     protected async Task<J> openJson<J>(string filePath, string cacheId)

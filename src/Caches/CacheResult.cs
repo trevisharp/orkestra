@@ -13,4 +13,8 @@ namespace Orkestra.Cache;
 /// </summary>
 public record CacheResult<T>(
     bool Hit, T? Object
-);
+)
+{
+    public static CacheResult<T> Hit(T obj) => new (true, obj);
+    public readonly static CacheResult<T> Miss = new(false, null);
+}

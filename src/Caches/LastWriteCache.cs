@@ -10,26 +10,18 @@ namespace Orkestra.Cache;
 
 public class LastWriteCache : Cache
 {
-    public override async Task<CacheResult<T>> TryGet(string filePath, Func<T> creator = null)
+    const string lastWriteCache = "lastWrite.json";
+
+    public override async Task<CacheResult<T>> TryGet(string filePath)
     {
-        var cache = getFileCache(file);
-        var lastWrite = await getLastWriteCache(cache);
-        var currentLastWrite = File.GetLastWriteTime(file);
-        if (lastWrite.lastSave == currentLastWrite)
-            return true;
-        
-        // TODO: Save lastWrite
-        return false;
+        var lastWriteCache = await openJson<LastWriteJson>(filePath, lastWriteCache);
+        var currentLastWrite = File.GetLastWriteTime(filePath);
+        return lastWriteCache.lastWriteDate == currentLastWrite ?
+            CacheResult<T>.Hit(currentLastWrite) : currentLastWrite.Miss;
     }
 
-    private async Task<LastWriteJson> getLastWriteCache(string cache)
-    {
-        const string lastWriteCache = "lastWrite.json";
-        var cacheFile = Path.Combine(cache, lastWriteCache);
-        
-        var obj = await openJson<LastWriteJson>(cacheFile);
-        return obj;
-    }
+    public override async Task Set(string filePath, T obj)
+        => await saveJson<LastWriteJson>(filePath, obj);
 
-    private record LastWriteJson(DateTime lastSave);
+    record LastWriteJson(DateTime lastWriteDate);
 }
