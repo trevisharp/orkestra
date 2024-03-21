@@ -8,13 +8,18 @@ using System.Threading.Tasks;
 
 namespace Orkestra.Cache;
 
-public class Cache(string file)
+public abstract class Cache(string file)
 {
-    public Task<bool> LastWriteTest()
+    public async Task<bool> TestLastWrite()
     {
         var cache = getFileCache(file);
-
+        var lastWrite = await getLastWriteCache(cache);
+        var currentLastWrite = File.GetLastWriteTime(file);
+        if (lastWrite.lastSave == currentLastWrite)
+            return true;
         
+        // TODO: Save lastWrite
+        return false;
     }
 
     private async Task<LastWriteJson> getLastWriteCache(string cache)
