@@ -6,9 +6,9 @@ using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Orkestra.Cache;
+namespace Orkestra.Caches;
 
-public class LastWriteCache : Cache
+public class LastWriteCache : Cache<DateTime>
 {
     const string lastWriteCache = "lastWrite.json";
 

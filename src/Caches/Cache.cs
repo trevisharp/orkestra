@@ -6,7 +6,7 @@ using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Orkestra.Cache;
+namespace Orkestra.Caches;
 
 /// <summary>
 /// A base class for all caches of data.
@@ -17,7 +17,7 @@ public abstract class Cache<T>
     /// Try get a specific data about a file.
     /// </summary>
     public abstract Task<CacheResult<T>> TryGet(string filePath);
-    
+
     /// <summary>
     /// Set the data of cache.
     /// </summary>
