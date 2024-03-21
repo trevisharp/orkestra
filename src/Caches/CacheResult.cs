@@ -16,5 +16,5 @@ public record CacheResult<T>(
 )
 {
     public static CacheResult<T> Hit(T obj) => new (true, obj);
-    public readonly static CacheResult<T> Miss = new(false, null);
+    public readonly static CacheResult<T> Miss = new(false, null as T);
 }

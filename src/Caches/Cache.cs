@@ -28,7 +28,7 @@ public abstract class Cache<T>
     /// </summary>
     protected async Task<J> openJson<J>(string filePath, string cacheId)
     {
-        var cacheFolder = getFileCache(file);
+        var cacheFolder = getFileCache(filePath);
         var cacheFile = Path.Combine(cacheFolder, cacheId);
 
         var json = await File.ReadAllTextAsync(cacheFile);
@@ -39,7 +39,7 @@ public abstract class Cache<T>
     /// <summary>
     /// Save a object of type T in a json file of a cache of a file based in cacheId.
     /// </summary>
-    protected async Task saveJson<J>(string filePath, string cacheId, T obj)
+    protected async Task saveJson<J>(string filePath, string cacheId, J obj)
     {
         var cacheFolder = getFileCache(filePath);
         var cacheFile = Path.Combine(cacheFolder, cacheId);
@@ -48,7 +48,7 @@ public abstract class Cache<T>
         await File.WriteAllTextAsync(cacheFile, json);
     }
 
-    private string getFileCache(string file)
+    private string getFileCache(string filePath)
     {
         var fileName = Path.GetFileNameWithoutExtension(filePath);
         var cacheFolder = getCacheFolderPath();
