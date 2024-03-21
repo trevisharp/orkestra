@@ -8,13 +8,15 @@ using System.Threading.Tasks;
 
 namespace Orkestra.Cache;
 
+/// <summary>
+/// A base class for all caches of data.
+/// </summary>
 public abstract class Cache<T>
 {
     /// <summary>
-    /// Try get a specific data about a file. You can send a creator function in case of cache miss
-    /// to update cache data.
+    /// Try get a specific data about a file.
     /// </summary>
-    public abstract Task<CacheResult<T>> TryGet(string filePath, Func<T> creator = null);
+    public abstract Task<CacheResult<T>> TryGet(string filePath);
     
     /// <summary>
     /// Open a json data from a cache of a file based in cacheId and return a object of type T.

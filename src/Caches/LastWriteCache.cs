@@ -10,7 +10,7 @@ namespace Orkestra.Cache;
 
 public class LastWriteCache : Cache
 {
-    public override Task<bool> Test(string file)  
+    public override async Task<CacheResult<T>> TryGet(string filePath, Func<T> creator = null)
     {
         var cache = getFileCache(file);
         var lastWrite = await getLastWriteCache(cache);
