@@ -8,6 +8,11 @@ using System.Threading.Tasks;
 
 namespace Orkestra.Caches;
 
+public static class Cache
+{
+    public readonly static LastWriteCache LastWrite = new LastWriteCache();
+}
+
 /// <summary>
 /// A base class for all caches of data.
 /// </summary>
@@ -23,6 +28,16 @@ public abstract class Cache<T>
     /// </summary>
     public abstract Task Set(string filePath, T obj);
     
+    /// <summary>
+    /// Return if a chache exists based on cache Id.
+    /// </summary>
+    protected bool exists(string filePath, string cacheId)
+    {
+        var cacheFolder = getFileCache(filePath);
+        var cacheFile = Path.Combine(cacheFolder, cacheId);
+        return Path.Exists(cacheFile);
+    }
+
     /// <summary>
     /// Open a json data from a cache of a file based in cacheId and return a object of type T.
     /// </summary>

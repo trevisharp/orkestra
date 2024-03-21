@@ -14,6 +14,9 @@ public class LastWriteCache : Cache<DateTime>
 
     public override async Task<CacheResult<DateTime>> TryGet(string filePath)
     {
+        if (!exists(filePath, lastWriteCacheId))
+            return CacheResult<DateTime>.Miss;
+
         var lastWriteCache = await openJson<LastWriteJson>(filePath, lastWriteCacheId);
         var currentLastWrite = File.GetLastWriteTime(filePath);
         return lastWriteCache.lastWriteDate == currentLastWrite ?
