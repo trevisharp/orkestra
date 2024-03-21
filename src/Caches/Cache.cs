@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    19/03/2024
+ * Date:    21/03/2024
  */
 using System;
 using System.IO;
@@ -8,37 +8,40 @@ using System.Threading.Tasks;
 
 namespace Orkestra.Cache;
 
-public abstract class Cache(string file)
+public abstract class Cache<T>
 {
-    public async Task<bool> TestLastWrite()
+    /// <summary>
+    /// Try get a specific data about a file. You can send a creator function in case of cache miss
+    /// to update cache data.
+    /// </summary>
+    public abstract Task<CacheResult<T>> TryGet(string filePath, Func<T> creator = null);
+    
+    /// <summary>
+    /// Open a json data from a cache of a file based in cacheId and return a object of type T.
+    /// </summary>
+    protected async Task<J> openJson<J>(string filePath, string cacheId)
     {
-        var cache = getFileCache(file);
-        var lastWrite = await getLastWriteCache(cache);
-        var currentLastWrite = File.GetLastWriteTime(file);
-        if (lastWrite.lastSave == currentLastWrite)
-            return true;
-        
-        // TODO: Save lastWrite
-        return false;
-    }
+        var cacheFolder = getFileCache(file);
+        var cacheFile = Path.Combine(cacheFolder, cacheId);
 
-    private async Task<LastWriteJson> getLastWriteCache(string cache)
-    {
-        const string lastWriteCache = "lastWrite.json";
-        var cacheFile = Path.Combine(cache, lastWriteCache);
-        
-        var obj = await openJson<LastWriteJson>(cacheFile);
+        var json = await File.ReadAllTextAsync(cacheFile);
+        var obj = JsonSerializer.Deserialize<J>(json);
         return obj;
     }
 
-    private async Task<T> openJson<T>(string file)
+    /// <summary>
+    /// Save a object of type T in a json file of a cache of a file based in cacheId.
+    /// </summary>
+    protected async Task saveJson<J>(string filePath, string cacheId, T obj)
     {
-        var json = await File.ReadAllTextAsync(file);
-        var obj = JsonSerializer.Deserialize<T>(json);
-        return obj;
+        var cacheFolder = getFileCache(filePath);
+        var cacheFile = Path.Combine(cacheFolder, cacheId);
+
+        var json = JsonSerializer.Serialize<J>(obj);
+        await File.WriteAllTextAsync(cacheFile, json);
     }
 
-    private string getFileCache(string filePath)
+    private string getFileCache(string file)
     {
         var fileName = Path.GetFileNameWithoutExtension(filePath);
         var cacheFolder = getCacheFolderPath();
@@ -66,6 +69,4 @@ public abstract class Cache(string file)
         Directory.CreateDirectory(cacheFolder);
         return cacheFolder;
     }
-
-    private record LastWriteJson(DateTime lastSave);
 }
