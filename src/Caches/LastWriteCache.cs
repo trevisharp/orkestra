@@ -21,7 +21,7 @@ public class LastWriteCache : Cache<DateTime>
     }
 
     public override async Task Set(string filePath, DateTime obj)
-        => await saveJson<LastWriteJson>(filePath, lastWriteCacheId, obj);
+        => await saveJson<LastWriteJson>(filePath, lastWriteCacheId, new(obj));
 
     record LastWriteJson(DateTime lastWriteDate);
 }
