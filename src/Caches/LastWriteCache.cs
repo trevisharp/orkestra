@@ -12,7 +12,7 @@ public class LastWriteCache : Cache<DateTime>
 {
     const string lastWriteCache = "lastWrite.json";
 
-    public override async Task<CacheResult<T>> TryGet(string filePath)
+    public override async Task<CacheResult<DateTime>> TryGet(string filePath)
     {
         var lastWriteCache = await openJson<LastWriteJson>(filePath, lastWriteCache);
         var currentLastWrite = File.GetLastWriteTime(filePath);
@@ -20,7 +20,7 @@ public class LastWriteCache : Cache<DateTime>
             CacheResult<T>.Hit(currentLastWrite) : currentLastWrite.Miss;
     }
 
-    public override async Task Set(string filePath, T obj)
+    public override async Task Set(string filePath, DateTime obj)
         => await saveJson<LastWriteJson>(filePath, obj);
 
     record LastWriteJson(DateTime lastWriteDate);
