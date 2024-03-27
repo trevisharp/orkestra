@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    21/03/2024
+ * Date:    26/03/2024
  */
 using System.IO;
 using System.Reflection;
@@ -14,6 +14,8 @@ using Providers;
 using Processings;
 using LexicalAnalysis;
 using SyntacticAnalysis;
+using System.Threading.Tasks;
+using System.Security.Cryptography;
 
 /// <summary>
 /// A base class for all compiler created with Orkestra framework.
@@ -22,9 +24,14 @@ public abstract class Compiler
 {
     public IAlgorithmGroupProvider Provider { get; set; }
 
-    public ExpressionTree Compile(string filePath)
+    public async Task<ExpressionTree> Compile(string filePath, params string[] args)
     {
-        var sourceCode = File.ReadAllText(filePath);
+        // TODO: Finish Cache use
+        var lstWrite = await Cache.LastWrite.TryGet(filePath);
+        var newWrite = File.GetLastWriteTime(filePath);
+        await Cache.LastWrite.Set(filePath, newWrite);
+
+        var sourceCode = await File.ReadAllTextAsync(filePath);
         Info("Build started...");
         NewLine();
 
