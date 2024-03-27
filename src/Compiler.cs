@@ -3,7 +3,9 @@
  */
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 
 namespace Orkestra;
 
@@ -14,8 +16,6 @@ using Providers;
 using Processings;
 using LexicalAnalysis;
 using SyntacticAnalysis;
-using System.Threading.Tasks;
-using System.Security.Cryptography;
 
 /// <summary>
 /// A base class for all compiler created with Orkestra framework.

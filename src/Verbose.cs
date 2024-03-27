@@ -8,6 +8,28 @@ namespace Orkestra;
 
 public static class Verbose
 {
+    public static void Configure(params string[] args)
+    {
+        for (int i = 0; i < args.Length; i++)
+        {
+            var crr = args[i];
+            if (crr != "--verbose" && crr != "-v")
+                continue;
+            
+            var next =
+                i + 1 < args.Length ?
+                args[i + 1] : null;
+            VerboseLevel = next switch
+            {
+                "max" => int.MaxValue,
+                null  => 1,
+                _     => int.TryParse(next, out int level) ? level : 1
+            };
+            return;
+        }
+        VerboseLevel = 0;
+    }
+
     public static int VerboseLevel = 0;
     private static string tabInfo = null;
     private static void message(

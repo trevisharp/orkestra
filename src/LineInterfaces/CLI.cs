@@ -74,36 +74,14 @@ public abstract class CLI
     {
         try
         {
-            configureVerbose(args);
+            Verbose.Configure(args);
             call(args[0], args.Length > 1 ? args[1..] : []);
             resetVerbose();
         }
         catch (Exception ex)
         {
             Verbose.Error(ex.Message);
-
             help();
-        }
-    }
-
-    private static void configureVerbose(string[] args)
-    {
-        Verbose.VerboseLevel = 0;
-        for (int i = 0; i < args.Length; i++)
-        {
-            var arg = args[i];
-            if (arg != "-v" && arg != "--verbose")
-                continue;
-            
-            Verbose.VerboseLevel = 1;
-            if (++i >= args.Length)
-                break;
-            
-            arg = args[i];
-            if (int.TryParse(arg, out int level))
-                Verbose.VerboseLevel = level;
-            else if (arg == "max")
-                Verbose.VerboseLevel = int.MaxValue;
         }
     }
 

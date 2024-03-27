@@ -39,9 +39,10 @@ internal class ReflectionHelper
         var types = getAssemplyTypes();
         var provider = getProvider(types);
 
-        var compiler = new T();
-        compiler.Provider = provider;
-        
+        var compiler = new T {
+            Provider = provider
+        };
+
         return compiler;
     }
 
