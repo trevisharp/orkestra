@@ -288,7 +288,8 @@ public class LR1ItemSet
     public IEnumerable<ISyntacticElement> GetElements()
     {
         var len = GetElementsLength();
-        for (int i = 0; i < len; i++)
+        yield return null;
+        for (int i = 1; i < len; i++)
             yield return indexMap[i];
     }
     
