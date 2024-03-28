@@ -103,17 +103,27 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         const int reduce = int.MaxValue / 8;
         const int keymod = int.MaxValue / 16;
         var side = elementCount + 1;
+        var table = new int[side * side];
         ISyntacticElement[] elements = set.GetElements().ToArray();
 
-        var table = new int[side * side];
-
+        int stateIndex = 0;
         foreach (var state in states)
         {
-            foreach (var item in state)
+            var gotoRow = gotoTable[stateIndex];
+            int stateIndexOf = stateIndex * side;
+            
+            foreach (var laItem in state)
             {
-                var pitem = set.GetPureItem(item);
+                var pureItem = set.GetPureItem(laItem);
+                var lookAhead = set.GetLookAhead(laItem);
+                var crrElement = set.GetCurrentElement(pureItem);
+                var gotoValue = gotoRow[crrElement];
+
+                if (gotoValue != 0)
+                    table[stateIndexOf + crrElement] = shift | gotoValue;
 
             }
+            stateIndex++;
         }
     }
 
