@@ -63,38 +63,46 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         {
             var crr = queue.Dequeue();
             var stateRow = new int[elementCount];
+            gotoTable.Add(stateRow);
 
+            // find possible transite states
             for (int el = 0; el < elementCount; el++)
             {
+                // generate state that transite by element el
                 var newState = goTo(crr, el);
                 if (newState.Count == 0)
                     continue;
                 int stateId = gotoTable.Count + queue.Count;
                 
-                var newHash = getHash(newState);
-                if (initStateHashes.Contains(newHash))
+                // test if the new state will be generate
+                // other already generated state
+                var hash = getHash(newState);
+                if (initStateHashes.Contains(hash))
                 {
-                    stateRow[el] = hashStateId[newHash];
+                    stateRow[el] = hashStateId[hash];
                     continue;
                 }
-                initStateHashes.Add(newHash);
-                hashStateId.Add(newHash, stateId);
+                initStateHashes.Add(hash);
+                hashStateId.Add(hash, stateId);
                 
+                // get closure of state
                 closure(newState, set);
-                newHash = getHash(newState);
-                if (stateHashes.Contains(newHash))
+
+                // test if the new state already exists
+                hash = getHash(newState);
+                if (stateHashes.Contains(hash))
                 {
-                    stateRow[el] = hashStateId[newHash];
+                    stateRow[el] = hashStateId[hash];
                     continue;
                 }
-                stateHashes.Add(newHash);
-                if (!hashStateId.ContainsKey(newHash))
-                    hashStateId.Add(newHash, stateId);
-
+                stateHashes.Add(hash);
+                if (!hashStateId.ContainsKey(hash))
+                    hashStateId.Add(hash, stateId);
+                
+                // save new state
                 states.Add(newState);
                 queue.Enqueue(newState);
                 stateRow[el] = stateId;
-                gotoTable.Add(stateRow);
             }
         }
 
@@ -102,15 +110,20 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         const int shift = int.MaxValue / 4;
         const int reduce = int.MaxValue / 8;
         const int keymod = int.MaxValue / 16;
-        var side = elementCount + 1;
-        ISyntacticElement[] elements = set.GetElements().ToArray();
-        var table = new int[side * elements.Length];
+
+        ISyntacticElement[] elements = set
+            .GetElements()
+            .ToArray();
+        
+        var rows = states.Count;
+        var rowSize = elements.Length;
+        var table = new int[rows * rowSize];
 
         int stateIndex = 0;
         foreach (var state in states)
         {
             var gotoRow = gotoTable[stateIndex];
-            int stateIndexOf = stateIndex * elements.Length;
+            int stateIndexOf = stateIndex * rowSize;
             
             foreach (var laItem in state)
             {
@@ -132,8 +145,13 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         }
         
         for (int i = 0; i < gotoTable.Count; i++)
-            for (int j = 0; j < gotoTable[j].Length; j++)
-                table[i * elements.Length + j] = gotoTable[i][j];
+            for (int j = 0; j < rowSize; j++)
+            {
+                var value = gotoTable[i][j];
+                if (value == 0)
+                    continue;
+                table[i * elements.Length + j] = value;
+            }
     }
 
     private void show(List<int[]> gotoTable)
