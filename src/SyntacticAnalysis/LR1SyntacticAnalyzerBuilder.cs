@@ -63,7 +63,6 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         {
             var crr = queue.Dequeue();
             var stateRow = new int[elementCount];
-            gotoTable.Add(stateRow);
 
             for (int el = 0; el < elementCount; el++)
             {
@@ -95,6 +94,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
                 states.Add(newState);
                 queue.Enqueue(newState);
                 stateRow[el] = stateId;
+                gotoTable.Add(stateRow);
             }
         }
 
@@ -103,28 +103,37 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         const int reduce = int.MaxValue / 8;
         const int keymod = int.MaxValue / 16;
         var side = elementCount + 1;
-        var table = new int[side * side];
         ISyntacticElement[] elements = set.GetElements().ToArray();
+        var table = new int[side * elements.Length];
 
         int stateIndex = 0;
         foreach (var state in states)
         {
             var gotoRow = gotoTable[stateIndex];
-            int stateIndexOf = stateIndex * side;
+            int stateIndexOf = stateIndex * elements.Length;
             
             foreach (var laItem in state)
             {
                 var pureItem = set.GetPureItem(laItem);
                 var lookAhead = set.GetLookAhead(laItem);
                 var crrElement = set.GetCurrentElement(pureItem);
-                var gotoValue = gotoRow[crrElement];
+                var gotoValue = 
+                    crrElement == -1 ? 0 :
+                    gotoRow[crrElement];
 
                 if (gotoValue != 0)
                     table[stateIndexOf + crrElement] = shift | gotoValue;
-
+                else if (laItem == initEl)
+                    table[stateIndexOf + crrElement] = accept;
+                else if (crrElement == -1)
+                    table[stateIndexOf + crrElement] = reduce;
             }
             stateIndex++;
         }
+        
+        for (int i = 0; i < gotoTable.Count; i++)
+            for (int j = 0; j < gotoTable[j].Length; j++)
+                table[i * elements.Length + j] = gotoTable[i][j];
     }
 
     private void show(List<int[]> gotoTable)

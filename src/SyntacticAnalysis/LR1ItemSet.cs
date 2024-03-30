@@ -21,6 +21,7 @@ public class LR1ItemSet
     /// are rule indexes.
     /// </summary>
     int keyLastIndex;
+
     /// <summary>
     /// The last index of rule on elementMap.
     /// </summary>
