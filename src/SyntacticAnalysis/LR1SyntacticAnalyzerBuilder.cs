@@ -141,17 +141,28 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
                 else if (crrElement == -1)
                     table[stateIndexOf + crrElement] = reduce;
             }
-            stateIndex++;
-        }
-        
-        for (int i = 0; i < gotoTable.Count; i++)
+            
             for (int j = 0; j < rowSize; j++)
             {
-                var value = gotoTable[i][j];
+                if (elements[j] is not Rule)
+                    continue;
+                
+                var value = gotoRow[j];
                 if (value == 0)
                     continue;
-                table[i * elements.Length + j] = value;
+                
+                table[stateIndexOf + j] = value;
             }
+
+            stateIndex++;
+        }
+
+        show(gotoTable);
+
+        foreach (var state in states)
+            show(state);
+
+        show(table, elements);
     }
 
     private void show(List<int[]> gotoTable)
@@ -182,6 +193,39 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
                 .Aggregate("", (acc, crr) => $"{acc}, {crr}")
             + " }"
         );
+    }
+
+    private void show(int[] table, ISyntacticElement[] elements)
+    {
+        Console.Write("#\t|");
+        for (int i = 0; i < elements.Length; i++)
+        {
+            if (elements[i] is null)
+                Console.Write("EOF\t|");
+            else Console.Write(elements[i].Name + "\t|");
+        }
+        Console.WriteLine();
+        
+        int stateLen = elements.Length;
+        int states = table.Length / stateLen;
+        for (int i = 0; i < states; i++)
+        {
+            Console.Write($"{i}\t|");
+            for (int j = 0; j < elements.Length; j++)
+            {
+                var value = table[stateLen * i + j];
+                var op = (value / (int.MaxValue / 16)) switch
+                {
+                    2 => "r ",
+                    4 => "s ",
+                    8 => "a ",
+                    _ => ""
+                };
+
+                Console.Write($"{op}{value % (int.MaxValue / 16)}\t|"); 
+            }
+            Console.WriteLine();
+        }
     }
 
     private int getHash(List<int> list)
