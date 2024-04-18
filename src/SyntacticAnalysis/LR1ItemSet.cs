@@ -90,7 +90,7 @@ public class LR1ItemSet
         int indexSize = ruleCount + keyCount;
         this.indexMap = new (indexSize);
         this.firstSet = new(indexSize + 1);
-        firstSet[-1] = [-1];
+        firstSet[0] = [0];
         
         int index = 0;
         this.elementMap = new (indexSize);
@@ -99,6 +99,7 @@ public class LR1ItemSet
             var keyIndex = ++index;
             elementMap.Add(key, keyIndex);
             indexMap.Add(keyIndex, key);
+            // init: forall x in T: FIRST(x) = { x }
             firstSet.Add(keyIndex, [keyIndex]);
         }
         this.keyLastIndex = index;
@@ -108,6 +109,7 @@ public class LR1ItemSet
             var ruleIndex = ++index;
             elementMap.Add(rule, ruleIndex);
             indexMap.Add(ruleIndex, rule);
+            // init: forall x in NT: FIRST(x) = { }
             firstSet.Add(ruleIndex, []);
         }
         this.ruleLastIndex = index;
@@ -142,11 +144,13 @@ public class LR1ItemSet
         }
 
         var goal = pool.Rent(3);
-        goal[0] = 0; 
+        goal[0] = GetGoal(); 
         goal[1] = 0;
         goal[2] = elementMap[startRule];
-        itemMap.Add(0, goal);
+        itemMap.Add(GetGoal(), goal);
         ruleItemMap.Add(0, [0]);
+        List<int> goalFirst = [];
+        firstSet[GetGoal()] = goalFirst;
 
         this.moveItemMap = new();
         this.lookAheadMap = new();
@@ -156,6 +160,18 @@ public class LR1ItemSet
         while (hasChange)
         {
             hasChange = false;
+
+            var fstId = elementMap[startRule];
+            var otherSet = firstSet[fstId];
+            foreach (var el in otherSet)
+            {
+                if (goalFirst.Contains(el))
+                    continue;
+                
+                goalFirst.Add(el);
+                hasChange = true;
+            }
+            
             foreach (var rule in rules)
             {
                 var ruleId = elementMap[rule];
@@ -163,8 +179,8 @@ public class LR1ItemSet
                 foreach (var sub in rule.SubRules)
                 {
                     var fst = sub.RuleTokens.First();
-                    var fstId = elementMap[fst];
-                    var otherSet = firstSet[fstId];
+                    fstId = elementMap[fst];
+                    otherSet = firstSet[fstId];
                     foreach (var el in otherSet)
                     {
                         if (set.Contains(el))
@@ -196,13 +212,28 @@ public class LR1ItemSet
     /// Get goal item ID.
     /// </summary>
     public int GetGoal()
-        => 0;
+        => -1;
+    
+    /// <summary>
+    /// Get empty item ID.
+    /// </summary>
+    public int GetEmpty()
+        => -2;
     
     /// <summary>
     /// Get EOF lookAhead ID.
     /// </summary>
     public int GetEOF()
-        => -1;
+        => 0;
+    
+    /// <summary>
+    /// Return true if a pure item is a rule Goal.
+    /// </summary>
+    public bool IsGoal(int itemId)
+    {
+        var item = itemMap[itemId];
+        return item[0] == GetGoal();
+    }
     
     /// <summary>
     /// Make a item with lookahead
@@ -245,7 +276,7 @@ public class LR1ItemSet
         var item = itemMap[itemId];
         var crrElement = item[1] + 2;
         if (crrElement >= item.Length)
-            return -1;
+            return GetEmpty();
         return item[crrElement];
     }
 
@@ -258,7 +289,7 @@ public class LR1ItemSet
         var crrElement = item[1] + 2;
         var nxtElement = crrElement + 1;
         if (nxtElement >= item.Length)
-            return -1;
+            return GetEmpty();
         return item[nxtElement];
     }
 
@@ -278,7 +309,7 @@ public class LR1ItemSet
     /// Get the first set items from a rule.
     /// </summary>
     public List<int> GetFirstSet(int elementId)
-        => firstSet[elementId];
+        => elementId == GetEmpty() ? [] : firstSet[elementId];
     
     public int GetElementsLength()
         => ruleLastIndex + 1;
@@ -327,7 +358,7 @@ public class LR1ItemSet
 
         var item = itemMap[itemId];
         var rule = 
-            item[0] == 0 ? "Goal" :
+            item[0] == -1 ? "Goal" :
             indexMap[item[0]].Name;
         sb.Append($"[ {rule} -> ");
 
@@ -337,15 +368,15 @@ public class LR1ItemSet
                 sb.Append("•");
             
             var elName = 
-                item[i] == 0 ? "Goal" :
+                item[i] == -1 ? "Goal" :
                 indexMap[item[i]].Name;
             sb.Append($" {elName}");
         }
         
         var lookAhead = lookAheadId switch
         {
-            -1 => "EOF",
-            0  => "Goal",
+            -1 => "Goal",
+            0  => "EOF",
             _  => indexMap[lookAheadId].Name
         };
         sb.Append($", {lookAhead} ]");

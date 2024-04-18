@@ -63,6 +63,8 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         {
             var crr = queue.Dequeue();
             var stateRow = new int[elementCount];
+            for (int i = 0; i < stateRow.Length; i++)
+                stateRow[i] = set.GetEmpty();
             gotoTable.Add(stateRow);
 
             // find possible transite states
@@ -105,11 +107,10 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
                 stateRow[el] = stateId;
             }
         }
-
-        const int accept = int.MaxValue / 2;
-        const int shift = int.MaxValue / 4;
-        const int reduce = int.MaxValue / 8;
-        const int keymod = int.MaxValue / 16;
+        
+        const int accept = 1 << 28;
+        const int shift = 1 << 29;
+        const int reduce = 1 << 30;
 
         ISyntacticElement[] elements = set
             .GetElements()
@@ -118,6 +119,11 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         var rows = states.Count;
         var rowSize = elements.Length;
         var table = new int[rows * rowSize];
+
+        show(gotoTable);
+
+        foreach (var state in states)
+            show(state);
 
         int stateIndex = 0;
         foreach (var state in states)
@@ -131,15 +137,16 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
                 var lookAhead = set.GetLookAhead(laItem);
                 var crrElement = set.GetCurrentElement(pureItem);
                 var gotoValue = 
-                    crrElement == -1 ? 0 :
+                    crrElement == set.GetEmpty() ?
+                    set.GetEmpty() :
                     gotoRow[crrElement];
 
-                if (gotoValue != 0)
+                if (gotoValue != set.GetEmpty() && !set.IsRule(crrElement))
                     table[stateIndexOf + crrElement] = shift | gotoValue;
-                else if (laItem == initEl)
-                    table[stateIndexOf + crrElement] = accept;
-                else if (crrElement == -1)
-                    table[stateIndexOf + crrElement] = reduce;
+                else if (set.IsGoal(pureItem) && crrElement == set.GetEmpty())
+                    table[stateIndexOf] = accept;
+                else if (crrElement == set.GetEmpty())
+                    table[stateIndexOf + lookAhead] = reduce;
             }
             
             for (int j = 0; j < rowSize; j++)
@@ -156,12 +163,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
 
             stateIndex++;
         }
-
-        show(gotoTable);
-
-        foreach (var state in states)
-            show(state);
-
+        
         show(table, elements);
     }
 
@@ -214,15 +216,15 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
             for (int j = 0; j < elements.Length; j++)
             {
                 var value = table[stateLen * i + j];
-                var op = (value / (int.MaxValue / 16)) switch
+                var op = (value / (1 << 28)) switch
                 {
-                    2 => "r ",
-                    4 => "s ",
-                    8 => "a ",
+                    4 => "r ",
+                    2 => "s ",
+                    1 => "a ",
                     _ => ""
                 };
 
-                Console.Write($"{op}{value % (int.MaxValue / 16)}\t|"); 
+                Console.Write($"{op}{value % (1 << 28)}\t|"); 
             }
             Console.WriteLine();
         }
@@ -263,17 +265,17 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
             if (!set.IsRule(element))
                 continue;
             
-            var nexts = set.GetPureElementsByRule(element);
-            var nextEl = set.GetNextElement(item);
-            foreach (var next in nexts)
+            var next = set.GetNextElement(item);
+            var prodcutions = set.GetPureElementsByRule(element);
+            var firstSet = 
+                next == set.GetEmpty() ?
+                set.GetFirstSet(lookAhead) :
+                set.GetFirstSet(next);
+            foreach (var production in prodcutions)
             {
-                var firstSet = 
-                    nextEl == -1 && lookAhead != -1 ?
-                    [-1, lookAhead] :
-                    set.GetFirstSet(nextEl);
                 foreach (var fstLA in firstSet)
                 {
-                    var newlaItem = set.CreateLookAheadItem(next, fstLA);
+                    var newlaItem = set.CreateLookAheadItem(production, fstLA);
                     if (state.Contains(newlaItem))
                         continue;
                     
