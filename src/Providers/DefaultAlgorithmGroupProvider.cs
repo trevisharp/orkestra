@@ -1,10 +1,11 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    04/11/2023
+ * Date:    18/04/2024
  */
 namespace Orkestra.Providers;
 
 using LexicalAnalysis;
 using SyntacticAnalysis;
+using SyntacticAnalysis.LR1;
 
 /// <summary>
 /// A default provider for basic implementations of Orkestra framework.

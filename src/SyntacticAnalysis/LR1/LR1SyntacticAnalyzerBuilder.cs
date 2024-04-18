@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System;
 using System.Reflection.Metadata;
 
-namespace Orkestra.SyntacticAnalysis;
+namespace Orkestra.SyntacticAnalysis.LR1;
 
 /// <summary>
 /// A builder for a LR(1) analyzer.

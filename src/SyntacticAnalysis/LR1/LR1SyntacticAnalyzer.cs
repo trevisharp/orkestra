@@ -3,7 +3,7 @@
  */
 using System.Collections.Generic;
 
-namespace Orkestra.SyntacticAnalysis;
+namespace Orkestra.SyntacticAnalysis.LR1;
 
 public class LR1SyntacticAnalyzer(
     int side,

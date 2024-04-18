@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Collections.Generic;
 
-namespace Orkestra.SyntacticAnalysis;
+namespace Orkestra.SyntacticAnalysis.LR1;
 
 using Orkestra.InternalStructure;
 
