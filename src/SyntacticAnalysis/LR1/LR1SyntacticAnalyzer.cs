@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace Orkestra.SyntacticAnalysis.LR1;
 
 public class LR1SyntacticAnalyzer(
-    int side,
+    int rowSize,
     int[] table,
     Dictionary<ISyntacticElement, int> indexMap,
     Dictionary<int, int> sizeMap
@@ -14,10 +14,10 @@ public class LR1SyntacticAnalyzer(
 {
     public ExpressionTree Parse(IEnumerable<Token> tokens)
     {
-        const int accept = int.MaxValue / 2;
-        const int shift = int.MaxValue / 4;
-        const int reduce = int.MaxValue / 8;
-        const int keymod = int.MaxValue / 16;
+        const int accept = 1 << 28;
+        const int shift = 1 << 29;
+        const int reduce = 1 << 30;
+        const int keymod = 1 << 27;
 
         Stack<int> stack = new Stack<int>();
         stack.Push(0);
@@ -32,7 +32,7 @@ public class LR1SyntacticAnalyzer(
         {
             var state = stack.Peek();
 
-            var value = table[tokenIndex + state * side];
+            var value = table[tokenIndex + state * rowSize];
             var argument = value % keymod;
             var operation = value - argument;
 
@@ -55,7 +55,7 @@ public class LR1SyntacticAnalyzer(
                 state = stack.Peek();
                 stack.Push(argument);
 
-                value = table[tokenIndex + state * side];
+                value = table[tokenIndex + state * rowSize];
                 argument = value % keymod;
                 stack.Push(argument);
             }

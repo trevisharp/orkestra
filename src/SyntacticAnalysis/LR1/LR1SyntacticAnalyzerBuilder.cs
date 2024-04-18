@@ -1,12 +1,14 @@
 /* Author:  Leonardo Trevisan Silio
  * Date:    18/04/2024
  */
-using System.Linq;
-using System.Collections.Generic;
 using System;
+using System.Linq;
 using System.Reflection.Metadata;
+using System.Collections.Generic;
 
 namespace Orkestra.SyntacticAnalysis.LR1;
+
+using Caches;
 
 /// <summary>
 /// A builder for a LR(1) analyzer.
@@ -15,6 +17,9 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
 {
     private List<Rule> rules = new();
     private LR1ItemSet set;
+    private int[] table;
+    private int rows;
+    private int rowSize;
 
     public Rule StartRule { get; set; }
     public IEnumerable<Rule> Rules => this.rules;
@@ -24,7 +29,13 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
 
     public ISyntacticAnalyzer Build()
     {
-        throw new System.NotImplementedException();
+        LR1SyntacticAnalyzer analyzer = new(
+            this.rowSize,
+            this.table,
+            null,
+            null
+        );
+        return analyzer;
     }
 
     public bool LoadCache()
@@ -116,14 +127,9 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
             .GetElements()
             .ToArray();
         
-        var rows = states.Count;
-        var rowSize = elements.Length;
-        var table = new int[rows * rowSize];
-
-        show(gotoTable);
-
-        foreach (var state in states)
-            show(state);
+        this.rows = states.Count;
+        this.rowSize = elements.Length;
+        this.table = new int[rows * rowSize];
 
         int stateIndex = 0;
         foreach (var state in states)
@@ -164,8 +170,6 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
 
             stateIndex++;
         }
-        
-        show(table, elements);
     }
 
     private void show(List<int[]> gotoTable)
