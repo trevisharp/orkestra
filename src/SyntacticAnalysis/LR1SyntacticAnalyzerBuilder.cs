@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    10/03/2024
+ * Date:    18/04/2024
  */
 using System.Linq;
 using System.Collections.Generic;
@@ -134,6 +134,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
             foreach (var laItem in state)
             {
                 var pureItem = set.GetPureItem(laItem);
+                var rule = set.GetRule(pureItem);
                 var lookAhead = set.GetLookAhead(laItem);
                 var crrElement = set.GetCurrentElement(pureItem);
                 var gotoValue = 
@@ -146,7 +147,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
                 else if (set.IsGoal(pureItem) && crrElement == set.GetEmpty())
                     table[stateIndexOf] = accept;
                 else if (crrElement == set.GetEmpty())
-                    table[stateIndexOf + lookAhead] = reduce;
+                    table[stateIndexOf + lookAhead] = reduce | rule;
             }
             
             for (int j = 0; j < rowSize; j++)

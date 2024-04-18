@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    10/03/2024
+ * Date:    18/04/2024
  */
 using System.Linq;
 using System.Text;
@@ -230,9 +230,16 @@ public class LR1ItemSet
     /// Return true if a pure item is a rule Goal.
     /// </summary>
     public bool IsGoal(int itemId)
+        => GetRule(itemId) == GetGoal();
+    
+    /// <summary>
+    /// For a A -> B item, returns id of A, the rule
+    /// of the production.
+    /// </summary>
+    public int GetRule(int itemId)
     {
         var item = itemMap[itemId];
-        return item[0] == GetGoal();
+        return item[0];
     }
     
     /// <summary>
