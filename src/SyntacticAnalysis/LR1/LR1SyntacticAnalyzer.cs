@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    14/03/2024
+ * Date:    21/04/2024
  */
 using System.Collections.Generic;
 
@@ -8,8 +8,7 @@ namespace Orkestra.SyntacticAnalysis.LR1;
 public class LR1SyntacticAnalyzer(
     int rowSize,
     int[] table,
-    Dictionary<ISyntacticElement, int> indexMap,
-    Dictionary<int, int> sizeMap
+    Dictionary<ISyntacticElement, int> indexMap
 ) : ISyntacticAnalyzer
 {
     public ExpressionTree Parse(IEnumerable<Token> tokens)
@@ -18,6 +17,7 @@ public class LR1SyntacticAnalyzer(
         const int shift = 1 << 29;
         const int reduce = 1 << 30;
         const int keymod = 1 << 27;
+        const int sizeParam = 1 << 16;
 
         Stack<int> stack = new Stack<int>();
         stack.Push(0);
@@ -48,12 +48,14 @@ public class LR1SyntacticAnalyzer(
             }
             else if (operation == reduce)
             {
-                int reduceSize = 2 * sizeMap[argument];
+                int rule = argument % sizeParam;
+                int size = argument / sizeParam;
+                int reduceSize = 2 * size;
                 for (int i = 0; i < reduceSize; i++)
                     stack.Pop();
                 
                 state = stack.Peek();
-                stack.Push(argument);
+                stack.Push(rule);
 
                 value = table[tokenIndex + state * rowSize];
                 argument = value % keymod;

@@ -1,9 +1,8 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    18/04/2024
+ * Date:    22/04/2024
  */
 using System;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Collections.Generic;
 
 namespace Orkestra.SyntacticAnalysis.LR1;
@@ -32,8 +31,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         LR1SyntacticAnalyzer analyzer = new(
             this.rowSize,
             this.table,
-            null,
-            null
+            set.ElementMap
         );
         return analyzer;
     }
@@ -122,6 +120,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         const int accept = 1 << 28;
         const int shift = 1 << 29;
         const int reduce = 1 << 30;
+        const int sizeParam = 1 << 16;
 
         ISyntacticElement[] elements = set
             .GetElements()
@@ -141,6 +140,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
             {
                 var pureItem = set.GetPureItem(laItem);
                 var rule = set.GetRule(pureItem);
+                var ruleSize = set.GetRuleSize(pureItem);
                 var lookAhead = set.GetLookAhead(laItem);
                 var crrElement = set.GetCurrentElement(pureItem);
                 var gotoValue = 
@@ -153,7 +153,8 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
                 else if (set.IsGoal(pureItem) && crrElement == set.GetEmpty())
                     table[stateIndexOf] = accept;
                 else if (crrElement == set.GetEmpty())
-                    table[stateIndexOf + lookAhead] = reduce | rule;
+                    table[stateIndexOf + lookAhead] = reduce
+                        | rule | (ruleSize * sizeParam);
             }
             
             for (int j = 0; j < rowSize; j++)

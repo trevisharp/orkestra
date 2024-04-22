@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    18/04/2024
+ * Date:    22/04/2024
  */
 using System.Linq;
 using System.Text;
@@ -15,6 +15,7 @@ public class LR1ItemSet
     /// The map to int from key or rule elements.
     /// </summary>
     Dictionary<ISyntacticElement, int> elementMap;
+    public Dictionary<ISyntacticElement, int> ElementMap => elementMap;
 
     /// <summary>
     /// The last index of keys on elementMap. Index higher than keyLastIndex
@@ -240,6 +241,12 @@ public class LR1ItemSet
     {
         var item = itemMap[itemId];
         return item[0];
+    }
+
+    public int GetRuleSize(int itemId)
+    {
+        var item = itemMap[itemId];
+        return item.Length - 2;
     }
     
     /// <summary>
