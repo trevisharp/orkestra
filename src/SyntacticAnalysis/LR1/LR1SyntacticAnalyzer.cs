@@ -57,7 +57,7 @@ public class LR1SyntacticAnalyzer(
                 state = stack.Peek();
                 stack.Push(rule);
 
-                value = table[tokenIndex + state * rowSize];
+                value = table[rule + state * rowSize];
                 argument = value % keymod;
                 stack.Push(argument);
             }
