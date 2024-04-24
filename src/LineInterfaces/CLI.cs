@@ -76,7 +76,7 @@ public abstract class CLI
         {
             Verbose.Configure(args);
             call(args[0], args.Length > 1 ? args[1..] : []);
-            resetVerbose();
+            // resetVerbose();
         }
         catch (Exception ex)
         {

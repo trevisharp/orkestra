@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    04/11/2023
+ * Date:    24/04/2024
  */
 using System.Text;
 using System.Collections.Generic;
@@ -9,37 +9,47 @@ namespace Orkestra.SyntacticAnalysis;
 /// <summary>
 /// A tree o syntax match.
 /// </summary>
-public class ExpressionTree(
-    ExpressionMatch match,
-    List<ExpressionTree> children
+public record ExpressionTree(
+    ISyntacticElement Element,
+    List<ExpressionTree> Children,
+    object Data = null
 )
 {
-    public readonly ExpressionMatch Match = match;
-    public readonly List<ExpressionTree> Children = children;
-
     public override string ToString()
     {
         var sb = new StringBuilder();
-        char[] tabData = [ '|', '\t', '|', '\t', '|', '\t', '|', '\t'];
-        toString(this, 0);
+        toString(this, []);
         return sb.ToString();
 
-        void toString(
-            ExpressionTree node,
-            int tabulation)
+        void toString(ExpressionTree node, LinkedList<char> tabulation)
         {
-            int i = 0;
-            while (i + 8 < tabulation) {
-                sb.Append(tabData, 0, 8);
-                i += 8;
+            if (tabulation.Count > 0)
+            {
+                foreach (var tab in tabulation)
+                    sb.Append(tab);
+                var tail = tabulation.Last.Value;
+                tabulation.RemoveLast();
+                tabulation.AddLast(
+                    tail == '├' ? '│' : ' '
+                );
             }
-            sb.Append(tabData, 0, tabulation - i);
             
-            sb.AppendLine(node.Match.Element.Name);
-            tabulation += 2;
+            sb.AppendLine(node.Element.Name);
 
-            foreach (var child in this.Children)
-                toString(child, tabulation);
+            if (node.Children.Count == 0)
+                return;
+
+            var last = node.Children.Count - 1;
+            for (int i = 0; i < last; i++)
+            {
+                tabulation.AddLast('├');
+                toString(node.Children[i], tabulation);
+                tabulation.RemoveLast();
+            }
+            
+            tabulation.AddLast('└');
+            toString(node.Children[last], tabulation);
+            tabulation.RemoveLast();
         }
     }
 }

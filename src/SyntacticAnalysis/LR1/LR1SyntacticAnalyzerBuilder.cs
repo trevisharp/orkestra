@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    22/04/2024
+ * Date:    23/04/2024
  */
 using System;
 using System.Linq;
@@ -31,7 +31,8 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         LR1SyntacticAnalyzer analyzer = new(
             this.rowSize,
             this.table,
-            set.ElementMap
+            set.ElementMap,
+            set.IndexMap
         );
         return analyzer;
     }

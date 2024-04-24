@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    22/04/2024
+ * Date:    23/04/2024
  */
 using System.Linq;
 using System.Text;
@@ -32,6 +32,7 @@ public class LR1ItemSet
     /// Reverse dicitionary of elementMap.
     /// </summary>
     Dictionary<int, ISyntacticElement> indexMap;
+    public Dictionary<int, ISyntacticElement> IndexMap => indexMap;
 
     /// <summary>
     /// The pool of buffer for items.

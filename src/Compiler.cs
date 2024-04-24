@@ -57,8 +57,8 @@ public abstract class Compiler
         var parser = buildSyntacticAnalyzer(keys);
         var tree = parser.Parse(tokens);
         Success("Syntacic Analysis completed!", 1);
-        Content("Processed Text:", 2);
-        Content(processedText, 2);
+        Content("Syntacic Tree:", 2);
+        Content(tree.ToString(), 2);
         NewLine();
 
         return tree;

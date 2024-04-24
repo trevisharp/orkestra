@@ -39,7 +39,7 @@ public class Project<T>
     public void StartCompilation(string[] args)
     {
         var dir = Environment.CurrentDirectory;
-        ConcurrentQueue<CompilerOutput> results = new();
+        ConcurrentQueue<CompilerOutput> queue = new();
 
         var compilationPairs = actions
             .Select(
@@ -56,7 +56,9 @@ public class Project<T>
             var result = new CompilerOutput(
                 file, compiler, tree
             );
-            results.Enqueue(result);
+            queue.Enqueue(result);
         });
+
+        var results = queue.ToArray();
     }
 }
