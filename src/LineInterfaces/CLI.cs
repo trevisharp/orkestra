@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    27/03/2024
+ * Date:    24/04/2024
  */
 using System;
 using System.Reflection;
@@ -76,7 +76,7 @@ public abstract class CLI
         {
             Verbose.Configure(args);
             call(args[0], args.Length > 1 ? args[1..] : []);
-            // resetVerbose();
+            resetVerbose();
         }
         catch (Exception ex)
         {

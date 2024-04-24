@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    26/03/2024
+ * Date:    24/04/2024
  */
 using System;
 using System.Linq;
@@ -49,7 +49,7 @@ public class Project<T>
             )
             .SelectMany(x => x);
 
-        Parallel.ForEach(compilationPairs, async tuple =>
+        Parallel.ForEachAsync(compilationPairs, async (tuple, tk) =>
         {
             (var file, var compiler) = tuple;
             var tree = await compiler.Compile(file, args);
@@ -57,7 +57,7 @@ public class Project<T>
                 file, compiler, tree
             );
             queue.Enqueue(result);
-        });
+        }).Wait();
 
         var results = queue.ToArray();
     }
