@@ -23,10 +23,14 @@ public class LR1SyntacticAnalyzer(
         stack.Push(0);
 
         var it = tokens.GetEnumerator();
-        if (!it.MoveNext())
-            return null;
-        var token = it.Current;
-        var tokenIndex = indexMap[token.Key];
+        var token = 
+            it.MoveNext() ? 
+            it.Current : 
+            null;
+        var tokenIndex =
+            token is not null ?
+            indexMap[token.Key] :
+            0;
 
         while (true)
         {
@@ -41,10 +45,14 @@ public class LR1SyntacticAnalyzer(
                 stack.Push(tokenIndex);
                 stack.Push(argument);
 
-                if (!it.MoveNext())
-                    return null;
-                token = it.Current;
-                tokenIndex = indexMap[token.Key];
+                token = 
+                    it.MoveNext() ? 
+                    it.Current : 
+                    null;
+                tokenIndex =
+                    token is not null ?
+                    indexMap[token.Key] :
+                    0;
             }
             else if (operation == reduce)
             {
@@ -72,5 +80,7 @@ public class LR1SyntacticAnalyzer(
         }
 
         throw new System.NotImplementedException();
+
+        
     }
 }
