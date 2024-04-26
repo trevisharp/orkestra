@@ -26,7 +26,9 @@ public class BasicSampleProject : Project<BasicSampleProject>
 public class BasicSampleCompiler : Compiler
 {
     Key kSUB = keyword("SUB", "\\-");
+    Key kSUM = keyword("SUM", "\\+");
     Key kMUL = keyword("MUL", "\\*");
+    Key kDIV = keyword("DIV", "\\/");
     Key kIDENT = key("IDENT", "[0-9]+");
 
     Rule rExp;
@@ -41,11 +43,13 @@ public class BasicSampleCompiler : Compiler
         rTerm = rule("term");
         rTerm.AddSubRules(
             sub(rFactor, kMUL, rTerm),
+            sub(rFactor, kDIV, rTerm),
             sub(rFactor)
         );
         
         rExp = Rule.CreateStartRule("expr");
         rExp.AddSubRules(sub(rTerm, kSUB, rExp));
+        rExp.AddSubRules(sub(rTerm, kSUM, rExp));
         rExp.AddSubRules(sub(rTerm));
     }
 }
