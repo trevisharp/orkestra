@@ -11,7 +11,7 @@ namespace Orkestra.SyntacticAnalysis;
 /// </summary>
 public record ExpressionTree(
     ISyntacticElement Element,
-    List<ExpressionTree> Children,
+    ExpressionTree[] Children,
     object Data = null
 )
 {
@@ -34,19 +34,19 @@ public record ExpressionTree(
                 );
             }
             
-            sb.AppendLine(node.Element.Name);
+            sb.AppendLine($"{node.Element.Name} ({node.Data})");
 
-            if (node.Children.Count == 0)
+            if (node.Children.Length == 0)
                 return;
 
-            var last = node.Children.Count - 1;
+            var last = node.Children.Length - 1;
             for (int i = 0; i < last; i++)
             {
                 tabulation.AddLast('├');
                 toString(node.Children[i], tabulation);
                 tabulation.RemoveLast();
             }
-            
+
             tabulation.AddLast('└');
             toString(node.Children[last], tabulation);
             tabulation.RemoveLast();

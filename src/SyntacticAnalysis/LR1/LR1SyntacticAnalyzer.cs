@@ -65,10 +65,10 @@ public class LR1SyntacticAnalyzer(
                 int rule = argument % sizeParam;
                 int size = argument / sizeParam;
 
-                List<ExpressionTree> children = [];
-                for (int i = 0; i < size; i++)
+                ExpressionTree[] children = new ExpressionTree[size];
+                for (int i = 0, j = size - 1; i < size; i++, j--)
                 {
-                    children.Add(treeStack.Pop());
+                    children[j] = treeStack.Pop();
                     stack.Pop();
                     stack.Pop();
                 }
