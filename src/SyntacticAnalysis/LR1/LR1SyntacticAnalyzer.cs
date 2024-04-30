@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    23/04/2024
+ * Date:    29/04/2024
  */
 using System.Collections.Generic;
 
@@ -91,7 +91,7 @@ public class LR1SyntacticAnalyzer(
             }
             else
             {
-                // Errors
+                throw 
             }
         }
 

@@ -34,7 +34,7 @@ public record ExpressionTree(
                 );
             }
             
-            sb.AppendLine($"{node.Element.Name} ({node.Data})");
+            sb.AppendLine(node.Element.Name);
 
             if (node.Children.Length == 0)
                 return;

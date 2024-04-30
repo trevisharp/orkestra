@@ -1,7 +1,13 @@
+/* Author:  Leonardo Trevisan Silio
+ * Date:    29/04/2024
+ */
 namespace Orkestra.Errors;
 
 using Packages;
 
+/// <summary>
+/// Base class for Errors
+/// </summary>
 public class Error : PackageElement
 {
     public string Message { get; set; }
@@ -9,13 +15,10 @@ public class Error : PackageElement
     public ErrorType Type { get; set; }
 
     public Error Clone()
-    {
-        Error error = new Error();
-        
-        error.Message = Message;
-        error.Title = Title;
-        error.Type = Type;
-
-        return error;
-    }
+        => new Error
+        {
+            Message = Message,
+            Title = Title,
+            Type = Type
+        };
 }
