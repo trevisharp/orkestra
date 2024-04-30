@@ -5,11 +5,14 @@ using System.Collections.Generic;
 
 namespace Orkestra.SyntacticAnalysis.LR1;
 
+using Exceptions;
+
 public class LR1SyntacticAnalyzer(
     int rowSize,
     int[] table,
     Dictionary<ISyntacticElement, int> elementMap,
-    Dictionary<int, ISyntacticElement> indexMap
+    Dictionary<int, ISyntacticElement> indexMap,
+    List<ISyntacticElement> panicSet
 ) : ISyntacticAnalyzer
 {
     public ExpressionTree Parse(IEnumerable<Token> tokens)
@@ -33,6 +36,8 @@ public class LR1SyntacticAnalyzer(
             token is not null ?
             elementMap[token.Key] :
             0;
+        
+        List<string> syntacticErrors = [];
 
         while (true)
         {
@@ -91,9 +96,27 @@ public class LR1SyntacticAnalyzer(
             }
             else
             {
-                throw 
+                syntacticErrors.Add("error!!");
+                do
+                {
+                    token = 
+                        it.MoveNext() ? 
+                        it.Current : 
+                        null;
+                    tokenIndex =
+                        token is not null ?
+                        elementMap[token.Key] :
+                        0;
+                } while (token is not null && !panicSet.Contains(token.Key));
+                stack.Push(0);
+                
+                if (token is null)
+                    break;
             }
         }
+
+        if (syntacticErrors.Count > 0)
+            throw new SyntacticException(syntacticErrors);
 
         return treeStack.Peek();
     }

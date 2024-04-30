@@ -10,6 +10,7 @@ using static System.Console;
 namespace Orkestra.LineInterfaces;
 
 using InternalStructure;
+using Orkestra.Exceptions;
 
 /// <summary>
 /// Represents a command line interface implementation.
@@ -80,7 +81,9 @@ public abstract class CLI
         }
         catch (Exception ex)
         {
-            Verbose.Error(ex.Message);
+            if (ex.InnerException is not null)
+                Verbose.Error(ex.InnerException.Message);
+            else Verbose.Error(ex.Message);
             help();
         }
     }

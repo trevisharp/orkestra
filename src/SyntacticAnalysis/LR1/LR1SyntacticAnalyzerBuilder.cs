@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    23/04/2024
+ * Date:    29/04/2024
  */
 using System;
 using System.Linq;
@@ -15,6 +15,7 @@ using Caches;
 public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
 {
     private List<Rule> rules = new();
+    private List<ISyntacticElement> panicSet = new();
     private LR1ItemSet set;
     private int[] table;
     private int rows;
@@ -32,7 +33,8 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
             this.rowSize,
             this.table,
             set.ElementMap,
-            set.IndexMap
+            set.IndexMap,
+            this.panicSet
         );
         return analyzer;
     }
@@ -49,6 +51,27 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
 
     public void Load(IEnumerable<Key> keys)
     {
+        List<Rule> panicSearch = [ StartRule ];
+        int crrIndex = 0;
+        while (crrIndex < panicSearch.Count)
+        {
+            var crr = panicSearch[crrIndex];
+            foreach (var rule in crr.SubRules)
+            {
+                var fst = rule.RuleTokens
+                    .FirstOrDefault();
+                if (fst is null)
+                    continue;
+                
+                if (fst is Rule fstRule && !panicSearch.Contains(fstRule))
+                    panicSearch.Add(fstRule);
+                
+                if (fst is Key key && !panicSet.Contains(key))
+                    panicSet.Add(key);
+            }
+            crrIndex++;
+        }
+
         this.set = new LR1ItemSet(
             keys.ToArray(),
             rules.ToArray(),
