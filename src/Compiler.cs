@@ -31,7 +31,7 @@ public abstract class Compiler
         var newWrite = File.GetLastWriteTime(filePath);
         await Cache.LastWrite.Set(filePath, newWrite);
 
-        var sourceCode = await File.ReadAllTextAsync(filePath);
+        var sourceCode = await Text.FromFile(filePath);
         Info("Build started...");
         NewLine();
 

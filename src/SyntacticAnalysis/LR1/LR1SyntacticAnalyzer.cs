@@ -36,6 +36,7 @@ public class LR1SyntacticAnalyzer(
             token is not null ?
             elementMap[token.Key] :
             0;
+        string file = token.File;
         
         List<string> syntacticErrors = [];
 
@@ -96,7 +97,7 @@ public class LR1SyntacticAnalyzer(
             }
             else
             {
-                syntacticErrors.Add("error!!");
+                syntacticErrors.Add($"Syntax error on {file}:{token?.Line ?? -1}.");
                 do
                 {
                     token = 

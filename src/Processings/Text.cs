@@ -10,6 +10,7 @@ namespace Orkestra.Processings;
 
 using SyntacticAnalysis;
 using InternalStructure;
+using System.Threading.Tasks;
 
 /// <summary>
 /// A Tree Pointer for Text elements
@@ -40,11 +41,15 @@ public class Text
         Token = null
     };
 
+    private string sourceFile;
+    public string SourceFile => sourceFile;
+    
     private Stack<ProcessStep> pointerStack;
     private FastList<Data> source;
 
-    private Text(string source)
+    private Text(string source, string file)
     {
+        this.sourceFile = file;
         var newlineReplacedSource = source
             .Replace("\r\n", "\n") // For Windows
             .Replace("\r", "\n");  // For MAC version < X
@@ -307,7 +312,7 @@ public class Text
     public void Append(Key baseKey)
     {
         // TODO: get Index
-        Token token = new Token(baseKey, null, 0);
+        Token token = new Token(baseKey, null, sourceFile, 0);
         Append(token);
     }
 
@@ -363,7 +368,7 @@ public class Text
     public void Prepend(Key baseKey)
     {
         // TODO: get Index
-        Token token = new Token(baseKey, null, 0);
+        Token token = new Token(baseKey, null, sourceFile, 0);
         Prepend(token);
     }
 
@@ -636,19 +641,16 @@ public class Text
         return "";
     }
 
-    public static Text FromFile(string path)
+    public static async Task<Text> FromFile(string path)
     {
         StreamReader reader = new StreamReader(path);
-        string source = reader.ReadToEnd();
+        string source = await reader.ReadToEndAsync();
         reader.Close();
 
-        Text text = new Text(source);
+        Text text = new Text(source, path);
         return text;
     }
 
     public static implicit operator string(Text text)
         => text?.ToString() ?? string.Empty;
-
-    public static implicit operator Text(string source)
-        => new Text(source);
 }
