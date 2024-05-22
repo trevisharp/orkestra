@@ -1,0 +1,1 @@
+define myset as nat
