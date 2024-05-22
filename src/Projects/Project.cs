@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    24/04/2024
+ * Date:    22/05/2024
  */
 using System;
 using System.Linq;
@@ -9,6 +9,7 @@ using System.Collections.Concurrent;
 
 namespace Orkestra.Projects;
 
+using Exceptions;
 using InternalStructure;
 
 /// <summary>
@@ -48,7 +49,7 @@ public class Project<T>
                     .Select(file => (file, action.Compiler))
             )
             .SelectMany(x => x);
-
+        
         try
         {
             Parallel.ForEachAsync(compilationPairs, async (tuple, tk) =>
@@ -60,6 +61,15 @@ public class Project<T>
                 );
                 queue.Enqueue(result);
             }).Wait();
+        }
+        catch (AggregateException ex)
+        {
+            Verbose.Error(
+                string.Join('\n', ex.InnerExceptions
+                    .Where(e => e is SyntacticException)
+                    .Select(e => e.Message)
+                )
+            );
         }
 
         var results = queue.ToArray();
