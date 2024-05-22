@@ -49,15 +49,18 @@ public class Project<T>
             )
             .SelectMany(x => x);
 
-        Parallel.ForEachAsync(compilationPairs, async (tuple, tk) =>
+        try
         {
-            (var file, var compiler) = tuple;
-            var tree = await compiler.Compile(file, args);
-            var result = new CompilerOutput(
-                file, compiler, tree
-            );
-            queue.Enqueue(result);
-        }).Wait();
+            Parallel.ForEachAsync(compilationPairs, async (tuple, tk) =>
+            {
+                (var file, var compiler) = tuple;
+                var tree = await compiler.Compile(file, args);
+                var result = new CompilerOutput(
+                    file, compiler, tree
+                );
+                queue.Enqueue(result);
+            }).Wait();
+        }
 
         var results = queue.ToArray();
     }

@@ -123,6 +123,9 @@ public abstract class Compiler
         
         foreach (var rule in getFields<Rule>())
         {
+            if (rule is null)
+                continue;
+
             if (rule.IsStartRule)
                 builder.StartRule = rule;
             builder.Add(rule);
