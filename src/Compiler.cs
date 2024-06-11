@@ -2,6 +2,7 @@
  * Date:    11/06/2024
  */
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -12,10 +13,10 @@ using static Verbose;
 
 using Caches;
 using Providers;
-using Extensions;
 using Processings;
 using LexicalAnalysis;
 using SyntacticAnalysis;
+using Orkestra.Extensions;
 
 /// <summary>
 /// A base class for all compiler created with Orkestra framework.
@@ -24,9 +25,24 @@ public class Compiler
 {
     public IAlgorithmGroupProvider Provider { get; set; }
     public IExtensionProvider ExtensionProvider { get; set; }
+    public List<Key> Keys { get; private set; } = new();
+    public List<Rule> Rules { get; private set; } = new();
+    public List<Processing> Processings { get; private set; } = new();
+
+    public async Task GenerateExtension(ExtensionArguments args)
+    {
+        var extension = ExtensionProvider.Provide();
+
+        args.Keys.AddRange(Keys);
+        args.Rules.AddRange(Rules);
+
+        await extension.Generate(args);
+    }
 
     public async Task<ExpressionTree> Compile(string filePath, params string[] args)
     {
+        loadFromFields();
+
         // TODO: Finish Cache use
         var lstWrite = await Cache.LastWrite.TryGet(filePath);
         var newWrite = File.GetLastWriteTime(filePath);
@@ -45,8 +61,7 @@ public class Compiler
         NewLine();
 
         Info("Lexical Analysis started...", 1);
-        var keys = getKeys();
-        var lex = buildLexicalAnalyzer(keys);
+        var lex = buildLexicalAnalyzer();
         var tokens = lex.Parse(processedText);
         Success("Lexical Analysis completed!", 1);
         Content("Token List:", 2);
@@ -55,7 +70,7 @@ public class Compiler
         NewLine();
 
         Info("Syntacic Analysis started...", 1);
-        var parser = buildSyntacticAnalyzer(keys);
+        var parser = buildSyntacticAnalyzer();
         var tree = parser.Parse(tokens);
         Success("Syntacic Analysis completed!", 1);
         Content("Syntacic Tree:", 2);
@@ -63,12 +78,6 @@ public class Compiler
         NewLine();
 
         return tree;
-    }
-
-    public async Task GenerateExtension(params string[] args)
-    {
-        var extension = ExtensionProvider.Provide();
-        await extension.Generate(new(args));
     }
 
     protected static Key key(string name, string expression)
@@ -98,6 +107,24 @@ public class Compiler
     protected static SubRule sub(params ISyntacticElement[] elements)
         => SubRule.Create(elements);
 
+    private void loadFromFields()
+    {
+        Keys = Keys
+            .Concat(getFields<Key>())
+            .Distinct()
+            .ToList();
+        
+        Rules = Rules
+            .Concat(getFields<Rule>())
+            .Distinct()
+            .ToList();
+        
+        Processings = Processings
+            .Concat(getFields<Processing>())
+            .Distinct()
+            .ToList();
+    }
+
     private ProcessingCollection buildProcessingMachine()
     {
         ProcessingCollection package = new ProcessingCollection();
@@ -108,19 +135,14 @@ public class Compiler
         return package;
     }
     
-    private IEnumerable<Key> getKeys()
-        => getFields<Key>();
-
-    private ILexicalAnalyzer buildLexicalAnalyzer(IEnumerable<Key> keys)
+    private ILexicalAnalyzer buildLexicalAnalyzer()
     {
         var lexicalAnalyzer = Provider.ProvideLexicalAnalyzer();
-
-        lexicalAnalyzer.AddKeys(keys);
-
+        lexicalAnalyzer.AddKeys(Keys);
         return lexicalAnalyzer;
     }
 
-    private ISyntacticAnalyzer buildSyntacticAnalyzer(IEnumerable<Key> keys)
+    private ISyntacticAnalyzer buildSyntacticAnalyzer()
     {
         var builder = Provider.ProvideSyntacticAnalyzerBuilder();
         var loaded = builder.LoadCache();
@@ -128,7 +150,7 @@ public class Compiler
         if (loaded)
             return builder.Build();
         
-        foreach (var rule in getFields<Rule>())
+        foreach (var rule in Rules)
         {
             if (rule is null)
                 continue;
@@ -137,7 +159,7 @@ public class Compiler
                 builder.StartRule = rule;
             builder.Add(rule);
         }
-        builder.Load(keys);
+        builder.Load(Keys);
         builder.SaveCache();
 
         return builder.Build();
