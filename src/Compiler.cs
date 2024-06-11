@@ -1,11 +1,10 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    26/03/2024
+ * Date:    11/06/2024
  */
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 
 namespace Orkestra;
 
@@ -13,6 +12,7 @@ using static Verbose;
 
 using Caches;
 using Providers;
+using Extensions;
 using Processings;
 using LexicalAnalysis;
 using SyntacticAnalysis;
@@ -20,9 +20,10 @@ using SyntacticAnalysis;
 /// <summary>
 /// A base class for all compiler created with Orkestra framework.
 /// </summary>
-public abstract class Compiler
+public class Compiler
 {
     public IAlgorithmGroupProvider Provider { get; set; }
+    public IExtensionProvider ExtensionProvider { get; set; }
 
     public async Task<ExpressionTree> Compile(string filePath, params string[] args)
     {
@@ -62,6 +63,12 @@ public abstract class Compiler
         NewLine();
 
         return tree;
+    }
+
+    public async Task GenerateExtension(params string[] args)
+    {
+        var extension = ExtensionProvider.Provide();
+        await extension.Generate(new(args));
     }
 
     protected static Key key(string name, string expression)
