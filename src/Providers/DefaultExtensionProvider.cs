@@ -4,11 +4,10 @@
 namespace Orkestra.Providers;
 
 using Extensions;
+using Extensions.VSCode;
 
 public class DefaultExtensionProvider : IExtensionProvider
 {
     public Extension Provide()
-    {
-        throw new System.NotImplementedException();
-    }
+        => new VSCodeExtension();
 }
