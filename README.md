@@ -27,6 +27,12 @@ Coming soon.
 
 # Versions
 
+### Orkestra v0.2.0
+
+ - ![](https://img.shields.io/badge/new-green) Added abstraction for IDE extension generation.
+ - ![](https://img.shields.io/badge/updated-blue) Compiler is now non-abstract.
+ - ![](https://img.shields.io/badge/bug%20solved-orange) Serveral bug fixes.
+
 ### Orkestra v0.1.0
 
  - ![](https://img.shields.io/badge/new-green) Lexical Analyzer System.
