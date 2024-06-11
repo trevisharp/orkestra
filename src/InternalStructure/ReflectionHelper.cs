@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    18/03/2024
+ * Date:    11/06/2024
  */
 using System;
 using System.Reflection;
@@ -37,35 +37,14 @@ internal class ReflectionHelper
         where T : Compiler, new()
     {
         var types = getAssemplyTypes();
-        var provider = getProvider(types);
+        var provider = getProvider<IAlgorithmGroupProvider>(
+            types, new DefaultAlgorithmGroupProvider());
 
         var compiler = new T {
             Provider = provider
         };
 
         return compiler;
-    }
-
-    private static Compiler getCompiler(Type[] types)
-    {
-        var compilerType = getCompilerType(types);
-        if (compilerType is null)
-            throw new NoCompilerExceptionsException();
-
-        var compiler = createCompiler(compilerType);
-
-        return compiler;
-    }
-
-    private static IAlgorithmGroupProvider getProvider(Type[] types)
-    {
-        var providerType = getProviderType(types);
-
-        var provider = providerType is null ?
-            new DefaultAlgorithmGroupProvider() :
-            createProvider(providerType);
-        
-        return provider;
     }
 
     private static Type[] getAssemplyTypes()
@@ -76,11 +55,22 @@ internal class ReflectionHelper
         return types;
     }
 
-    private static Type getCompilerType(Type[] types)
+    private static T getProvider<T>(Type[] types, T defaultValue)
+    {
+        var providerType = getProviderType<T>(types);
+
+        var provider = providerType is null ?
+            defaultValue :
+            createProvider<T>(providerType);
+        
+        return provider;
+    }
+
+    private static Type getProviderType<T>(Type[] types)
     {
         foreach (var type in types)
         {
-            if (type.BaseType != typeof(Compiler))
+            if (type.BaseType != typeof(T))
                 continue;
             
             var ignoreAttribute = type.GetCustomAttribute<IgnoreAttribute>();
@@ -93,45 +83,16 @@ internal class ReflectionHelper
         return null;
     }
 
-    private static Compiler createCompiler(Type type)
+    private static T createProvider<T>(Type type)
     {
         var constructor = getEmptyConstructor(type);
         
         if (constructor is null)
             throw new NoConstructorException();
         
-        var compiler = constructor.Invoke(new object[0]) as Compiler;
+        var compiler = constructor.Invoke([]);
 
-        return compiler;
-    }
-
-    private static Type getProviderType(Type[] types)
-    {
-        foreach (var type in types)
-        {
-            if (type.BaseType != typeof(IAlgorithmGroupProvider))
-                continue;
-            
-            var ignoreAttribute = type.GetCustomAttribute<IgnoreAttribute>();
-            if (ignoreAttribute is not null)
-                continue;
-            
-            return type;
-        }
-
-        return null;
-    }
-
-    private static IAlgorithmGroupProvider createProvider(Type type)
-    {
-        var constructor = getEmptyConstructor(type);
-        
-        if (constructor is null)
-            throw new NoConstructorException();
-        
-        var compiler = constructor.Invoke(new object[0]) as IAlgorithmGroupProvider;
-
-        return compiler;
+        return (T)compiler;
     }
     
     private static ConstructorInfo getEmptyConstructor(Type type)

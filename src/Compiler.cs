@@ -23,20 +23,24 @@ using Orkestra.Extensions;
 /// </summary>
 public class Compiler
 {
+    private bool loadedFromFields = false;
+
     public IAlgorithmGroupProvider Provider { get; set; }
-    public IExtensionProvider ExtensionProvider { get; set; }
     public List<Key> Keys { get; private set; } = new();
     public List<Rule> Rules { get; private set; } = new();
     public List<Processing> Processings { get; private set; } = new();
 
-    public async Task GenerateExtension(ExtensionArguments args)
+    /// <summary>
+    /// Get metadata of language defined by the compiler.
+    /// </summary>
+    public LanguageInfo GetInfo()
     {
-        var extension = ExtensionProvider.Provide();
-
-        args.Keys.AddRange(Keys);
-        args.Rules.AddRange(Rules);
-
-        await extension.Generate(args);
+        loadFromFields();
+        return new() {
+            Name = getSpecialName(),
+            Keys = Keys,
+            Rules = Rules
+        };
     }
 
     public async Task<ExpressionTree> Compile(string filePath, params string[] args)
@@ -107,8 +111,20 @@ public class Compiler
     protected static SubRule sub(params ISyntacticElement[] elements)
         => SubRule.Create(elements);
 
+    private string getSpecialName()
+    {
+        var baseName = GetType().Name;
+        if (baseName == "Compiler")
+            return "no-named-lang";
+        return baseName.Replace("Compiler", "");
+    }
+
     private void loadFromFields()
     {
+        if (loadedFromFields)
+            return;
+        loadedFromFields = true;
+
         Keys = Keys
             .Concat(getFields<Key>())
             .Distinct()

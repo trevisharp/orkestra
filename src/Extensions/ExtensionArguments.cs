@@ -10,6 +10,5 @@ namespace Orkestra.Extensions;
 /// </summary>
 public class ExtensionArguments {
     public string[] Arguments { get; set; }
-    public List<Rule> Rules { get; set; }
-    public List<Key> Keys { get; set; }
+    public List<LanguageInfo> Languages { get; set; } = new();
 }

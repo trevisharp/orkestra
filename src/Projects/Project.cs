@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    22/05/2024
+ * Date:    11/06/2024
  */
 using System;
 using System.Linq;
@@ -11,6 +11,7 @@ namespace Orkestra.Projects;
 
 using Exceptions;
 using InternalStructure;
+using Orkestra.Providers;
 
 /// <summary>
 /// Represents a collection of compile actions,
@@ -19,10 +20,19 @@ using InternalStructure;
 public class Project<T>
     where T : Project<T>, new()
 {
+    public IExtensionProvider ExtensionProvider { get; set; }
+        = new DefaultExtensionProvider();
+
     public static void Compile(params string[] args)
     {
         var prj = new T();
         prj.StartCompilation(args);
+    }
+
+    public static void InstallExtension()
+    {
+        var prj = new T();
+        prj.CreateInstallExtension();
     }
 
     List<CompileAction> actions = new();
@@ -33,7 +43,15 @@ public class Project<T>
             selector, 
             ReflectionHelper.GetConfiguredCompiler<C>()
         ));
-    
+
+    public void CreateInstallExtension()
+    {
+        var extension = ExtensionProvider.Provide();
+
+        // TODO: Get all Arguments based on CompileActions
+        // Generate and install the extension based on provider
+    }      
+
     /// <summary>
     /// Start compile process.
     /// </summary>
