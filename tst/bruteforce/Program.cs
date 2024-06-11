@@ -23,6 +23,46 @@ public class BruteForceProject : Project<BruteForceProject>
     }
 }
 
+public class MyWebCLI : CLI
+{
+    [HelpMessage("Run web app.")]
+    void run(params string[] args) {
+        MyWebProject.Compile(args);
+    }
+
+    [HelpMessage("Run tests web app.")]
+    void test(params string[] args) {
+        // run tests file
+    }
+
+    [HelpMessage("Add a new item to the web app.")]
+    void add(params string[] args) {
+        if (args[0] == "page") {
+            // Creata new .myhtml
+        }
+    }
+}
+
+public class MyWebProject : Project<MyWebProject>
+{
+    public MyWebProject()
+    {
+        Add<MyJSCompiler>(
+            new FileSelector("*.myjs")
+        );
+        Add<MyHTMLCompiler>(
+            new FileSelector("*.myhtml")
+        );
+        Add<MyConfigCompiler>(
+            new FileSelector("configuration.json")
+        );
+    }
+}
+
+public class MyConfigCompiler : Compiler;
+public class MyJSCompiler : Compiler;
+public class MyHTMLCompiler : Compiler;
+
 public class BruteForceCompiler : Compiler
 {
     // Key SUM = key("SUM", "\\+");
