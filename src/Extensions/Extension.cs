@@ -9,17 +9,7 @@ namespace Orkestra.Extensions;
 /// <summary>
 /// Represents a language extension.
 /// </summary>
-public abstract class Extension : List<ExtensionItem>
+public abstract class Extension
 {
-    public List<PackageAction> PackageActions { get; private set; } = new();
-
-    public async Task Generate(ExtensionArguments args) {
-        foreach (var item in this) {
-            await item.Create(args);
-        }
-
-        foreach (var action in this.PackageActions) {
-            await action.Pack(args);
-        }
-    }
+    public abstract Task Generate(ExtensionArguments args);
 }
