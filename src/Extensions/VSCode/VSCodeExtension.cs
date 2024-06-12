@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    11/06/2023
+ * Date:    12/06/2023
  */
 using System;
 using System.IO;
@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Orkestra.Extensions.VSCode;
 
+/// <summary>
+/// Represents a VSCode Extension.
+/// </summary>
 public class VSCodeExtension : Extension
 {
     public override async Task Generate(ExtensionArguments args)
@@ -92,7 +95,23 @@ public class VSCodeExtension : Extension
 
     async Task addExtensionJS(string dict, ExtensionArguments args)
     {
+        const string file = "extension.js";
+        var sw = open(dict, file);
 
+        await sw.WriteAsync(
+            $$"""
+            const vscode = require('vscode');
+
+            function activate(context) {}
+
+            function deactivate() {}
+
+            module.exports = {
+                activate,
+                deactivate
+            }
+            """
+        );
     }
 
     async Task addChangeLog(string dict, ExtensionArguments args)
