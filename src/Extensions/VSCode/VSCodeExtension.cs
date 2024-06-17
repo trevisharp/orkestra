@@ -2,7 +2,12 @@
  * Date:    12/06/2023
  */
 using System;
+using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Diagnostics.Contracts;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Orkestra.Extensions.VSCode;
@@ -12,23 +17,32 @@ namespace Orkestra.Extensions.VSCode;
 /// </summary>
 public class VSCodeExtension : Extension
 {
+    List<VSCodeContribute> contributes = new();
+    public IEnumerable<VSCodeContribute> Contributes => contributes;
+    public void Add(VSCodeContribute contribute)
+    {
+        if (contribute is null)
+            return;
+        
+        this.contributes.Add(contribute);
+    }
+
     public override async Task Generate(ExtensionArguments args)
     {
         var path = createTempFolder();
         await addPackageJson(path, args);
         await addReadme(path, args);
-        await addLangConfiguration(path, args);
+        await addContributes(path, args);
         await addExtensionJS(path, args);
         await addChangeLog(path, args);
-        await addSyntaxes(path, args);
         await zip(path, args.Name + ".vsix");
         await install(path, args.Name + ".vsix");
     }
 
-    async Task addPackageJson(string dict, ExtensionArguments args)
+    async Task addPackageJson(string dir, ExtensionArguments args)
     {
         const string file = "package.json";
-        var sw = open(dict, file);
+        var sw = open(dir, file);
 
         var name = args.Name;
 
@@ -51,13 +65,22 @@ public class VSCodeExtension : Extension
             """
         );
 
-        await sw.WriteAsync(
-            """
-                    "commands": [],
-                    "languages": [],
-                    "grammars": [],
-            """
-        );
+        var contributeGroups = 
+            from c in contributes
+            group c by c.Type;
+
+        foreach (var g in contributeGroups)
+        {
+            var sb = new StringBuilder();
+            var contName = g.Key.ToCamelCase();
+            sb.AppendLine($"\t\t\"{contName}\": [");
+
+            foreach (var contribute in g)
+                sb.AppendLine(contribute.Declaration);
+
+            sb.AppendLine("],");
+            await sw.WriteAsync(sb.ToString());
+        }
 
         await sw.WriteAsync(
             """
@@ -83,20 +106,21 @@ public class VSCodeExtension : Extension
         sw.Close();
     }
 
-    async Task addReadme(string dict, ExtensionArguments args)
+    async Task addContributes(string dir, ExtensionArguments args)
+    {
+        foreach (var contribute in this.contributes)
+            await contribute?.GenerateFile(dir, args);
+    }
+
+    async Task addReadme(string dir, ExtensionArguments args)
     {
 
     }
 
-    async Task addLangConfiguration(string dict, ExtensionArguments args)
-    {
-
-    }
-
-    async Task addExtensionJS(string dict, ExtensionArguments args)
+    async Task addExtensionJS(string dir, ExtensionArguments args)
     {
         const string file = "extension.js";
-        var sw = open(dict, file);
+        var sw = open(dir, file);
 
         await sw.WriteAsync(
             $$"""
@@ -114,22 +138,17 @@ public class VSCodeExtension : Extension
         );
     }
 
-    async Task addChangeLog(string dict, ExtensionArguments args)
+    async Task addChangeLog(string dir, ExtensionArguments args)
     {
 
     }
 
-    async Task addSyntaxes(string dict, ExtensionArguments args)
+    async Task zip(string dir, string output)
     {
 
     }
 
-    async Task zip(string dict, string output)
-    {
-
-    }
-
-    async Task install(string dict, string file)
+    async Task install(string dir, string file)
     {
 
     }
@@ -167,8 +186,8 @@ public class VSCodeExtension : Extension
         if (!Path.Exists(path))
             return;
 
-        var dict = new DirectoryInfo(path);
-        dict.Delete(true);
+        var dir = new DirectoryInfo(path);
+        dir.Delete(true);
     }
 
     void createFile(string path)
