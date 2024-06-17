@@ -140,7 +140,7 @@ public class VSCodeExtension : Extension
 
     async Task addChangeLog(string dir, ExtensionArguments args)
     {
-
+ 
     }
 
     async Task zip(string dir, string output)
