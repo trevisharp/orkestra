@@ -34,7 +34,7 @@ public static class Verbose
     private static string tabInfo = null;
     private static void message(
         int level,
-        object msg, 
+        object msg,
         Color color,
         bool inline = false
     )

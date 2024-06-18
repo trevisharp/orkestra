@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.IO.Compression;
+using System.Diagnostics;
 
 namespace Orkestra.Extensions.VSCode;
 
@@ -27,7 +29,7 @@ public class VSCodeExtension : Extension
 
     public virtual void LoadDefaultContributes(ExtensionArguments args)
     {
-
+        
     }
 
     public override async Task Generate(ExtensionArguments args)
@@ -41,7 +43,7 @@ public class VSCodeExtension : Extension
         await addExtensionJS(path, args);
         await addChangeLog(path, args);
         await zip(path, args.Name + ".vsix");
-        await install(path, args.Name + ".vsix");
+        install(path, args.Name + ".vsix");
     }
 
     async Task addPackageJson(string dir, ExtensionArguments args)
@@ -180,14 +182,15 @@ public class VSCodeExtension : Extension
         sw.Close();
     }
 
-    async Task zip(string dir, string output)
-    {
-        
-    }
+    async Task zip(string dir, string file)
+        => await Task.Run(
+            () => ZipFile.CreateFromDirectory(dir, file)
+        );
 
-    async Task install(string dir, string file)
+    void install(string dir, string output)
     {
-
+        var command = $"code --install-extension {output}";
+        Process.Start(command);
     }
 
     StreamWriter open(string folder, string file)
