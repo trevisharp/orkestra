@@ -27,6 +27,10 @@ Coming soon.
 
 # Versions
 
+### Orkestra v0.3.0
+
+ - ![](https://img.shields.io/badge/new-green) Added VSCode extension default generation code.
+
 ### Orkestra v0.2.0
 
  - ![](https://img.shields.io/badge/new-green) Added abstraction for IDE extension generation.
