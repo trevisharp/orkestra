@@ -27,7 +27,7 @@ Coming soon.
 
 # Versions
 
-### Orkestra v0.3.0
+### Orkestra v0.3.0 (Coming soon)
 
  - ![](https://img.shields.io/badge/new-green) Added VSCode extension default generation code.
 
@@ -47,5 +47,7 @@ Coming soon.
 
 # Next Features
 
-- VSCode extension generation system.
-- Syntatcti tree analyzes system.
+- Syntactic tree analyzes system.
+- Battery Tests resulting on several bug fixex.
+- Default Apply of the Cache System.
+- Improvements on default VSCode extension contributes.
