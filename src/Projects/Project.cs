@@ -11,6 +11,7 @@ namespace Orkestra.Projects;
 
 using Exceptions;
 using InternalStructure;
+using Orkestra.Extensions;
 using Orkestra.Providers;
 
 /// <summary>
@@ -48,8 +49,11 @@ public class Project<T>
     {
         var extension = ExtensionProvider.Provide();
 
+        var args = new ExtensionArguments();
         // TODO: Get all Arguments based on CompileActions
         // Generate and install the extension based on provider
+
+        extension.Generate(args).Wait();
     }      
 
     /// <summary>

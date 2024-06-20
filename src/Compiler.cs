@@ -62,7 +62,7 @@ public class Compiler
         Success("Preprocessing completed!", 1);
         Content("Processed Text:", 2);
         Content(processedText, 2);
-        NewLine();
+        NewLine(1);
 
         Info("Lexical Analysis started...", 1);
         var lex = buildLexicalAnalyzer();
@@ -71,7 +71,7 @@ public class Compiler
         Content("Token List:", 2);
         foreach (var token in tokens)
             InlineContent(token, 2);
-        NewLine();
+        NewLine(1);
 
         Info("Syntacic Analysis started...", 1);
         var parser = buildSyntacticAnalyzer();
@@ -79,7 +79,7 @@ public class Compiler
         Success("Syntacic Analysis completed!", 1);
         Content("Syntacic Tree:", 2);
         Content(tree.ToString(), 2);
-        NewLine();
+        NewLine(1);
 
         return tree;
     }
