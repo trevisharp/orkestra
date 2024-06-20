@@ -35,6 +35,7 @@ public class VSCodeExtension : Extension
     public override async Task Generate(ExtensionArguments args)
     {
         Verbose.Info("Generating VSCode Extension...", 1);
+        Verbose.NewLine();
 
         LoadDefaultContributes(args);
 
@@ -220,8 +221,9 @@ public class VSCodeExtension : Extension
         {
             StartInfo = startInfo
         };
-        
+
         Verbose.NewLine();
+        Verbose.Info("Visual Studio Code Output:");
         process.Start();
         process.WaitForExit();
     }
