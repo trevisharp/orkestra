@@ -51,7 +51,10 @@ public class Project<T>
         var extension = ExtensionProvider.Provide();
 
         Verbose.Info("Loading language metadata...", 1);
-        var args = new ExtensionArguments();
+        var args = new ExtensionArguments
+        {
+            Name = typeof(T).Name.Replace("Project", "")
+        };
         // TODO: Get all Arguments based on CompileActions
         // Generate and install the extension based on provider
 
