@@ -60,25 +60,25 @@ public class Compiler
         var machine = buildProcessingMachine();
         var processedText = machine.ProcessAll(sourceCode);
         Success("Preprocessing completed!", 1);
-        Content("Processed Text:", 2);
-        Content(processedText, 2);
+        Content("Processed Text:", 5);
+        Content(processedText, 5);
         NewLine(1);
 
         Info("Lexical Analysis started...", 1);
         var lex = buildLexicalAnalyzer();
         var tokens = lex.Parse(processedText);
         Success("Lexical Analysis completed!", 1);
-        Content("Token List:", 2);
+        Content("Token List:", 5);
         foreach (var token in tokens)
-            InlineContent(token, 2);
+            InlineContent(token, 5);
         NewLine(1);
 
         Info("Syntacic Analysis started...", 1);
         var parser = buildSyntacticAnalyzer();
         var tree = parser.Parse(tokens);
         Success("Syntacic Analysis completed!", 1);
-        Content("Syntacic Tree:", 2);
-        Content(tree.ToString(), 2);
+        Content("Syntacic Tree:", 5);
+        Content(tree.ToString(), 5);
         NewLine(1);
 
         return tree;

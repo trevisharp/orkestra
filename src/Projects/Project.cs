@@ -47,13 +47,31 @@ public class Project<T>
 
     public void CreateInstallExtension()
     {
+        Verbose.Info("Generating Extension...");
         var extension = ExtensionProvider.Provide();
 
+        Verbose.Info("Loading language metadata...", 1);
         var args = new ExtensionArguments();
         // TODO: Get all Arguments based on CompileActions
         // Generate and install the extension based on provider
 
-        extension.Generate(args).Wait();
+        try
+        {
+            Verbose.StartGroup();
+            extension.Generate(args).Wait();
+        }
+        catch (Exception ex)
+        {
+            Verbose.Error("Error in extension generation!");
+            Verbose.Error("Use --verbose 1 or bigger to see details...");
+            Verbose.Error(ex.Message, 1);
+            Verbose.Error(ex.StackTrace, 2);
+        }
+        finally
+        {
+            Verbose.EndGroup();
+            Verbose.Info("Extension generation process finished!");
+        }
     }      
 
     /// <summary>
