@@ -1,9 +1,6 @@
-﻿using System;
-using System.ComponentModel;
-using System.Security.Permissions;
-using Orkestra;
-using Orkestra.LineInterfaces;
+﻿using Orkestra;
 using Orkestra.Projects;
+using Orkestra.LineInterfaces;
 
 CLI.Run(args);
 
@@ -64,7 +61,7 @@ public class BruteForceCompiler : Compiler
     Key SOME = keyword("some");
     Key IN = keyword("in");
     Key CHECK = keyword("check");
-    // Key CONSIDERING = keyword("considering");
+    Key CONSIDERING = keyword("considering");
     Key GIVEN = keyword("given");
     
     Key NUMBER = key("NUMBER", "-?[0-9][0-9\\.]*");
@@ -72,7 +69,7 @@ public class BruteForceCompiler : Compiler
 
     Rule set, op, exp, list, value, given, boolean,
         definition, inclusion, checking, cond, condinclusion,
-        forall, exists, test, tests, //import,
+        forall, exists, test, tests, import,
         item, itens, program;
     
     public BruteForceCompiler()
@@ -172,12 +169,18 @@ public class BruteForceCompiler : Compiler
             sub(CHECK, IF, tests, inclusion)
         );
 
+        import = rule("import");
+        import.AddSubRules(
+            sub(CONSIDERING, ID)
+        );
+
         item = rule("item");
         item.AddSubRules(
             sub(definition),
             sub(inclusion),
             sub(condinclusion),
-            sub(given)
+            sub(given),
+            sub(import)
         );
 
         itens = rule("itens");

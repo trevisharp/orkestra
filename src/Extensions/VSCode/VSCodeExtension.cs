@@ -1,14 +1,14 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    18/06/2023
+ * Date:    20/06/2023
  */
 using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
+using System.IO.Compression;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.IO.Compression;
-using System.Diagnostics;
 
 namespace Orkestra.Extensions.VSCode;
 
@@ -224,6 +224,7 @@ public class VSCodeExtension : Extension
 
         Verbose.NewLine();
         Verbose.Info("Visual Studio Code Output:");
+        Verbose.NewLine();
         process.Start();
         process.WaitForExit();
     }
