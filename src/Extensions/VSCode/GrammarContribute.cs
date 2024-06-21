@@ -37,6 +37,7 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
         const string schema = "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json";
         var sw = new StreamWriter($"{dir}/{info.Name}.tmLanguage.json");
 
+        // https://macromates.com/manual/en/language_grammars
         await sw.WriteAsync(
             $$"""
             {
