@@ -125,7 +125,9 @@ public class Project<T>
         where action.Selector is FileSelector
         select new LanguageInfo
         {
-            Name = action.Compiler.Name,
+            Name = action.Compiler.Name
+                .Replace(" ", "")
+                .ToLower(),
             Extension = ((FileSelector)action.Selector).Extension,
             Keys = action.Compiler.Keys,
             Rules = action.Compiler.Rules

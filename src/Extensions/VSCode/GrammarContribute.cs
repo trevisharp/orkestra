@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 namespace Orkestra.Extensions.VSCode;
 
 /// <summary>
-/// A Grammar Contribute for VSCode Extension
+/// A Grammar Contribute for a VSCode Extension
 /// </summary>
 public class GrammarContribute(LanguageInfo info) : VSCodeContribute
 {
+
     public override VSCodeContributeType Type 
         => VSCodeContributeType.Grammars;
 
@@ -46,7 +47,12 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
                     { "include": "#strings" }
                 ],
                 "repository": {
-                    
+                    "keywords": {
+                        "patterns": [{
+                            "name": "keyword.control.{{info.Name}}",
+                            "match": "\\b(given|define|for|if)\\b"
+                        }]
+                    }
                 },
                 "scopeName": "source{{info.Extension}}"
             }

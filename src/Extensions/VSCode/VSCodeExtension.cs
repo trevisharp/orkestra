@@ -29,7 +29,11 @@ public class VSCodeExtension : Extension
 
     public virtual void LoadDefaultContributes(ExtensionArguments args)
     {
-        
+        foreach (var lang in args.Languages)
+        {
+            Add(new LanguageContribute(lang));
+            Add(new GrammarContribute(lang));
+        }
     }
 
     public override async Task Generate(ExtensionArguments args)
@@ -74,7 +78,7 @@ public class VSCodeExtension : Extension
 
         var name = args.Name;
 
-        await sw.WriteAsync(
+        await sw.WriteLineAsync(
             $$"""
             {
                 "name": "{{name}}",
@@ -91,24 +95,35 @@ public class VSCodeExtension : Extension
                 "activationEvents": [],
                 "main": "./extension.js",
                 "contributes": {
+                    "commands": [{
+                        "command": "bruteforce.helloWorld",
+                        "title": "Hello World"
+                    }],
             """
         );
 
         var contributeGroups = 
             from c in contributes
             group c by c.Type;
+        var contributeGroupsArray = 
+            contributeGroups.ToArray();
 
-        foreach (var g in contributeGroups)
+        for (int i = 0; i < contributeGroupsArray.Length; i++)
         {
-            var sb = new StringBuilder();
-            var contName = g.Key.ToCamelCasePlural();
-            sb.AppendLine($"\t\t\"{contName}\": [");
+            var g = contributeGroupsArray[i];
+            var contName = g.Key.ToString().ToLower();
+            await sw.WriteLineAsync($"\t\t\"{contName}\": [");
 
             foreach (var contribute in g)
-                sb.AppendLine(contribute.Declaration);
+                await sw.WriteLineAsync("\t\t" + 
+                    contribute.Declaration
+                        .Replace("\n\r", "\t\t")
+                        .Replace("\n", "\t\t")
+                );
 
-            sb.AppendLine("],");
-            await sw.WriteAsync(sb.ToString());
+            if (i < contributeGroupsArray.Length - 1)
+                await sw.WriteLineAsync("\t],");
+            else await sw.WriteLineAsync("\t]");
         }
 
         await sw.WriteAsync(
@@ -180,7 +195,14 @@ public class VSCodeExtension : Extension
             $$"""
             const vscode = require('vscode');
 
-            function activate(context) {}
+            function activate(context) {
+                        
+                let disposable = vscode.commands.registerCommand('bruteforce.helloWorld', function () {
+                    vscode.window.showInformationMessage('Hello World from Orkestra!');
+                });
+
+                context.subscriptions.push(disposable);
+            }
 
             function deactivate() {}
 
