@@ -26,7 +26,7 @@ public class LanguageContribute(LanguageInfo info) : VSCodeContribute
 
     public override string Documentation => 
         """
-
+        
         """;
 
     public override async Task GenerateFile(string dir, ExtensionArguments args)

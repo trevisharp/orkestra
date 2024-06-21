@@ -44,14 +44,71 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
                 "name": "{{info.Name}}",
                 "patterns": [
                     { "include": "#keywords" },
-                    { "include": "#strings" }
+                    { "include": "#constants" },
+                    { "include": "#variables" },
+                    { "include": "#storages" },
+                    { "include": "#entitys" }
                 ],
                 "repository": {
                     "keywords": {
-                        "patterns": [{
-                            "name": "keyword.control.{{info.Name}}",
-                            "match": "\\b(given|define|for|if)\\b"
-                        }]
+                        "patterns": [
+                            {
+                                "name": "keyword.control.{{info.Name}}",
+                                "match": "\\b(for|if)\\b"
+                            },
+                            {
+                                "name": "keyword.{{info.Name}}",
+                                "match": "\\b(given|define|check)\\b"
+                            },
+                            {
+                                "name": "keyword.operator.{{info.Name}}",
+                                "match": "\\b(\\+)\\b"
+                            },
+                            {
+                                "name": "keyword.other.{{info.Name}}",
+                                "match": "\\b(all|some)\\b"
+                            }
+                        ]
+                    },
+
+                    "constants": {
+                        "patterns": [
+                            {
+                                "name": "constant.numeric.{{info.Name}}",
+                                "match": "-?[0-9][0-9\\.]*"
+                            }
+                        ]
+                    },
+
+                    "variables": {
+                        "patterns": [
+                            {
+                                "name": "variable.parameter.{{info.Name}}",
+                                "match": "\\b(nat|real|rat|int)\\b"
+                            }
+                        ]
+                    },
+
+                    "storages": {
+                        "patterns": [
+                            {
+                                "name": "storage.type.{{info.Name}}",
+                                "match": "\\b(is|contains|as|of|then|in)\\b"
+                            }
+                        ]
+                    },
+
+                    "entitys": {
+                        "patterns": [
+                            {
+                                "name": "entity.name.function.{{info.Name}}",
+                                "match": "\\b(subset)\\b"
+                            },
+                            {
+                                "name": "entity.name.class.{{info.Name}}",
+                                "match": "\\b([a-z]+)\\b"
+                            }
+                        ]
                     }
                 },
                 "scopeName": "source{{info.Extension}}"
