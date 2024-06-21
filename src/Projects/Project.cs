@@ -9,6 +9,7 @@ using System.Collections.Concurrent;
 
 namespace Orkestra.Projects;
 
+using System.IO;
 using Exceptions;
 using InternalStructure;
 using Orkestra.Extensions;
@@ -119,15 +120,14 @@ public class Project<T>
         var results = queue.ToArray();
     }
 
-    private IEnumerable<LanguageInfo> getLangs()
-    {
-        foreach (var action in actions)
-            yield return new()
-            {
-                Name = action.Compiler.Name,
-                ExtensionPath = action.Selector,
-                Keys = action.Compiler.Keys,
-                Rules = action.Compiler.Rules
-            };
-    }
+    private IEnumerable<LanguageInfo> getLangs() => 
+        from action in actions
+        where action.Selector is FileSelector
+        select new LanguageInfo
+        {
+            Name = action.Compiler.Name,
+            Extension = ((FileSelector)action.Selector).Extension,
+            Keys = action.Compiler.Keys,
+            Rules = action.Compiler.Rules
+        };
 }

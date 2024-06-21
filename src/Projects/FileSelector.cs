@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    17/03/2024
+ * Date:    21/06/2024
  */
 using System.IO;
 using System.Collections.Generic;
@@ -11,6 +11,16 @@ namespace Orkestra.Projects;
 /// </summary>
 public class FileSelector(string query) : PathSelector
 {
+    public string Extension
+    {
+        get
+        {
+            var parts = query.Split(".");
+            var final = parts[^1];
+            return $".{final}";
+        }
+    }
+
     public override IEnumerable<string> GetFiles(string baseFile)
     {
         query ??= "";

@@ -13,7 +13,7 @@ using Projects;
 public class LanguageInfo
 {
     public string Name { get; set; }
-    public PathSelector ExtensionPath { get; set; }
+    public string Extension { get; set; }
     public List<Rule> Rules { get; set; }
     public List<Key> Keys { get; set; }
 }
