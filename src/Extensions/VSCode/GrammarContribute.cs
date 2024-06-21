@@ -1,6 +1,7 @@
 /* Author:  Leonardo Trevisan Silio
  * Date:    21/06/2023
  */
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Orkestra.Extensions.VSCode;
@@ -16,15 +17,42 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
     public override string Declaration => 
         $$"""
         {
-            "language": {{info.Name}},
-            "scopeName": source{{info.Extension}}
+            "language": "{{info.Name}}",
+            "scopeName": "source{{info.Extension}}",
+            "path" : "./{{info.Name}}.tmLanguage.json"
         }
         """;
 
-    public override string Documentation => throw new System.NotImplementedException();
-
-    public override Task GenerateFile(string dir, ExtensionArguments args)
+    public override string Documentation
     {
-        throw new System.NotImplementedException();
+        get
+        {
+            return "";
+        }
+    }
+
+    public override async Task GenerateFile(string dir, ExtensionArguments args)
+    {
+        const string schema = "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json";
+        var sw = new StreamWriter($"{dir}/{info.Name}.tmLanguage.json");
+
+        await sw.WriteAsync(
+            $$"""
+            {
+                "$schema": "{{schema}}",
+                "name": "{{info.Name}}",
+                "patterns": [
+                    { "include": "#keywords" },
+                    { "include": "#strings" }
+                ],
+                "repository": {
+                    
+                },
+                "scopeName": "source{{info.Extension}}"
+            }
+            """
+        );
+
+        sw.Close();
     }
 }

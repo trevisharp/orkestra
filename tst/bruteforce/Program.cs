@@ -15,7 +15,7 @@ public class BruteForceCLI : CLI
     [HelpMessage("Install the BruteForce extension for VSCode.")]
     void install(params string[] args)
     {
-        BruteForceProject.InstallExtension();
+        BruteForceProject.InstallExtension(args);
     }
 }
 
