@@ -25,6 +25,28 @@ public class Compiler
 {
     private bool loadedFromFields = false;
 
+    public virtual string Name
+    {
+        get
+        {
+            var className = ToString();
+            var pascalLangName = className
+                .Replace("Compiler", "")
+                .Replace("compiler", "");
+            
+            return string.Concat(
+                pascalLangName.Select((c, i) =>
+                    (c, i) switch
+                    {
+                        (_, 0) => c.ToString(),
+                        _ when c >= 'A' && c <= 'Z' => $" {c}",
+                        _ => c.ToString()
+                    }
+                )
+            );
+        }
+    }
+
     public IAlgorithmGroupProvider Provider { get; set; }
     public List<Key> Keys { get; private set; } = new();
     public List<Rule> Rules { get; private set; } = new();

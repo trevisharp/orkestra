@@ -21,6 +21,7 @@ using Orkestra.Providers;
 public class Project<T>
     where T : Project<T>, new()
 {
+    List<CompileAction> actions = new();
     public IExtensionProvider ExtensionProvider { get; set; }
         = new DefaultExtensionProvider();
 
@@ -30,14 +31,12 @@ public class Project<T>
         prj.StartCompilation(args);
     }
 
-    public static void InstallExtension()
+    public static void InstallExtension(params string[] args)
     {
         var prj = new T();
-        prj.CreateInstallExtension();
+        prj.CreateInstallExtension(args);
     }
 
-    List<CompileAction> actions = new();
-    
     public void Add<C>(PathSelector selector)
         where C : Compiler, new()
         => actions.Add(new(
@@ -45,23 +44,25 @@ public class Project<T>
             ReflectionHelper.GetConfiguredCompiler<C>()
         ));
 
-    public void CreateInstallExtension()
+    public void CreateInstallExtension(params string[] args)
     {
         Verbose.Info("Generating Extension...");
         var extension = ExtensionProvider.Provide();
 
         Verbose.Info("Loading language metadata...", 1);
-        var args = new ExtensionArguments
+        var extArgs = new ExtensionArguments
         {
-            Name = typeof(T).Name.Replace("Project", "")
+            Name = typeof(T).Name.Replace("Project", ""),
+            Arguments = args
         };
-        // TODO: Get all Arguments based on CompileActions
-        // Generate and install the extension based on provider
+        
+        foreach (var lang in getLangs())
+            extArgs.Languages.Add(lang);
 
         try
         {
             Verbose.StartGroup();
-            extension.Generate(args).Wait();
+            extension.Generate(extArgs).Wait();
         }
         catch (Exception ex)
         {
@@ -116,5 +117,17 @@ public class Project<T>
         }
 
         var results = queue.ToArray();
+    }
+
+    private IEnumerable<LanguageInfo> getLangs()
+    {
+        foreach (var action in actions)
+            yield return new()
+            {
+                Name = action.Compiler.Name,
+                ExtensionPath = action.Selector,
+                Keys = action.Compiler.Keys,
+                Rules = action.Compiler.Rules
+            };
     }
 }
