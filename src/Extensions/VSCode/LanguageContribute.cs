@@ -29,7 +29,7 @@ public class LanguageContribute(LanguageInfo info) : VSCodeContribute
         
         """;
 
-    public override async Task GenerateFile(string dir, ExtensionArguments args)
+    public override async Task GenerateFile(string dir)
     {
         var sw = new StreamWriter($"{dir}/{info.Name}-configuration.json");
 
@@ -37,7 +37,7 @@ public class LanguageContribute(LanguageInfo info) : VSCodeContribute
             $$"""
             {
                 "comments": {
-                    "lineComment": "//",
+                    "lineComment": "//"
                 }
             }
             """
