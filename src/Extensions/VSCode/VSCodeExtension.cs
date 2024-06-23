@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    21/06/2023
+ * Date:    23/06/2023
  */
 using System;
 using System.IO;
@@ -152,7 +152,7 @@ public class VSCodeExtension : Extension
     async Task addContributes(string dir, ExtensionArguments args)
     {
         foreach (var contribute in this.contributes)
-            await contribute?.GenerateFile(dir, args);
+            await contribute?.GenerateFile(dir);
     }
 
     async Task addReadme(string dir, ExtensionArguments args)

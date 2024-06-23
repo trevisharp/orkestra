@@ -1,8 +1,10 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    21/06/2023
+ * Date:    23/06/2023
  */
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.Marshalling;
 using System.Threading.Tasks;
 
 namespace Orkestra.Extensions.VSCode;
@@ -41,7 +43,7 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
         string nums = "";
         string ids = "";
 
-        var others = new List<string>();
+        var others = new List<Key>();
 
         string append(string regex, string exp)
         {
@@ -66,7 +68,10 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
                 continue;
             }
 
-            others.Add(key.Expression);
+            if (!key.Expression.All(c => c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z'))
+                continue;
+
+            others.Add(key);
         }
 
         string keywords = "";
@@ -74,7 +79,18 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
         string operations = "";
         string definitions = "";
 
-        
+        var start = info.Rules
+            .FirstOrDefault(rule => rule.IsStartRule);
+        var complexity = getComplexities(start);
+
+        foreach (var pair in complexity)
+        {
+            System.Console.WriteLine(pair.Key.Expression);
+            System.Console.WriteLine(pair.Value);
+            System.Console.WriteLine();
+        }
+
+        // TODO: define groups
 
         // https://macromates.com/manual/en/language_grammars
         await sw.WriteAsync(
@@ -139,5 +155,37 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
         );
 
         sw.Close();
+    }
+
+    Dictionary<Key, int> getComplexities(Rule start)
+    {
+        var complexity = new Dictionary<Key, int>();
+        
+        var set = new HashSet<Rule>();
+        var queue = new Queue<(Rule rule, int level)>();
+        queue.Enqueue((start, 0));
+
+        while (queue.Count > 0)
+        {
+            var item = queue.Dequeue();
+
+            if (set.Contains(item.rule))
+                continue;
+            set.Add(item.rule);
+
+            foreach (var sb in item.rule.SubRules)
+            {
+                foreach (var tk in sb.RuleTokens)
+                {
+                    if (tk is Key key && !complexity.ContainsKey(key))
+                        complexity.Add(key, item.level);
+
+                    if (tk is Rule rule)
+                        queue.Enqueue((rule, item.level + 1));
+                }
+            }
+        }
+
+        return complexity;
     }
 }

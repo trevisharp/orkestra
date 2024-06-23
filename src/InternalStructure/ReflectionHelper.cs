@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    11/06/2024
+ * Date:    23/06/2024
  */
 using System;
 using System.Reflection;
@@ -43,6 +43,7 @@ internal class ReflectionHelper
         var compiler = new T {
             Provider = provider
         };
+        compiler.Load();
 
         return compiler;
     }

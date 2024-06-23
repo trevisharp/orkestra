@@ -53,11 +53,18 @@ public class Compiler
     public List<Processing> Processings { get; private set; } = new();
 
     /// <summary>
+    /// Load all data of compiler from fields.
+    /// </summary>
+    public void Load()
+    {
+        loadFromFields();
+    }
+
+    /// <summary>
     /// Get metadata of language defined by the compiler.
     /// </summary>
     public LanguageInfo GetInfo()
     {
-        loadFromFields();
         return new() {
             Name = getSpecialName(),
             Keys = Keys,
@@ -67,8 +74,6 @@ public class Compiler
 
     public async Task<ExpressionTree> Compile(string filePath, params string[] args)
     {
-        loadFromFields();
-
         // TODO: Finish Cache use
         var lstWrite = await Cache.LastWrite.TryGet(filePath);
         var newWrite = File.GetLastWriteTime(filePath);

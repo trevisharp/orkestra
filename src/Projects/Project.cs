@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    11/06/2024
+ * Date:    23/06/2024
  */
 using System;
 using System.Linq;
@@ -9,11 +9,10 @@ using System.Collections.Concurrent;
 
 namespace Orkestra.Projects;
 
-using System.IO;
+using Providers;
 using Exceptions;
+using Extensions;
 using InternalStructure;
-using Orkestra.Extensions;
-using Orkestra.Providers;
 
 /// <summary>
 /// Represents a collection of compile actions,
