@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    11/03/2024
+ * Date:    24/06/2024
  */
 using System.Collections.Generic;
 
@@ -33,6 +33,16 @@ public record Rule : ISyntacticElement
 
         foreach (var subRule in subRules)
             subRule.Parent = this;
+    }
+    
+    public void AddSubRules(params List<ISyntacticElement>[] subRules)
+    {
+        foreach (var subRule in subRules)
+        {
+            var sb = SubRule.Create(subRule.ToArray());
+            sb.Parent = this;
+            this.subRules.Add(sb);
+        }
     }
     
     public static Rule CreateRule(string name, params SubRule[] subRules)

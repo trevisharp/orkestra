@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    11/06/2024
+ * Date:    24/06/2024
  */
 using System.IO;
 using System.Linq;
@@ -132,11 +132,34 @@ public class Compiler
     protected static Key identity(string name, string expression)
         => Key.CreateIdentity(name, expression);
 
-    protected static Rule rule(string name, params SubRule[] subRules)
-        => Rule.CreateRule(name, subRules);
+    protected static Rule rule(string name, params List<ISyntacticElement>[] subRules)
+    {
+        var rule = Rule.CreateRule(name);
+        rule.AddSubRules(subRules);
+        return rule;
+    }
+    
+    protected static Rule many(ISyntacticElement element, ISyntacticElement separator = null)
+    {
+        var newRule = Rule.CreateRule(element.Name + "s");
+        newRule.AddSubRules(
+            SubRule.Create(element),
+            separator is null
+                ? SubRule.Create(element, newRule)
+                : SubRule.Create(element, separator, newRule)
+        );
+        return newRule;
+    }
 
-    protected static SubRule sub(params ISyntacticElement[] elements)
-        => SubRule.Create(elements);
+    protected static Rule leaf(string name, params ISyntacticElement[] elements)
+    {
+        var newRule = Rule.CreateRule(name);
+        foreach (var element in elements)
+            newRule.AddSubRules(
+                SubRule.Create(element)
+            );
+        return newRule;
+    }
 
     private string getSpecialName()
     {

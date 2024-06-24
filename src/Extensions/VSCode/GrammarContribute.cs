@@ -1,11 +1,10 @@
 /* Author:  Leonardo Trevisan Silio
  * Date:    23/06/2023
  */
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.Marshalling;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Orkestra.Extensions.VSCode;
 

@@ -67,45 +67,38 @@ public class BruteForceCompiler : Compiler
     Key NUMBER = key("NUMBER", "-?[0-9][0-9\\.]*");
     Key ID = identity("IDENT", "[a-z]+");
 
-    Rule baseset, set, op, exp, list, value, given, boolean,
+    Rule baseset, set, op, exp, exps, value, given, boolean,
         definition, inclusion, checking, cond, condinclusion,
         test, tests, import, item, itens, program, fortype;
     
     public BruteForceCompiler()
     {
-        op = rule("op",
-            sub(SUM), sub(MUL), sub(SUB),
-            sub(DIV), sub(POW), sub(MOD)
+        op = leaf("op",
+            SUM, MUL, SUB, 
+            DIV, POW, MOD
         );
 
-        exp = rule("exp");
-        exp.AddSubRules(
-            sub(NUMBER),
-            sub(NUMBER, op, exp),
-            sub(ID),
-            sub(ID, op, exp)
+        exp = rule("exp",
+            [ NUMBER ],
+            [ NUMBER, op, exp ],
+            [ ID ],
+            [ ID, op, exp ]
         );
 
-        baseset = rule("baseset",
-            sub(NAT), sub(REAL),
-            sub(RAT), sub(INT)
+        baseset = leaf("baseset",
+            NAT, REAL, RAT, INT
         );
 
         set = rule("set");
         set.AddSubRules(
-            sub(baseset), sub(SUBSET, OF, set), sub(ID)
+            [ baseset ], [ SUBSET, OF, set ], [ ID ]
         );
 
-        list = rule("list");
-        list.AddSubRules(
-            sub(exp),
-            sub(exp, COMMA, list)
-        );
+        exps = many(exp, COMMA);
 
-        value = rule("value");
-        value.AddSubRules(
-            sub(exp),
-            sub(OPENPAR, list, CLOSEPAR)
+        value = rule("value",
+            [ exp ],
+            [ OPENPAR, exps, CLOSEPAR ]
         );
 
         boolean = rule("boolean",
@@ -148,11 +141,7 @@ public class BruteForceCompiler : Compiler
             sub(FOR, fortype, ID, IN, set)
         );
         
-        tests = rule("tests");
-        tests.AddSubRules(
-            sub(test),
-            sub(test, tests)
-        );
+        tests = many(test);
 
         checking = rule("cheking",
             sub(CHECK, IF, inclusion),
@@ -171,11 +160,7 @@ public class BruteForceCompiler : Compiler
             sub(import)
         );
 
-        itens = rule("itens");
-        itens.AddSubRules(
-            sub(item),
-            sub(item, itens)
-        );
+        itens = many(item);
 
         program = Rule.CreateStartRule("program",
             sub(itens),
