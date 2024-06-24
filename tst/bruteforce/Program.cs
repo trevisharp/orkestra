@@ -73,40 +73,41 @@ public class BruteForceCompiler : Compiler
     
     public BruteForceCompiler()
     {
-        op = leaf("op",
-            SUM, MUL, SUB, 
-            DIV, POW, MOD
+        op = Rule.CreateRule(null,
+            sub(SUM), sub(MUL), sub(SUB), 
+            sub(DIV), sub(POW), sub(MOD)
         );
 
-        exp = rule("exp",
-            [ NUMBER ],
-            [ NUMBER, op, exp ],
-            [ ID ],
-            [ ID, op, exp ]
+        exp = Rule.CreateRule("exp");
+        exp.AddSubRules(
+            sub(NUMBER),
+            sub(NUMBER, op, exp),
+            sub(ID),
+            sub(ID, op, exp)
         );
 
-        baseset = leaf("baseset",
-            NAT, REAL, RAT, INT
+        baseset = Rule.CreateRule("baseset",
+            sub(NAT), sub(REAL), sub(RAT), sub(INT)
         );
 
-        set = rule("set");
+        set = Rule.CreateRule("set");
         set.AddSubRules(
-            [ baseset ], [ SUBSET, OF, set ], [ ID ]
+            sub(baseset), sub(SUBSET, OF, set), sub(ID)
         );
 
         exps = many(exp, COMMA);
 
-        value = rule("value",
-            [ exp ],
-            [ OPENPAR, exps, CLOSEPAR ]
+        value = Rule.CreateRule("value",
+            sub(exp),
+            sub(OPENPAR, exps, CLOSEPAR)
         );
 
-        boolean = rule("boolean",
+        boolean = Rule.CreateRule("boolean",
             sub(value, IS, value),
             sub(ID, CONTAINS, value)
         );
 
-        cond = rule("cond");
+        cond = Rule.CreateRule("cond");
         cond.AddSubRules(
             sub(boolean),
             sub(boolean, AND, cond),
@@ -115,44 +116,48 @@ public class BruteForceCompiler : Compiler
             sub(OPENPAR, boolean, CLOSEPAR)
         );
 
-        definition = rule("definition",
+        definition = Rule.CreateRule("definition",
             sub(DEFINE, ID, AS, set)
         );
 
-        inclusion = rule("inclusion",
+        inclusion = Rule.CreateRule("inclusion",
             sub(ID, CONTAINS, value),
             sub(ID, CONTAINS, ID)
         );
 
-        condinclusion = rule("condinclusion",
+        condinclusion = Rule.CreateRule("condinclusion",
             sub(IF, cond, THEN, inclusion)
         );
 
-        given = rule("given",
+        given = Rule.CreateRule("given",
             sub(GIVEN, ID, IN, set)
         );
 
-        fortype = rule("fortype",
+        fortype = Rule.CreateRule("fortype",
             sub(SOME),
             sub(ALL)
         );
 
-        test = rule("test",
+        test = Rule.CreateRule("test",
             sub(FOR, fortype, ID, IN, set)
         );
         
-        tests = many(test);
+        tests = Rule.CreateRule("tests");
+        tests.AddSubRules(
+            sub(test),
+            sub(test, tests)
+        );
 
-        checking = rule("cheking",
+        checking = Rule.CreateRule("cheking",
             sub(CHECK, IF, inclusion),
             sub(CHECK, IF, tests, inclusion)
         );
 
-        import = rule("import",
+        import = Rule.CreateRule("import",
             sub(CONSIDERING, ID)
         );
 
-        item = rule("item",
+        item = Rule.CreateRule("item",
             sub(definition),
             sub(inclusion),
             sub(condinclusion),
@@ -160,7 +165,11 @@ public class BruteForceCompiler : Compiler
             sub(import)
         );
 
-        itens = many(item);
+        itens = Rule.CreateRule("itens");
+        itens.AddSubRules(
+            sub(item),
+            sub(item, itens)
+        );
 
         program = Rule.CreateStartRule("program",
             sub(itens),

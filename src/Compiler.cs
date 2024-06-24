@@ -138,6 +138,9 @@ public class Compiler
         rule.AddSubRules(subRules);
         return rule;
     }
+
+    protected static SubRule sub(params ISyntacticElement[] elements)
+        => SubRule.Create(elements);
     
     protected static Rule many(ISyntacticElement element, ISyntacticElement separator = null)
     {
@@ -174,6 +177,7 @@ public class Compiler
         if (loadedFromFields)
             return;
         loadedFromFields = true;
+        setEmptyNames();
 
         Keys = Keys
             .Concat(getFields<Key>())
@@ -231,14 +235,33 @@ public class Compiler
         return builder.Build();
     }
 
+    private void setEmptyNames()
+    {
+        var type = this.GetType();
+        foreach (var field in type.GetRuntimeFields())
+        {
+            if (field.FieldType != typeof(Rule) && field.FieldType != typeof(Key))
+                continue;
+            
+            var obj = field.GetValue(this) as ISyntacticElement;
+            if (obj is null)
+                continue;
+            
+            if (!string.IsNullOrEmpty(obj.Name))
+                continue;
+            
+            obj.Name = field.Name;
+        }
+    }
+
     private IEnumerable<T> getFields<T>()
         where T : class
     {
         var type = this.GetType();
-        foreach (var filed in type.GetRuntimeFields())
+        foreach (var field in type.GetRuntimeFields())
         {
-            if (filed.FieldType == typeof(T))
-                yield return filed.GetValue(this) as T;
+            if (field.FieldType == typeof(T))
+                yield return field.GetValue(this) as T;
         }
     }
 }

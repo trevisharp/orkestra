@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    03/07/2023
+ * Date:    24/06/2024
  */
 namespace Orkestra;
 
@@ -11,5 +11,5 @@ public interface ISyntacticElement
     /// <summary>
     /// The string name of the element.
     /// </summary>
-    string Name { get; }
+    string Name { get; set; }
 }

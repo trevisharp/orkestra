@@ -9,7 +9,7 @@ namespace Orkestra;
 /// <summary>
 /// A record that represents a sub sintactycal rule. 
 /// </summary>
-public record SubRule : ISyntacticElement
+public record SubRule
 {
     private List<ISyntacticElement> ruleTokens;
     private SubRule(ISyntacticElement[] tokens)

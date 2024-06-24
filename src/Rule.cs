@@ -8,24 +8,16 @@ namespace Orkestra;
 /// <summary>
 /// A record that represents a set of rules with same name.
 /// </summary>
-/// <value></value>
-public record Rule : ISyntacticElement
+public class Rule(string name, bool startRule, params SubRule[] subRules) : ISyntacticElement
 {
-    private List<SubRule> subRules;
+    private List<SubRule> subRules = [ ..subRules ];
 
-    private Rule(string name, bool startRule, SubRule[] subRules)
-    {
-        this.Name = name;
-        this.subRules = [ ..subRules ];
-        this.IsStartRule = startRule;
-
-        foreach (var subRule in subRules)
-            subRule.Parent = this;
-    }
-    
-    public string Name { get; set; }
-    public bool IsStartRule { get; set; }
+    public string Name { get; set; } = name;
+    public bool IsStartRule { get; set; } = startRule;
     public IEnumerable<SubRule> SubRules => subRules;
+
+    public override string ToString()
+        => $"R:{Name}";
 
     public void AddSubRules(params SubRule[] subRules)
     {
@@ -39,7 +31,9 @@ public record Rule : ISyntacticElement
     {
         foreach (var subRule in subRules)
         {
-            var sb = SubRule.Create(subRule.ToArray());
+            var sb = SubRule.Create(
+                subRule.ToArray()
+            );
             sb.Parent = this;
             this.subRules.Add(sb);
         }
@@ -50,7 +44,10 @@ public record Rule : ISyntacticElement
 
     public static Rule CreateStartRule(string name, params SubRule[] subRules)
         => new Rule(name, true, subRules);
+    
+    public static Rule CreateRule(params SubRule[] subRules)
+        => new Rule(null, false, subRules);
 
-    public override string ToString()
-        => $"R:{Name}";
+    public static Rule CreateStartRule(params SubRule[] subRules)
+        => new Rule(null, true, subRules);
 }

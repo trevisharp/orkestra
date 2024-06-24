@@ -34,7 +34,7 @@ public record Key : ISyntacticElement
     public static Key CreateContextual(string name, string expression)
         => new Key(name, expression, true, false, true, false);
 
-    public string Name { get; private set; }
+    public string Name { get; set; }
     public string Expression { get; private set; }
     public bool IsContextual { get; private set; }
     public bool IsIdentity { get; private set; }
