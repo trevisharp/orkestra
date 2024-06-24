@@ -67,10 +67,9 @@ public class BruteForceCompiler : Compiler
     Key NUMBER = key("NUMBER", "-?[0-9][0-9\\.]*");
     Key ID = identity("IDENT", "[a-z]+");
 
-    Rule set, op, exp, list, value, given, boolean,
+    Rule baseset, set, op, exp, list, value, given, boolean,
         definition, inclusion, checking, cond, condinclusion,
-        forall, exists, test, tests, import,
-        item, itens, program;
+        test, tests, import, item, itens, program, fortype;
     
     public BruteForceCompiler()
     {
@@ -87,10 +86,14 @@ public class BruteForceCompiler : Compiler
             sub(ID, op, exp)
         );
 
+        baseset = rule("baseset",
+            sub(NAT), sub(REAL),
+            sub(RAT), sub(INT)
+        );
+
         set = rule("set");
         set.AddSubRules(
-            sub(NAT), sub(REAL), sub(RAT), sub(INT),
-            sub(SUBSET, OF, set), sub(ID)
+            sub(baseset), sub(SUBSET, OF, set), sub(ID)
         );
 
         list = rule("list");
@@ -105,8 +108,7 @@ public class BruteForceCompiler : Compiler
             sub(OPENPAR, list, CLOSEPAR)
         );
 
-        boolean = rule("boolean");
-        boolean.AddSubRules(
+        boolean = rule("boolean",
             sub(value, IS, value),
             sub(ID, CONTAINS, value)
         );
@@ -120,41 +122,30 @@ public class BruteForceCompiler : Compiler
             sub(OPENPAR, boolean, CLOSEPAR)
         );
 
-        definition = rule("definition");
-        definition.AddSubRules(
+        definition = rule("definition",
             sub(DEFINE, ID, AS, set)
         );
 
-        inclusion = rule("inclusion");
-        inclusion.AddSubRules(
+        inclusion = rule("inclusion",
             sub(ID, CONTAINS, value),
             sub(ID, CONTAINS, ID)
         );
 
-        condinclusion = rule("condinclusion");
-        condinclusion.AddSubRules(
+        condinclusion = rule("condinclusion",
             sub(IF, cond, THEN, inclusion)
         );
 
-        given = rule("given");
-        given.AddSubRules(
+        given = rule("given",
             sub(GIVEN, ID, IN, set)
         );
 
-        forall = rule("forall");
-        forall.AddSubRules(
-            sub(FOR, ALL, ID, IN, set)
+        fortype = rule("fortype",
+            sub(SOME),
+            sub(ALL)
         );
 
-        exists = rule("exists");
-        exists.AddSubRules(
-            sub(FOR, SOME, ID, IN, set)
-        );
-
-        test = rule("test");
-        test.AddSubRules(
-            sub(forall),
-            sub(exists)
+        test = rule("test",
+            sub(FOR, fortype, ID, IN, set)
         );
         
         tests = rule("tests");
@@ -163,19 +154,16 @@ public class BruteForceCompiler : Compiler
             sub(test, tests)
         );
 
-        checking = rule("cheking");
-        checking.AddSubRules(
+        checking = rule("cheking",
             sub(CHECK, IF, inclusion),
             sub(CHECK, IF, tests, inclusion)
         );
 
-        import = rule("import");
-        import.AddSubRules(
+        import = rule("import",
             sub(CONSIDERING, ID)
         );
 
-        item = rule("item");
-        item.AddSubRules(
+        item = rule("item",
             sub(definition),
             sub(inclusion),
             sub(condinclusion),
@@ -189,8 +177,7 @@ public class BruteForceCompiler : Compiler
             sub(item, itens)
         );
 
-        program = Rule.CreateStartRule("program");
-        program.AddSubRules(
+        program = Rule.CreateStartRule("program",
             sub(itens),
             sub(itens, checking)
         );

@@ -56,7 +56,7 @@ public class VSCodeExtension : Extension
         var finalFile = args.Name + ".vsix";
         deleteFileIfExists(finalFile);
         zip(path, finalFile);
-        install(finalFile);
+        // install(finalFile);
 
         deleteFolderIfExists(path);
         Verbose.Info($"Temp directory removed from {path}.", 3);
