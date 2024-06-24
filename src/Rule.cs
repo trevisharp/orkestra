@@ -31,7 +31,7 @@ public class Rule(string name, bool startRule, params SubRule[] subRules) : ISyn
     {
         foreach (var subRule in subRules)
         {
-            var sb = SubRule.Create(
+            var sb = new SubRule(
                 subRule.ToArray()
             );
             sb.Parent = this;
