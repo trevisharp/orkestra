@@ -29,7 +29,8 @@ Coming soon.
 
 ### Orkestra v0.3.0 (Coming soon)
 
- - ![](https://img.shields.io/badge/new-green) Added VSCode extension default generation code.
+ - ![](https://img.shields.io/badge/new-green) Added default VSCode extension generation code with smart highligthing.
+ - ![](https://img.shields.io/badge/updated-blue) Improve key and rule definition sintaxes.
 
 ### Orkestra v0.2.0
 
