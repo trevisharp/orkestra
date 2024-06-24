@@ -1,6 +1,7 @@
 /* Author:  Leonardo Trevisan Silio
  * Date:    24/06/2024
  */
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -13,11 +14,10 @@ using static Verbose;
 
 using Caches;
 using Providers;
+using Extensions;
 using Processings;
 using LexicalAnalysis;
 using SyntacticAnalysis;
-using Orkestra.Extensions;
-using System;
 
 /// <summary>
 /// A base class for all compiler created with Orkestra framework.
@@ -121,17 +121,14 @@ public class Compiler
     protected static Key keyword(string expression)
         => keyword(expression.ToUpper(), expression);
 
-    protected static Key contextual(string name, string expression)
-        => Key.CreateContextual(name, expression);
-
     protected static Key contextual(string expression)
-        => contextual(expression.ToUpper(), expression);
+        => Key.CreateContextual(null, expression);
 
     protected static Key auto(string name)
         => Key.CreateAutoKeyword(name);
 
-    protected static Key identity(string name, string expression)
-        => Key.CreateIdentity(name, expression);
+    protected static Key identity(string expression)
+        => Key.CreateIdentity(expression);
 
     protected static Rule rule(params List<ISyntacticElement>[] subRules)
     {
@@ -151,7 +148,7 @@ public class Compiler
     {
         var rule = Rule.CreateRule();
         rule.AddSubRules(
-            SubRule.Create(elements)
+            new SubRule(elements)
         );
         return rule;
     }
@@ -174,7 +171,7 @@ public class Compiler
     {
         var rule = Rule.CreateStartRule();
         rule.AddSubRules(
-            SubRule.Create(elements)
+            new SubRule(elements)
         );
         return rule;
     }
@@ -183,10 +180,10 @@ public class Compiler
     {
         var newRule = Rule.CreateRule();
         newRule.AddSubRules(
-            SubRule.Create(element),
+            new SubRule(element),
             separator is null
-                ? SubRule.Create(element, newRule)
-                : SubRule.Create(element, separator, newRule)
+                ? new SubRule(element, newRule)
+                : new SubRule(element, separator, newRule)
         );
         return newRule;
     }
@@ -194,7 +191,7 @@ public class Compiler
     protected static Rule one(params ISyntacticElement[] elements)
         => Rule.CreateRule(
             elements
-                .Select(element => SubRule.Create(element))
+                .Select(element => new SubRule(element))
                 .ToArray()
         );
 
