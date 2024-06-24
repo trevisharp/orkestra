@@ -31,40 +31,40 @@ public class BruteForceProject : Project<BruteForceProject>
 
 public class BruteForceCompiler : Compiler
 {
-    Key SUM = key("SUM", "\\+");
-    Key SUB = key("SUB", "\\-");
-    Key MUL = key("MUL", "\\*");
-    Key DIV = key("DIV", "\\/");
-    Key POW = key("POW", "\\^");
-    Key MOD = key("MOD", "\\%");
-    Key COMMA = key("COMMA", "\\,");
-    Key OPENPAR = key("OPENPAR", "\\(");
-    Key CLOSEPAR = key("CLOSEPAR", "\\)");
+    Key SUM = "\\+";
+    Key SUB = "\\-";
+    Key MUL = "\\*";
+    Key DIV = "\\/";
+    Key POW = "\\^";
+    Key MOD = "\\%";
+    Key COMMA = "\\,";
+    Key OPENPAR = "\\(";
+    Key CLOSEPAR = "\\)";
 
-    Key SUBSET = keyword("subset");
-    Key OF = keyword("of");
-    Key NAT = keyword("nat");
-    Key INT = keyword("int");
-    Key RAT = keyword("rat");
-    Key REAL = keyword("real");
-    Key IS = keyword("is");
-    Key AND = keyword("and");
-    Key OR = keyword("or");
-    Key NOT = keyword("not");
-    Key DEFINE = keyword("define");
-    Key AS = keyword("as");
-    Key CONTAINS = keyword("contains");
-    Key IF = keyword("if");
-    Key THEN = keyword("then");
-    Key FOR = keyword("for");
-    Key ALL = keyword("all");
-    Key SOME = keyword("some");
-    Key IN = keyword("in");
-    Key CHECK = keyword("check");
-    Key CONSIDERING = keyword("considering");
-    Key GIVEN = keyword("given");
+    Key SUBSET = "subset";
+    Key OF = "of";
+    Key NAT = "nat";
+    Key INT = "int";
+    Key RAT = "rat";
+    Key REAL = "real";
+    Key IS = "is";
+    Key AND = "and";
+    Key OR = "or";
+    Key NOT = "not";
+    Key DEFINE = "define";
+    Key AS = "as";
+    Key CONTAINS = "contains";
+    Key IF = "if";
+    Key THEN = "then";
+    Key FOR = "for";
+    Key ALL = "all";
+    Key SOME = "some";
+    Key IN = "in";
+    Key CHECK = "check";
+    Key CONSIDERING = "considering";
+    Key GIVEN = "given";
     
-    Key NUMBER = key("NUMBER", "-?[0-9][0-9\\.]*");
+    Key NUMBER = "-?[0-9][0-9\\.]*";
     Key ID = identity("IDENT", "[a-z]+");
 
     Rule baseset, set, op, exp, exps, value, given, boolean,
@@ -73,107 +73,77 @@ public class BruteForceCompiler : Compiler
     
     public BruteForceCompiler()
     {
-        op = Rule.CreateRule(null,
-            sub(SUM), sub(MUL), sub(SUB), 
-            sub(DIV), sub(POW), sub(MOD)
-        );
+        op = one(SUM, MUL, SUB, DIV, POW, MOD);
 
-        exp = Rule.CreateRule("exp");
-        exp.AddSubRules(
-            sub(NUMBER),
-            sub(NUMBER, op, exp),
-            sub(ID),
-            sub(ID, op, exp)
-        );
+        exp = rule(exp => [
+            [ NUMBER ],
+            [ NUMBER, op, exp ],
+            [ ID ],
+            [ ID, op, exp ]
+        ]);
 
-        baseset = Rule.CreateRule("baseset",
-            sub(NAT), sub(REAL), sub(RAT), sub(INT)
-        );
+        baseset = one(NAT, REAL, RAT, INT);
 
-        set = Rule.CreateRule("set");
-        set.AddSubRules(
-            sub(baseset), sub(SUBSET, OF, set), sub(ID)
-        );
+        set = rule(set => [
+            [ baseset ],
+            [ SUBSET, OF, set ],
+            [ ID ]
+        ]);
 
         exps = many(exp, COMMA);
 
-        value = Rule.CreateRule("value",
-            sub(exp),
-            sub(OPENPAR, exps, CLOSEPAR)
+        value = rule(
+            [ exp ],
+            [ OPENPAR, exps, CLOSEPAR ]
         );
 
-        boolean = Rule.CreateRule("boolean",
-            sub(value, IS, value),
-            sub(ID, CONTAINS, value)
+        boolean = rule(
+            [ value, IS, value ],
+            [ ID, CONTAINS, value ]
         );
 
-        cond = Rule.CreateRule("cond");
-        cond.AddSubRules(
-            sub(boolean),
-            sub(boolean, AND, cond),
-            sub(boolean, OR, cond),
-            sub(NOT, boolean),
-            sub(OPENPAR, boolean, CLOSEPAR)
+        cond = rule(cond => [
+            [ boolean ],
+            [ boolean, AND, cond ],
+            [ boolean, OR, cond ],
+            [ NOT, boolean ],
+            [ OPENPAR, boolean, CLOSEPAR ]
+        ]);
+
+        definition = rule(DEFINE, ID, AS, set);
+
+        inclusion = rule(
+            [ ID, CONTAINS, value ],
+            [ ID, CONTAINS, ID ]
         );
 
-        definition = Rule.CreateRule("definition",
-            sub(DEFINE, ID, AS, set)
-        );
+        condinclusion = rule(IF, cond, THEN, inclusion);
 
-        inclusion = Rule.CreateRule("inclusion",
-            sub(ID, CONTAINS, value),
-            sub(ID, CONTAINS, ID)
-        );
+        given = rule(GIVEN, ID, IN, set);
 
-        condinclusion = Rule.CreateRule("condinclusion",
-            sub(IF, cond, THEN, inclusion)
-        );
+        fortype = one(SOME, ALL);
 
-        given = Rule.CreateRule("given",
-            sub(GIVEN, ID, IN, set)
-        );
-
-        fortype = Rule.CreateRule("fortype",
-            sub(SOME),
-            sub(ALL)
-        );
-
-        test = Rule.CreateRule("test",
-            sub(FOR, fortype, ID, IN, set)
-        );
+        test = rule(FOR, fortype, ID, IN, set);
         
-        tests = Rule.CreateRule("tests");
-        tests.AddSubRules(
-            sub(test),
-            sub(test, tests)
+        tests = many(test);
+
+        checking = rule(
+            [ CHECK, IF, inclusion ],
+            [ CHECK, IF, tests, inclusion ]
         );
 
-        checking = Rule.CreateRule("cheking",
-            sub(CHECK, IF, inclusion),
-            sub(CHECK, IF, tests, inclusion)
+        import = rule(CONSIDERING, ID);
+
+        item = one(
+            definition, inclusion, 
+            condinclusion, given, import
         );
 
-        import = Rule.CreateRule("import",
-            sub(CONSIDERING, ID)
-        );
+        itens = many(item);
 
-        item = Rule.CreateRule("item",
-            sub(definition),
-            sub(inclusion),
-            sub(condinclusion),
-            sub(given),
-            sub(import)
-        );
-
-        itens = Rule.CreateRule("itens");
-        itens.AddSubRules(
-            sub(item),
-            sub(item, itens)
-        );
-
-        program = Rule.CreateStartRule("program",
-            sub(itens),
-            sub(itens, checking)
+        program = start(
+            [ itens ],
+            [ itens, checking ]
         );
     }
 }

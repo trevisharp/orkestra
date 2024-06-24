@@ -17,6 +17,7 @@ using Processings;
 using LexicalAnalysis;
 using SyntacticAnalysis;
 using Orkestra.Extensions;
+using System;
 
 /// <summary>
 /// A base class for all compiler created with Orkestra framework.
@@ -132,19 +133,55 @@ public class Compiler
     protected static Key identity(string name, string expression)
         => Key.CreateIdentity(name, expression);
 
-    protected static Rule rule(string name, params List<ISyntacticElement>[] subRules)
+    protected static Rule rule(params List<ISyntacticElement>[] subRules)
     {
-        var rule = Rule.CreateRule(name);
+        var rule = Rule.CreateRule();
         rule.AddSubRules(subRules);
         return rule;
     }
 
-    protected static SubRule sub(params ISyntacticElement[] elements)
-        => SubRule.Create(elements);
+    protected static Rule rule(Func<Rule, List<ISyntacticElement>[]> creator)
+    {
+        var rule = Rule.CreateRule();
+        rule.AddSubRules(creator(rule));
+        return rule;
+    }
+    
+    protected static Rule rule(params ISyntacticElement[] elements)
+    {
+        var rule = Rule.CreateRule();
+        rule.AddSubRules(
+            SubRule.Create(elements)
+        );
+        return rule;
+    }
+    
+    protected static Rule start(params List<ISyntacticElement>[] subRules)
+    {
+        var rule = Rule.CreateStartRule();
+        rule.AddSubRules(subRules);
+        return rule;
+    }
+
+    protected static Rule start(Func<Rule, List<ISyntacticElement>[]> creator)
+    {
+        var rule = Rule.CreateStartRule();
+        rule.AddSubRules(creator(rule));
+        return rule;
+    }
+    
+    protected static Rule start(params ISyntacticElement[] elements)
+    {
+        var rule = Rule.CreateStartRule();
+        rule.AddSubRules(
+            SubRule.Create(elements)
+        );
+        return rule;
+    }
     
     protected static Rule many(ISyntacticElement element, ISyntacticElement separator = null)
     {
-        var newRule = Rule.CreateRule(element.Name + "s");
+        var newRule = Rule.CreateRule();
         newRule.AddSubRules(
             SubRule.Create(element),
             separator is null
@@ -154,15 +191,12 @@ public class Compiler
         return newRule;
     }
 
-    protected static Rule leaf(string name, params ISyntacticElement[] elements)
-    {
-        var newRule = Rule.CreateRule(name);
-        foreach (var element in elements)
-            newRule.AddSubRules(
-                SubRule.Create(element)
-            );
-        return newRule;
-    }
+    protected static Rule one(params ISyntacticElement[] elements)
+        => Rule.CreateRule(
+            elements
+                .Select(element => SubRule.Create(element))
+                .ToArray()
+        );
 
     private string getSpecialName()
     {

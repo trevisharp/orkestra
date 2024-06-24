@@ -17,7 +17,7 @@ public class Rule(string name, bool startRule, params SubRule[] subRules) : ISyn
     public IEnumerable<SubRule> SubRules => subRules;
 
     public override string ToString()
-        => $"R:{Name}";
+        => $"R:{Name ?? "unnamed"}";
 
     public void AddSubRules(params SubRule[] subRules)
     {

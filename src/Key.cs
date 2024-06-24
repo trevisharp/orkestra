@@ -23,7 +23,7 @@ public class Key(
     public bool IsAuto { get; private set; } = auto;
 
     public override string ToString()
-        => $"K:{Name}";
+        => $"K:{Name ?? "unnamed"}";
     
     public static Key CreateKey(string name, string expression)
         => new(name, expression, false, false, false, false);
