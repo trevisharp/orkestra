@@ -56,13 +56,8 @@ public static class Verbose
     {
         if (VerboseLevel < level)
             return;
-
-        if (tabInfo is null)
-        {
-            tabInfo = "";
-            return;
-        }
-
+        
+        tabInfo ??= "";
         tabInfo += "\t";
     }
     public static void EndGroup(int level = 0)

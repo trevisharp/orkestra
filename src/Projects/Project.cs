@@ -107,11 +107,17 @@ public class Project<T>
                     );
                     queue.Enqueue(result);
                 }
+                catch (SyntacticException ex)
+                {
+                    Verbose.Error($"Syntax error in {tuple.file} compilation:");
+                    Verbose.Error(ex.Message);
+                }
                 catch (Exception ex)
                 {
                     Verbose.Error($"Internal error in {tuple.file} compilation!");
                     Verbose.StartGroup();
-                        Verbose.Error(ex.Message);
+                    Verbose.Error(ex.Message);
+                    Verbose.Error(ex.StackTrace, 1);
                     Verbose.EndGroup();
                 }
             }).Wait();
