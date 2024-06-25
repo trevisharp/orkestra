@@ -31,6 +31,8 @@ Coming soon.
 
  - ![](https://img.shields.io/badge/new-green) Added default VSCode extension generation code with smart highligthing.
  - ![](https://img.shields.io/badge/updated-blue) Improve key and rule definition sintaxes.
+ - ![](https://img.shields.io/badge/updated-blue) Improve Processing performance.
+ - ![](https://img.shields.io/badge/bug%20solved-orange) Many bug fixes in Processing abstraction.
 
 ### Orkestra v0.2.0
 
