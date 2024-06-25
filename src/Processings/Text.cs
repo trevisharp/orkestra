@@ -141,6 +141,9 @@ public class Text
         Append(token);
     }
 
+    /// <summary>
+    /// Append a String in current position.
+    /// </summary>
     public void Append(string str)
     {
         var step = this.pointerStack.Peek();
@@ -175,13 +178,19 @@ public class Text
         
         this.data.Insert(data, i);
     }
-
+    
+    /// <summary>
+    /// Prepend a Token in current position.
+    /// </summary>
     public void Prepend(Token token)
     {
         var data = new Data('\0', token);
         prepend(data);
     }
 
+    /// <summary>
+    /// Prepend a Token in current position.
+    /// </summary>
     public void Prepend(Key baseKey)
     {
         // TODO: get Index
@@ -189,6 +198,9 @@ public class Text
         Prepend(token);
     }
 
+    /// <summary>
+    /// Preprend a string in current position.
+    /// </summary>
     public void Prepend(string str)
     {
         var step = this.pointerStack.Peek();
@@ -239,18 +251,27 @@ public class Text
     public void PrependTab()
         => prepend(tab);
     
+    /// <summary>
+    /// Replace the current unity by a String.
+    /// </summary>
     public void Replace(string str)
     {
         removeUnity();
         Append(str);
     }
 
+    /// <summary>
+    /// Replace the current unity by a Token.
+    /// </summary>
     public void Replace(Token token)
     {
         removeUnity();
         Append(token);
     }
 
+    /// <summary>
+    /// Replace the current unity by a Key.
+    /// </summary>
     public void Replace(Key baseKey)
     {
         removeUnity();
@@ -329,12 +350,11 @@ public class Text
     public object[] ToSources()
     {
         List<object> data = new List<object>();
-        StringBuilder sb = null;
         int index = 0;
 
         while (index < this.data.Count)
         {
-            sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             while (this.data[index].Token is null)
             {
                 sb.Append(this.data[index].Character);
