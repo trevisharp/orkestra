@@ -1,9 +1,11 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    03/07/2023
+ * Date:    25/06/2024
  */
 using System;
 
 namespace Orkestra.Processings;
+
+using Implementations;
 
 /// <summary>
 /// A processing code to transform text.
@@ -14,4 +16,7 @@ public abstract class Processing
 
     public static Processing FromFunction(Func<Text, Text> func)
         => new FuncProcessing(func);
+    
+    public static LineCommentProcessing LineComment(string starter)
+        => new LineCommentProcessing(starter);
 }

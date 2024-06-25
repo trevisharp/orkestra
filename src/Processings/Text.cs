@@ -4,14 +4,13 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 
 namespace Orkestra.Processings;
 
 using SyntacticAnalysis;
 using InternalStructure;
-using System.Threading.Tasks;
-using System.Collections.Specialized;
 
 /// <summary>
 /// A Tree Pointer for Text elements
