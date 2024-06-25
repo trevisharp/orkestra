@@ -86,9 +86,7 @@ public class BruteForceCompiler : Compiler
                 {
                     if (text.Is("//"))
                     {
-                        Verbose.Warning("achei!");
                         text.Discard();
-                        break;
                     }
                 }
             }

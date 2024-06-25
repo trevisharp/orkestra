@@ -34,7 +34,7 @@ public class Text
             source.Replace("\r", "")
         );
         this.pointerStack = new Stack<ProcessStep>();
-        addStep(0, UnityType.All);
+        addStep(0, UnityType.All, false);
     }
     
     /// <summary>
@@ -47,7 +47,7 @@ public class Text
         if (step.Type == UnityType.All)
         {
             int startLine = getStartLineIndex(step);
-            addStep(startLine, UnityType.Line);
+            addStep(startLine, UnityType.Line, false);
             return;
         }
         
@@ -63,7 +63,7 @@ public class Text
 
         if (step.Type == UnityType.All || step.Type == UnityType.Line)
         {
-            addStep(step.Index, UnityType.Character);
+            addStep(step.Index, UnityType.Character, false);
             return;
         }
         
@@ -219,7 +219,7 @@ public class Text
         if (type == UnityType.Character)
         {
             this.data.Insert(data, step.Index);
-            updateStep(step.Index - data.Length, UnityType.Character);
+            updateStep(step.Index - data.Length, UnityType.Character, step.Started);
             return;
         }
         
@@ -236,7 +236,7 @@ public class Text
         
         this.data.Insert(data, i);
         this.data.Insert(newline, i);
-        updateStep(step.Index - data.Length - 1, UnityType.Line);
+        updateStep(step.Index - data.Length - 1, UnityType.Line, step.Started);
     }
 
     public void AppendNewline()
@@ -322,7 +322,7 @@ public class Text
         {
             case UnityType.All:
                 this.pointerStack.Pop();
-                addStep(-1, UnityType.All);
+                addStep(-1, UnityType.All, true);
                 return true;
             
             case UnityType.Line:
@@ -349,7 +349,7 @@ public class Text
     {
         var step = this.pointerStack.Peek();
         removeUnity();
-        updateStep(step.Index - 1, step.Type);
+        updateStep(step.Index - 1, step.Type, step.Started);
     }
 
     public object[] ToSources()
@@ -471,18 +471,18 @@ public class Text
     void addStep(ProcessStep step)
         => pointerStack.Push(step);
     
-    void addStep(int index, UnityType type)
-        => pointerStack.Push(new(index, type));
+    void addStep(int index, UnityType type, bool started)
+        => pointerStack.Push(new(index, type, started));
 
     ProcessStep popStep() => 
         pointerStack.Count == 0 ? 
             null : 
             pointerStack.Pop();
 
-    void updateStep(int index, UnityType type)
+    void updateStep(int index, UnityType type, bool started)
     {
         popStep();
-        addStep(index, type);
+        addStep(index, type, started);
     }
 
     int getStartLineIndex(ProcessStep step)
@@ -512,6 +512,11 @@ public class Text
     bool goToNextLine()
     {
         var step = pointerStack.Peek();
+        if (!step.Started)
+        {
+            updateStep(step.Index, step.Type, true);
+            return true;
+        }
 
         var end = getEndLineIndex(step);
         if (end + 1 >= this.data.Count)
@@ -520,7 +525,7 @@ public class Text
             return false;
         }
         
-        updateStep(end + 1, UnityType.Line);
+        updateStep(end + 1, UnityType.Line, true);
         return true;
     }
 
@@ -529,8 +534,8 @@ public class Text
         var crr = popStep();
         var parent = popStep();
 
-        addStep(parent.Index, parent.Type);
-        addStep(crr.Index, crr.Type);
+        addStep(parent.Index, parent.Type, parent.Started);
+        addStep(crr.Index, crr.Type, crr.Started);
 
         if (parent is null || parent.Type == UnityType.All)
             return nextCharacter();
@@ -545,6 +550,12 @@ public class Text
     {
         var step = pointerStack.Peek();
         int index = step.Index;
+
+        if (!step.Started)
+        {
+            updateStep(index, UnityType.Character, true);
+            return true;
+        }
         
         index++;
         if (index >= data.Count)
@@ -553,7 +564,7 @@ public class Text
             return false;
         }
         
-        updateStep(index, UnityType.Character);
+        updateStep(index, UnityType.Character, true);
         return true;
     }
 
@@ -561,6 +572,12 @@ public class Text
     {
         var step = pointerStack.Peek();
         int index = step.Index;
+
+        if (!step.Started)
+        {
+            updateStep(step.Index, step.Type, true);
+            return true;
+        }
 
         if (index >= this.data.Count)
         {
@@ -581,7 +598,7 @@ public class Text
             return false;
         }
 
-        updateStep(index, UnityType.Character);
+        updateStep(index, UnityType.Character, true);
         return true;
     }
 
@@ -670,7 +687,7 @@ public class Text
             int index = step.Index;
             this.data.Remove(index, 1);
             int newIndex = index - 1;
-            updateStep(newIndex, UnityType.Character);
+            updateStep(newIndex, UnityType.Character, step.Started);
             return;
         }
     }
@@ -691,5 +708,5 @@ public class Text
         => text?.ToString() ?? string.Empty;
 
     record Data(char Character = '\0', Token Token = null, int Line = -1);
-    record ProcessStep(int Index, UnityType Type);
+    record ProcessStep(int Index, UnityType Type, bool Started = false);
 }
