@@ -1,6 +1,7 @@
 ﻿using Orkestra;
 using Orkestra.Projects;
 using Orkestra.LineInterfaces;
+using Orkestra.Processings;
 
 CLI.Run(args);
 
@@ -71,8 +72,26 @@ public class BruteForceCompiler : Compiler
         definition, inclusion, checking, cond, condinclusion,
         test, tests, import, item, itens, program, fortype;
     
+    Processing defaultProcessing;
+    
     public BruteForceCompiler()
     {
+        defaultProcessing = Processing.FromFunction(text =>
+        {
+            text.ProcessLines();
+            while (text.Next())
+            {
+                text.ProcessCharacters();
+                while (text.Next())
+                {
+                    if (text.Is("//"))
+                        text.Discard();
+                }
+            }
+
+            return text;
+        });
+        
         op = one(SUM, MUL, SUB, DIV, POW, MOD);
 
         exp = rule(exp => [

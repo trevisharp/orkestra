@@ -4,6 +4,7 @@ define even as subset of nat
 if n % 2 is 0 then
     even contains n
 
+// um código bem bonito
 define odd as subset of nat
 if n % 2 is 1 then
     odd contains n
