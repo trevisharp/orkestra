@@ -277,6 +277,9 @@ public class Text
         Append(baseKey);
     }
 
+    /// <summary>
+    /// Discard the following unities from final result.
+    /// </summary>
     public void Discard()
     {
         var step = popStep();
@@ -313,7 +316,8 @@ public class Text
         throw new Exception("Inconsistence in stack pointers.");
     }
 
-    public bool Next2()
+    //TODO: Update to new API; Improve code quality
+    public bool Continue()
     {
         var step = this.pointerStack.Peek();
 
@@ -344,6 +348,7 @@ public class Text
         }
     }
 
+    //TODO: Update to new API; Improve code quality
     public void Skip()
     {
         var step = this.pointerStack.Peek();
