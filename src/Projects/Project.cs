@@ -98,12 +98,22 @@ public class Project<T>
         {
             Parallel.ForEachAsync(compilationPairs, async (tuple, tk) =>
             {
-                (var file, var compiler) = tuple;
-                var tree = await compiler.Compile(file, args);
-                var result = new CompilerOutput(
-                    file, compiler, tree
-                );
-                queue.Enqueue(result);
+                try
+                {
+                    (var file, var compiler) = tuple;
+                    var tree = await compiler.Compile(file, args);
+                    var result = new CompilerOutput(
+                        file, compiler, tree
+                    );
+                    queue.Enqueue(result);
+                }
+                catch (Exception ex)
+                {
+                    Verbose.Error($"Internal error in {tuple.file} compilation!");
+                    Verbose.StartGroup();
+                        Verbose.Error(ex.Message);
+                    Verbose.EndGroup();
+                }
             }).Wait();
         }
         catch (AggregateException ex)

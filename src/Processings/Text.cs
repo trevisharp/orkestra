@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    01/07/2023
+ * Date:    25/06/2024
  */
 using System;
 using System.IO;
@@ -17,167 +17,13 @@ using System.Threading.Tasks;
 /// </summary>
 public class Text
 {
-    private struct ProcessStep
-    {
-        public int Index { get; set; }
-        public UnityType Type { get; set; }
-    }
-
-    private struct Data
-    {
-        public char Character { get; set; }
-        public Token Token { get; set; }
-    }
-
-    private readonly Data newline = new Data()
-    {
-        Character = '\n',
-        Token = null
-    };
-
-    private readonly Data tab = new Data()
-    {
-        Character = '\t',
-        Token = null
-    };
-
+    readonly Data tab = new('\t', null);
+    readonly Data newline = new('\n', null);
     private string sourceFile;
-    public string SourceFile => sourceFile;
-    
-    private Stack<ProcessStep> pointerStack;
     private FastList<Data> source;
+    private Stack<ProcessStep> pointerStack;
 
-    private Text(string source, string file)
-    {
-        this.sourceFile = file;
-        var newlineReplacedSource = source
-            .Replace("\r\n", "\n") // For Windows
-            .Replace("\r", "\n");  // For MAC version < X
-        initFastList(newlineReplacedSource);
-        this.pointerStack = new Stack<ProcessStep>();
-        addStep(0, UnityType.All);
-    }
-
-    private int getStartLineIndex(ProcessStep step)
-    {
-        int i = step.Index - 1;
-        while (i >= 0 && this.source[i].Character != '\n')
-            i--;
-        
-        if (i == 0)
-            return 0;
-        
-        return i + 1;
-    }
-
-    private int getEndLineIndex(ProcessStep step)
-    {
-        int i = step.Index;
-        while (i < this.source.Count && this.source[i].Character != '\n')
-            i++;
-        
-        if (i == this.source.Count)
-            i--;
-        
-        return i;
-    }
-
-    private void initFastList(string text)
-    {
-        this.source = new FastList<Data>();
-
-        char[] characters = text.ToCharArray();
-        Data[] data = new Data[characters.Length];
-        for (int i = 0; i < data.Length; i++)
-            data[i] = new Data()
-            {
-                Character = characters[i],
-                Token = null
-            };
-        
-        this.source.AddRange(data);
-    }
-    
-    private void addStep(int index, UnityType type)
-    {
-        this.pointerStack.Push(new ProcessStep
-        {
-            Index = index,
-            Type = type,
-        });
-    }
-
-    private void updateStep(int index, UnityType type)
-    {
-        var step = this.pointerStack.Pop();
-        step.Index = index;
-        step.Type = type;
-        this.pointerStack.Push(step);
-    }
-
-    private void appendAll(Data data)
-    {
-        this.source.Add(data);
-    }
-
-    private void appendLine(Data data)
-    {
-        var step = this.pointerStack.Peek();
-        int end = getEndLineIndex(step);
-        if (this.source[end].Character == '\n')
-            this.source.Insert(data, end);
-        else this.source.Insert(data, end + 1);
-    }
-
-    private void appendCharacter(Data data)
-    {
-        var step = this.pointerStack.Peek();
-        this.source.Insert(data, step.Index + 1);
-    }
-
-    private void append(Data data)
-    {
-        var step = this.pointerStack.Peek();
-        var type = step.Type;
-
-        if (type == UnityType.All)
-            appendAll(data);
-        else if (type == UnityType.Line)
-            appendLine(data);
-        else if (type == UnityType.Character)
-            appendCharacter(data);
-    }
-
-    private void prependAll(Data data)
-    {
-        this.source.Insert(data, 0);
-    }
-
-    private void prependLine(Data data)
-    {
-        var step = this.pointerStack.Peek();
-        int index = getStartLineIndex(step);
-        this.source.Insert(data, index);
-    }
-
-    private void prependCharacter(Data data)
-    {
-        var step = this.pointerStack.Peek();
-        this.source.Insert(data, step.Index - 1);
-    }
-
-    private void prepend(Data data)
-    {
-        var step = this.pointerStack.Peek();
-        var type = step.Type;
-
-        if (type == UnityType.All)
-            prependAll(data);
-        else if (type == UnityType.Line)
-            prependLine(data);
-        else if (type == UnityType.Character)
-            prependCharacter(data);
-    }
+    public string SourceFile => sourceFile;
 
     public bool NextLine()
     {
@@ -301,11 +147,7 @@ public class Text
 
     public void Append(Token token)
     {
-        var data = new Data()
-        {
-            Character = '\0',
-            Token = token
-        };
+        var data = new Data('\0', token);
         append(data);
     }
 
@@ -323,11 +165,7 @@ public class Text
         var data = new Data[str.Length];
         int n = 0;
         foreach (var c in str)
-            data[n] = new Data()
-            {
-                Character = c,
-                Token = null
-            };
+            data[n] = new Data(c, null);
 
         if (type == UnityType.All)
         {
@@ -357,11 +195,7 @@ public class Text
 
     public void Prepend(Token token)
     {
-        var data = new Data()
-        {
-            Character = '\0',
-            Token = token
-        };
+        var data = new Data('\0', token);
         prepend(data);
     }
 
@@ -379,11 +213,7 @@ public class Text
         var data = new Data[str.Length];
         int n = 0;
         foreach (var c in str)
-            data[n] = new Data()
-            {
-                Character = c,
-                Token = null
-            };
+            data[n] = new Data(c, null);
 
         if (type == UnityType.All)
         {
@@ -425,34 +255,8 @@ public class Text
 
     public void PrependTab()
         => prepend(tab);
-
-    private void removeUnity()
-    {
-        var step = this.pointerStack.Peek();
-
-        if (step.Type == UnityType.All)
-        {
-            this.source.Clear();
-            return;
-        }
-
-        if (step.Type == UnityType.Line)
-        {
-            int start = getStartLineIndex(step);
-            int end = getStartLineIndex(step);
-            this.source.Remove(start, end - start + 1);
-            return;
-        }
-
-        if (step.Type == UnityType.Character)
-        {
-            int index = step.Index;
-            this.source.Remove(index, 1);
-            int newIndex = index - 1;
-            updateStep(newIndex, UnityType.Character);
-            return;
-        }
-    }
+    
+    
 
     public void Replace(string str)
     {
@@ -641,6 +445,156 @@ public class Text
         return "";
     }
 
+    private Text(string source, string file)
+    {
+        this.sourceFile = file;
+        var newlineReplacedSource = source
+            .Replace("\r\n", "\n") // For Windows
+            .Replace("\r", "\n");  // For MAC version < X
+        initFastList(newlineReplacedSource);
+        this.pointerStack = new Stack<ProcessStep>();
+        addStep(0, UnityType.All);
+    }
+
+    private int getStartLineIndex(ProcessStep step)
+    {
+        int i = step.Index - 1;
+        while (i >= 0 && this.source[i].Character != '\n')
+            i--;
+        
+        if (i == 0)
+            return 0;
+        
+        return i + 1;
+    }
+
+    private int getEndLineIndex(ProcessStep step)
+    {
+        int i = step.Index;
+        while (i < this.source.Count && this.source[i].Character != '\n')
+            i++;
+        
+        if (i == this.source.Count)
+            i--;
+        
+        return i;
+    }
+
+    private void initFastList(string text)
+    {
+        this.source = new FastList<Data>();
+
+        char[] characters = text.ToCharArray();
+        Data[] data = new Data[characters.Length];
+        for (int i = 0; i < data.Length; i++)
+            data[i] = new Data(characters[i], null);
+        
+        this.source.AddRange(data);
+    }
+    
+    private void addStep(int index, UnityType type)
+    {
+        this.pointerStack.Push(new ProcessStep(index, type));
+    }
+
+    private void updateStep(int index, UnityType type)
+    {
+        var step = this.pointerStack.Pop();
+        this.pointerStack.Push(new ProcessStep(index, type));
+    }
+
+    private void appendAll(Data data)
+    {
+        this.source.Add(data);
+    }
+
+    private void appendLine(Data data)
+    {
+        var step = this.pointerStack.Peek();
+        int end = getEndLineIndex(step);
+        if (this.source[end].Character == '\n')
+            this.source.Insert(data, end);
+        else this.source.Insert(data, end + 1);
+    }
+
+    private void appendCharacter(Data data)
+    {
+        var step = this.pointerStack.Peek();
+        this.source.Insert(data, step.Index + 1);
+    }
+
+    private void append(Data data)
+    {
+        var step = this.pointerStack.Peek();
+        var type = step.Type;
+
+        if (type == UnityType.All)
+            appendAll(data);
+        else if (type == UnityType.Line)
+            appendLine(data);
+        else if (type == UnityType.Character)
+            appendCharacter(data);
+    }
+
+    private void prependAll(Data data)
+    {
+        this.source.Insert(data, 0);
+    }
+
+    private void prependLine(Data data)
+    {
+        var step = this.pointerStack.Peek();
+        int index = getStartLineIndex(step);
+        this.source.Insert(data, index);
+    }
+
+    private void prependCharacter(Data data)
+    {
+        var step = this.pointerStack.Peek();
+        this.source.Insert(data, step.Index - 1);
+    }
+
+    private void prepend(Data data)
+    {
+        var step = this.pointerStack.Peek();
+        var type = step.Type;
+
+        if (type == UnityType.All)
+            prependAll(data);
+        else if (type == UnityType.Line)
+            prependLine(data);
+        else if (type == UnityType.Character)
+            prependCharacter(data);
+    }
+
+    private void removeUnity()
+    {
+        var step = this.pointerStack.Peek();
+
+        if (step.Type == UnityType.All)
+        {
+            this.source.Clear();
+            return;
+        }
+
+        if (step.Type == UnityType.Line)
+        {
+            int start = getStartLineIndex(step);
+            int end = getStartLineIndex(step);
+            this.source.Remove(start, end - start + 1);
+            return;
+        }
+
+        if (step.Type == UnityType.Character)
+        {
+            int index = step.Index;
+            this.source.Remove(index, 1);
+            int newIndex = index - 1;
+            updateStep(newIndex, UnityType.Character);
+            return;
+        }
+    }
+
     public static async Task<Text> FromFile(string path)
     {
         StreamReader reader = new StreamReader(path);
@@ -653,4 +607,7 @@ public class Text
 
     public static implicit operator string(Text text)
         => text?.ToString() ?? string.Empty;
+
+    record Data(char Character, Token Token);
+    record ProcessStep(int Index, UnityType Type);
 }
