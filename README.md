@@ -27,6 +27,10 @@ Coming soon.
 
 # Versions
 
+### Orkestra v0.4.0 (Coming soon)
+
+ - ![](https://img.shields.io/badge/updated-blue) Consider processings in extension generation.
+
 ### Orkestra v0.3.0 (Coming soon)
 
  - ![](https://img.shields.io/badge/new-green) Added default VSCode extension generation code with smart highligthing.
@@ -51,6 +55,4 @@ Coming soon.
 # Next Features
 
 - Syntactic tree analyzes system.
-- Battery Tests resulting on several bug fixex.
 - Default Apply of the Cache System.
-- Improvements on default VSCode extension contributes.
