@@ -32,6 +32,7 @@ public class VSCodeExtension : Extension
         {
             Add(new LanguageContribute(lang));
             Add(new GrammarContribute(lang));
+            Add(new SnippetContribute(lang));
         }
     }
 
