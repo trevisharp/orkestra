@@ -27,21 +27,12 @@ public class SnippetContribute(LanguageInfo info) : VSCodeContribute
         await sw.WriteAsync(
             $$"""
             {
-                "Print to console": {
-                    "prefix": "print",
+                "Define": {
+                    "prefix": "define",
                     "body": [
-                    "print($1);"
+                        "define ${1:setname} as ${2:subset of nat}",
                     ],
-                    "description": "Insere um comando de impressão no console."
-                },
-                "Loop for": {
-                    "prefix": "for",
-                    "body": [
-                    "for (int i = 0; i < ${1:count}; i++) {",
-                    "\t$2",
-                    "}"
-                    ],
-                    "description": "Estrutura de loop for."
+                    "description": "Define Snippet."
                 }
             }
             """

@@ -30,6 +30,7 @@ Coming soon.
 ### Orkestra v1.0.0 (Coming soon)
 
  - ![](https://img.shields.io/badge/new-green) Added Tree consumer system.
+ - ![](https://img.shields.io/badge/new-green) Add Smart Error detection in extension generation.
  
 ### Orkestra v0.5.0 (Coming soon)
  - ![](https://img.shields.io/badge/updated-blue) InstallExtension will not generate .vsix by default.
@@ -41,7 +42,6 @@ Coming soon.
 ### Orkestra v0.4.0 (Coming soon)
 
  - ![](https://img.shields.io/badge/new-green) Add Smart Autocomplete in extension generation.
- - ![](https://img.shields.io/badge/new-green) Add Smart Error detection in extension generation.
  - ![](https://img.shields.io/badge/new-green) Add Smart Snipets in extension generation.
 
 ### Orkestra v0.3.0 (Not yet published)

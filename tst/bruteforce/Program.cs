@@ -72,7 +72,7 @@ public class BruteForceCompiler : Compiler
         definition, inclusion, checking, cond, condinclusion,
         test, tests, import, item, itens, program, fortype;
     
-    Processing lineComment = Processing.LineComment("//");
+    Processing lineComment = Processing.LineComment("::");
     
     public BruteForceCompiler()
     {
