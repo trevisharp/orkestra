@@ -80,15 +80,12 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
 
         var start = info.Rules
             .FirstOrDefault(rule => rule.IsStartRule);
-        (var brothers, var others) = getContextInfo(start, groupKeys);
+        (var brothers, var headers, var others) = getContextInfo(start, groupKeys);
 
-        if (brothers.Count > 0)
-        {
-            keywords = string.Join('|',
-                from key in brothers[0].list
-                select key.Expression
-            );
-        }
+        keywords = string.Join('|',
+            from key in headers
+            select key.Expression
+        );
 
         if (others.Count > 0)
         {
@@ -97,66 +94,66 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
                 select key.Expression
             );
         }
-
-        var extraContextBrothers = brothers[1..];
-        if (extraContextBrothers.Count == 0)
+        
+        if (brothers.Count == 0)
         {
             await write();
             return;
         }
 
-        var problabyTypes = extraContextBrothers
-            .MaxBy(brothers => brothers.list.Count);
+        var problabyTypes = brothers
+            .MaxBy(brothers => brothers.Count);
         definitions = string.Join('|',
-            from key in problabyTypes.list
+            from key in problabyTypes
             select key.Expression
         );
 
-        extraContextBrothers = extraContextBrothers
+        brothers = brothers
             .Where(brothers => brothers != problabyTypes)
             .ToList();
-        if (extraContextBrothers.Count == 0)
+        if (brothers.Count == 0)
         {
             await write();
             return;
         }
         
-        var problabyControl = extraContextBrothers
-            .FirstOrDefault(brothers => brothers.list
-                .Count(key => 
+        var problabyControl = brothers
+            .FirstOrDefault(brothers => brothers
+                .Any(key =>
                     key.Expression.Contains("for") ||
                     key.Expression.Contains("while") ||
                     key.Expression.Contains("if")
-                ) > 0
+                )
             );
-        if (problabyControl.list is not null)
+        if (problabyControl is not null)
         {
             controls = string.Join('|',
-                from key in problabyTypes.list
+                from key in problabyTypes
                 select key.Expression
             );
         }
 
-        extraContextBrothers = extraContextBrothers
+        brothers = brothers
             .Where(brothers => brothers != problabyControl)
             .ToList();
-        if (extraContextBrothers.Count == 0)
+        if (brothers.Count == 0)
         {
             await write();
             return;
         }
 
-        while (extraContextBrothers.Count > 0)
+        int groupId = 1;
+        while (brothers.Count > 0)
         {
-            var bgroup = extraContextBrothers[0];
-            extraContextBrothers.RemoveAt(0);
+            var bgroup = brothers[0];
+            brothers.RemoveAt(0);
 
-            switch (bgroup.type)
+            switch (groupId % 3)
             {
                 case 0:
                     keywords += (keywords.Length == 0 ? "" : "|") + 
                         string.Join('|',
-                            from key in bgroup.list
+                            from key in bgroup
                             select key.Expression
                         );
                     break;
@@ -164,7 +161,7 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
                 case 1:
                     operations += (operations.Length == 0 ? "" : "|") + 
                         string.Join('|',
-                            from key in bgroup.list
+                            from key in bgroup
                             select key.Expression
                         );
                     break;
@@ -172,11 +169,12 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
                 case 2:
                     controls += (controls.Length == 0 ? "" : "|") + 
                         string.Join('|',
-                            from key in bgroup.list
+                            from key in bgroup
                             select key.Expression
                         );
                     break;
             }
+            groupId++;
         }
 
         await write();
@@ -190,9 +188,9 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
                     "name": "{{info.Name}}",
                     "patterns": [
                         { "include": "#keywords" },
+                        { "include": "#entitys" },
                         { "include": "#constants" },
-                        { "include": "#variables" },
-                        { "include": "#entitys" }
+                        { "include": "#variables" }
                     ],
                     "repository": {
                         "keywords": {
@@ -248,13 +246,16 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
         }
     }
 
-    (List<(List<Key> list, int type)> brothers, List<Key> others) getContextInfo(Rule start, List<Key> allKeys)
+    (List<List<Key>> brothers, List<Key> headers, List<Key> others) getContextInfo(Rule start, List<Key> allKeys)
     {
-        var brothers = new List<(List<Key> list, int type)>();
+        var brothers = new List<List<Key>>();
+        var headers = new List<Key>();
         var others = new List<Key>();
 
         var queue = new Queue<Rule>();
+        var headerQueue = new Queue<bool>();
         queue.Enqueue(start);
+        headerQueue.Enqueue(true);
 
         var set = new HashSet<Rule>();
         var keySet = new HashSet<Key>();
@@ -262,6 +263,7 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
         while (queue.Count > 0)
         {
             var rule = queue.Dequeue();
+            var canHeader = headerQueue.Dequeue();
 
             if (set.Contains(rule))
                 continue;
@@ -269,39 +271,48 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
 
             var tokens = rule.SubRules
                 .SelectMany(r => r.RuleTokens);
-            
-            int operationIndex = rule.SubRules
-                .Count(r => r.RuleTokens.Skip(1).FirstOrDefault() is Key);
-            int controlIndex = rule.SubRules
-                .Count(r => r.RuleTokens.FirstOrDefault() is Key);
-            int otherIndex = rule.SubRules.Count() - operationIndex - controlIndex;
-            int max = int.Max(otherIndex, int.Max(operationIndex, controlIndex));
-            int type = 0;
-            if (operationIndex == max)
-                type = 1;
-            if (controlIndex == max)
-                type = 2;
 
             List<Key> keys = [];
+            List<Rule> rules = [];
             foreach (var token in tokens)
             {
-                switch (token)
+                if (token is Key k)
                 {
-                    case Key k:
-                        if (keySet.Contains(k))
-                            continue;
-                        if (!allKeys.Contains(k))
-                            continue;
-                        keySet.Add(k);
-                        keys.Add(k);
-                        break;
+                    if (keySet.Contains(k))
+                        continue;
                     
-                    case Rule r:
-                        queue.Enqueue(r);
-                        break;
+                    if (!allKeys.Contains(k))
+                        continue;
+                    
+                    keySet.Add(k);
+
+                    if (canHeader)
+                    {
+                        headers.Add(k);
+                        canHeader = false;
+                        continue;
+                    }
+                    
+                    keys.Add(k);
+                    continue;
                 }
+
+                if (token is Rule r)
+                    rules.Add(r);
             }
-            brothers.Add((keys, type));            
+
+            foreach (var r in rules)
+            {
+                queue.Enqueue(r);
+                headerQueue.Enqueue(canHeader);
+            }
+
+            if (keys.Count < 2)
+            {
+                others.AddRange(keys);
+                continue;
+            }
+            brothers.Add(keys);            
         }
 
         foreach (var key in allKeys)
@@ -312,6 +323,6 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
             others.Add(key);
         }
 
-        return (brothers, others);
+        return (brothers, headers, others);
     }
 }

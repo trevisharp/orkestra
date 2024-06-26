@@ -65,7 +65,7 @@ public class BruteForceCompiler : Compiler
     Key CONSIDERING = "considering";
     Key GIVEN = "given";
     
-    Key NUMBER = "-?[0-9][0-9\\.]*";
+    Key NUMBER = "-?[0-9][0-9\\\\.]*";
     Key ID = identity("[a-z]+");
 
     Rule baseset, set, op, exp, exps, value, given, boolean,
