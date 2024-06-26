@@ -90,6 +90,7 @@ public class BruteForceCompiler : Compiler
         set = rule(set => [
             [ baseset ],
             [ SUBSET, OF, set ],
+            [ OPENPAR, set, COMMA, set, CLOSEPAR ],
             [ ID ]
         ]);
 
