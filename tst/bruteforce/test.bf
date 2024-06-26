@@ -13,14 +13,11 @@ csk contains (n, 0, n)
 
 given k in nat
 given m in nat
-given y in nat
-if csk contains (n, k, m) and cs contains (m, y) then
-    csk contains (n, k + 1, y)
-
-define collatz as subset of nat
-if csk contains (n, k, 1) then
-    collatz contains n
+given z in nat
+if csk contains (n, k, m) and cs contains (m, z) then
+    csk contains (n, k + 1, z)
 
 check if
     for all x in nat
-    collatz contains x
+    for some y in nat
+    csk contains (x, y, 1)
