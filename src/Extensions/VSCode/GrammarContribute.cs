@@ -42,7 +42,7 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
         string nums = "";
         string ids = "";
 
-        var others = new List<Key>();
+        var groupKeys = new List<Key>();
 
         string append(string regex, string exp)
         {
@@ -70,7 +70,7 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
             if (!key.Expression.All(c => c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z'))
                 continue;
 
-            others.Add(key);
+            groupKeys.Add(key);
         }
 
         string keywords = "";
@@ -80,111 +80,238 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
 
         var start = info.Rules
             .FirstOrDefault(rule => rule.IsStartRule);
-        var complexity = getComplexities(start);
+        (var brothers, var others) = getContextInfo(start, groupKeys);
 
-        foreach (var pair in complexity)
+        if (brothers.Count > 0)
         {
-            System.Console.WriteLine(pair.Key.Expression);
-            System.Console.WriteLine(pair.Value);
-            System.Console.WriteLine();
+            keywords = string.Join('|',
+                from key in brothers[0].list
+                select key.Expression
+            );
         }
 
-        // TODO: define groups
+        if (others.Count > 0)
+        {
+            keywords += '|' + string.Join('|',
+                from key in others
+                select key.Expression
+            );
+        }
 
-        // https://macromates.com/manual/en/language_grammars
-        await sw.WriteAsync(
-            $$"""
-            {
-                "$schema": "{{schema}}",
-                "name": "{{info.Name}}",
-                "patterns": [
-                    { "include": "#keywords" },
-                    { "include": "#constants" },
-                    { "include": "#variables" },
-                    { "include": "#entitys" }
-                ],
-                "repository": {
-                    "keywords": {
-                        "patterns": [
-                            {
-                                "name": "keyword.{{info.Name}}",
-                                "match": "\\b({{keywords}})\\b"
-                            },
-                            {
-                                "name": "keyword.control.{{info.Name}}",
-                                "match": "\\b({{controls}})\\b"
-                            }
-                        ]
-                    },
+        var extraContextBrothers = brothers[1..];
+        if (extraContextBrothers.Count == 0)
+        {
+            await write();
+            return;
+        }
 
-                    "entitys": {
-                        "patterns": [
-                            {
-                                "name": "entity.name.function.{{info.Name}}",
-                                "match": "\\b({{operations}})\\b"
-                            },
-                            {
-                                "name": "entity.name.class.{{info.Name}}",
-                                "match": "\\b({{definitions}})\\b"
-                            }
-                        ]
-                    },
-
-                    "constants": {
-                        "patterns": [
-                            {
-                                "name": "constant.numeric.{{info.Name}}",
-                                "match": "\\b({{nums}})\\b"
-                            }
-                        ]
-                    },
-
-                    "variables": {
-                        "patterns": [
-                            {
-                                "name": "variable.parameter.{{info.Name}}",
-                                "match": "\\b({{ids}})\\b"
-                            }
-                        ]
-                    }
-                },
-                "scopeName": "source{{info.Extension}}"
-            }
-            """
+        var problabyTypes = extraContextBrothers
+            .MaxBy(brothers => brothers.list.Count);
+        definitions = string.Join('|',
+            from key in problabyTypes.list
+            select key.Expression
         );
 
-        sw.Close();
+        extraContextBrothers = extraContextBrothers
+            .Where(brothers => brothers != problabyTypes)
+            .ToList();
+        if (extraContextBrothers.Count == 0)
+        {
+            await write();
+            return;
+        }
+        
+        var problabyControl = extraContextBrothers
+            .FirstOrDefault(brothers => brothers.list
+                .Count(key => 
+                    key.Expression.Contains("for") ||
+                    key.Expression.Contains("while") ||
+                    key.Expression.Contains("if")
+                ) > 0
+            );
+        if (problabyControl.list is not null)
+        {
+            controls = string.Join('|',
+                from key in problabyTypes.list
+                select key.Expression
+            );
+        }
+
+        extraContextBrothers = extraContextBrothers
+            .Where(brothers => brothers != problabyControl)
+            .ToList();
+        if (extraContextBrothers.Count == 0)
+        {
+            await write();
+            return;
+        }
+
+        while (extraContextBrothers.Count > 0)
+        {
+            var bgroup = extraContextBrothers[0];
+            extraContextBrothers.RemoveAt(0);
+
+            switch (bgroup.type)
+            {
+                case 0:
+                    keywords += (keywords.Length == 0 ? "" : "|") + 
+                        string.Join('|',
+                            from key in bgroup.list
+                            select key.Expression
+                        );
+                    break;
+                    
+                case 1:
+                    operations += (operations.Length == 0 ? "" : "|") + 
+                        string.Join('|',
+                            from key in bgroup.list
+                            select key.Expression
+                        );
+                    break;
+                    
+                case 2:
+                    controls += (controls.Length == 0 ? "" : "|") + 
+                        string.Join('|',
+                            from key in bgroup.list
+                            select key.Expression
+                        );
+                    break;
+            }
+        }
+
+        await write();
+
+        async Task write()
+        {
+            await sw.WriteAsync(
+                $$"""
+                {
+                    "$schema": "{{schema}}",
+                    "name": "{{info.Name}}",
+                    "patterns": [
+                        { "include": "#keywords" },
+                        { "include": "#constants" },
+                        { "include": "#variables" },
+                        { "include": "#entitys" }
+                    ],
+                    "repository": {
+                        "keywords": {
+                            "patterns": [
+                                {
+                                    "name": "keyword.{{info.Name}}",
+                                    "match": "\\b({{keywords}})\\b"
+                                },
+                                {
+                                    "name": "keyword.control.{{info.Name}}",
+                                    "match": "\\b({{controls}})\\b"
+                                }
+                            ]
+                        },
+                        
+                        "entitys": {
+                            "patterns": [
+                                {
+                                    "name": "entity.name.function.{{info.Name}}",
+                                    "match": "\\b({{operations}})\\b"
+                                },
+                                {
+                                    "name": "entity.name.class.{{info.Name}}",
+                                    "match": "\\b({{definitions}})\\b"
+                                }
+                            ]
+                        },
+
+                        "constants": {
+                            "patterns": [
+                                {
+                                    "name": "constant.numeric.{{info.Name}}",
+                                    "match": "\\b({{nums}})\\b"
+                                }
+                            ]
+                        },
+
+                        "variables": {
+                            "patterns": [
+                                {
+                                    "name": "variable.parameter.{{info.Name}}",
+                                    "match": "\\b({{ids}})\\b"
+                                }
+                            ]
+                        }
+                    },
+                    "scopeName": "source{{info.Extension}}"
+                }
+                """
+            );
+
+            sw.Close();
+        }
     }
 
-    Dictionary<Key, int> getComplexities(Rule start)
+    (List<(List<Key> list, int type)> brothers, List<Key> others) getContextInfo(Rule start, List<Key> allKeys)
     {
-        var complexity = new Dictionary<Key, int>();
-        
+        var brothers = new List<(List<Key> list, int type)>();
+        var others = new List<Key>();
+
+        var queue = new Queue<Rule>();
+        queue.Enqueue(start);
+
         var set = new HashSet<Rule>();
-        var queue = new Queue<(Rule rule, int level)>();
-        queue.Enqueue((start, 0));
+        var keySet = new HashSet<Key>();
 
         while (queue.Count > 0)
         {
-            var item = queue.Dequeue();
+            var rule = queue.Dequeue();
 
-            if (set.Contains(item.rule))
+            if (set.Contains(rule))
                 continue;
-            set.Add(item.rule);
+            set.Add(rule);
 
-            foreach (var sb in item.rule.SubRules)
+            var tokens = rule.SubRules
+                .SelectMany(r => r.RuleTokens);
+            
+            int operationIndex = rule.SubRules
+                .Count(r => r.RuleTokens.Skip(1).FirstOrDefault() is Key);
+            int controlIndex = rule.SubRules
+                .Count(r => r.RuleTokens.FirstOrDefault() is Key);
+            int otherIndex = rule.SubRules.Count() - operationIndex - controlIndex;
+            int max = int.Max(otherIndex, int.Max(operationIndex, controlIndex));
+            int type = 0;
+            if (operationIndex == max)
+                type = 1;
+            if (controlIndex == max)
+                type = 2;
+
+            List<Key> keys = [];
+            foreach (var token in tokens)
             {
-                foreach (var tk in sb.RuleTokens)
+                switch (token)
                 {
-                    if (tk is Key key && !complexity.ContainsKey(key))
-                        complexity.Add(key, item.level);
-
-                    if (tk is Rule rule)
-                        queue.Enqueue((rule, item.level + 1));
+                    case Key k:
+                        if (keySet.Contains(k))
+                            continue;
+                        if (!allKeys.Contains(k))
+                            continue;
+                        keySet.Add(k);
+                        keys.Add(k);
+                        break;
+                    
+                    case Rule r:
+                        queue.Enqueue(r);
+                        break;
                 }
             }
+            brothers.Add((keys, type));            
         }
 
-        return complexity;
+        foreach (var key in allKeys)
+        {
+            if (keySet.Contains(key))
+                continue;
+            
+            others.Add(key);
+        }
+
+        return (brothers, others);
     }
 }
