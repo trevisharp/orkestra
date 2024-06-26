@@ -91,6 +91,7 @@ public class BruteForceCompiler : Compiler
             [ baseset ],
             [ SUBSET, OF, set ],
             [ OPENPAR, set, COMMA, set, CLOSEPAR ],
+            [ OPENPAR, set, COMMA, set, COMMA, set, CLOSEPAR ],
             [ ID ]
         ]);
 
