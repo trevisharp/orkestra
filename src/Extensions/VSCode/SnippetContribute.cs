@@ -1,6 +1,10 @@
+/* Author:  Leonardo Trevisan Silio
+ * Date:    27/06/2023
+ */
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Orkestra.Extensions.VSCode;
@@ -25,32 +29,37 @@ public class SnippetContribute(LanguageInfo info) : VSCodeContribute
     public override async Task GenerateFile(string dir)
     {
         var sw = new StreamWriter($"{dir}/{info.Name}-snippets.json");
-
-        foreach (var sb in getFirstSet())
+        
+        bool first = true;
+        foreach (var fst in getFirstSet())
         {
-            Verbose.Warning(sb);
+            var header = fst.RuleTokens.FirstOrDefault() as Key;
+            if (header is null)
+                continue;
+            var headerExp = header.Expression;
+            var normalForm = fst.GetNormalForm();
+
+            await sw.WriteAsync(
+                $$"""
+                {{(first ? "{" : ",")}}
+                    "{{headerExp}}" : {
+                        "prefix": "{{headerExp}}",
+                        "body": [
+                            "{{normalForm}}"
+                        ],
+                        "descrition": "{{headerExp}} snippet."
+                    }
+                """
+            );
+            first = false;
         }
 
-        await sw.WriteAsync(
-            $$"""
-            {
-                "Define": {
-                    "prefix": "define",
-                    "body": [
-                        "define ${1:setname} as ${2:subset of nat}",
-                    ],
-                    "description": "Define Snippet."
-                }
-            }
-            """
-        );
-
+        await sw.WriteAsync("}");
         sw.Close();
     }
 
-    List<SubRule> getFirstSet()
+    IEnumerable<SubRule> getFirstSet()
     {
-        var list = new List<SubRule>();
         var queue = new Queue<SubRule>();
         var hash = new HashSet<SubRule>();
         var parentHash = new HashSet<Rule>();
@@ -78,7 +87,7 @@ public class SnippetContribute(LanguageInfo info) : VSCodeContribute
             if (header is Key key && key.IsKeyword)
             {
                 parentHash.Add(rule.Parent);
-                list.Add(rule);
+                yield return rule;
                 continue;
             }
             
@@ -89,7 +98,5 @@ public class SnippetContribute(LanguageInfo info) : VSCodeContribute
                         queue.Enqueue(sb);
             }
         }
-
-        return list;
     }
 }
