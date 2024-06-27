@@ -44,7 +44,7 @@ public static class SintaxExtension
         }
 
         return rule.SubRules
-            .FirstOrDefault()?
+            .MaxBy(r => r.RuleTokens.Count())?
             .GetNormalForm(ref index)
             ?? string.Empty;
     }
