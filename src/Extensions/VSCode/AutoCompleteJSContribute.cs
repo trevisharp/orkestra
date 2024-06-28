@@ -33,6 +33,7 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
                     const comp = new vscode.CompletionItem('check');
                     comp.insertText = new vscode.SnippetString('check if\n\t${1|for|}');
                     comp.command = { command: 'editor.action.triggerSuggest' }
+                    // comp.commitCharacters = [' '];
 
                     return [
                         comp
