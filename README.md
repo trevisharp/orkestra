@@ -30,19 +30,20 @@ Coming soon.
 ### Orkestra v1.0.0 (Coming soon)
 
  - ![](https://img.shields.io/badge/new-green) Added Tree consumer system.
- - ![](https://img.shields.io/badge/new-green) Add Smart Error detection in extension generation.
+ - ![](https://img.shields.io/badge/new-green) Add Smart Autocomplete in extension generation.
  
 ### Orkestra v0.5.0 (Coming soon)
+
+ - ![](https://img.shields.io/badge/new-blue) Improve key definition using intermediary objects. Now ruleA | ruleB, keyA | keyB is allowed.
+
+### Orkestra v0.4.0 (Not yet published)
+
+ - ![](https://img.shields.io/badge/new-green) Add Smart Snipets in extension generation.
  - ![](https://img.shields.io/badge/updated-blue) InstallExtension will not generate .vsix by default.
  - ![](https://img.shields.io/badge/updated-blue) GenerateExtension will generate .vsix now.
  - ![](https://img.shields.io/badge/new-green) Consider processings in extension generation.
  - ![](https://img.shields.io/badge/updated-blue) Add comments in extension generation.
  - ![](https://img.shields.io/badge/bug%20solved-orange) Bug fixes when create a language with low keywords.
-
-### Orkestra v0.4.0 (Coming soon)
-
- - ![](https://img.shields.io/badge/new-green) Add Smart Autocomplete in extension generation.
- - ![](https://img.shields.io/badge/new-green) Add Smart Snipets in extension generation.
 
 ### Orkestra v0.3.0 (Not yet published)
 
