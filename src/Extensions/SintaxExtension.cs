@@ -1,11 +1,10 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    27/06/2023
+ * Date:    28/06/2023
  */
 using System.Linq;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Text;
 using System.Data;
+using System.Collections.Generic;
 
 namespace Orkestra.Extensions;
 
@@ -21,18 +20,20 @@ public static class SintaxExtension
         if (key.Expression is [ '{' or '}' or '[' or ']' ])
             return key.Expression + newBody;
         
+        if (key.Expression is [ '(' or ')' ])
+            return key.Expression;
+        
         index++;
         return $"${{{index}:{key.Name}}}";
     }
 
-    public static string GetNormalForm(this SubRule rule)
+    public static string GetNormalForm(this Rule rule, ref int index, HashSet<Rule> asoSet = null)
     {
-        int index = 0;
-        return rule.GetNormalForm(ref index);
-    }
+        asoSet ??= [];
+        if (asoSet.Contains(rule))
+            return null;
+        asoSet.Add(rule);
 
-    public static string GetNormalForm(this Rule rule, ref int index)
-    {
         if (rule.SubRules.All(r => r.RuleTokens.Count() == 1))
         {
             var exps = rule.SubRules
@@ -42,14 +43,31 @@ public static class SintaxExtension
             index++;
             return $"${{{index}|{string.Join(',', exps)}|}}";
         }
+        
+        foreach (var subrule in rule.SubRules)
+        {
+            var oldIndex = index;
+            var normalForm = subrule.GetNormalForm(ref index, asoSet);
+            if (normalForm is null)
+            {
+                index = oldIndex;
+                continue;
+            }
+            
+            return normalForm;
+        }
 
-        return rule.SubRules
-            .MaxBy(r => r.RuleTokens.Count())?
-            .GetNormalForm(ref index)
-            ?? string.Empty;
+        index++;
+        return $"${{{index}:{rule.Name.ToLower()}}}";
     }
 
-    public static string GetNormalForm(this SubRule rule, ref int index)
+    public static string GetNormalForm(this SubRule rule)
+    {
+        int index = 0;
+        return rule.GetNormalForm(ref index);
+    }
+
+    public static string GetNormalForm(this SubRule rule, ref int index, HashSet<Rule> asoSet = null)
     {
         var sb = new StringBuilder();
 
@@ -67,7 +85,14 @@ public static class SintaxExtension
 
             if (token is Rule rul)
             {
-                sb.Append(rul.GetNormalForm(ref index));
+                int oldIndex = index;
+                var form = rul.GetNormalForm(ref index, asoSet);
+                if (form is null)
+                {
+                    index = oldIndex;
+                    return null;
+                }
+                sb.Append(form);
                 sb.Append(" ");
                 continue;
             }
@@ -102,5 +127,51 @@ public static class SintaxExtension
         }
 
         return hash.Count;
+    }
+
+    public static  IEnumerable<SubRule> GetFirstSet(this IEnumerable<Rule> rules)
+    {
+        var queue = new Queue<SubRule>();
+        var hash = new HashSet<SubRule>();
+        var parentHash = new HashSet<Rule>();
+
+        var first = rules
+            .FirstOrDefault(r => r.IsStartRule);
+        foreach (var sb in first.SubRules)
+            queue.Enqueue(sb);
+        
+        while (queue.Count > 0)
+        {
+            var rule = queue.Dequeue();
+            if (hash.Contains(rule))
+                continue;
+            hash.Add(rule);
+
+            var header = rule.RuleTokens
+                .FirstOrDefault();
+            if (header is null)
+                continue;
+            
+            if (parentHash.Contains(rule.Parent))
+                continue;
+            
+            if (header is Key key && key.IsKeyword)
+            {
+                parentHash.Add(rule.Parent);
+                yield return rule;
+                continue;
+            }
+            
+            foreach (var token in rule.RuleTokens)
+            {
+                if (token is Rule ruleToken)
+                {  
+                    var subRules = ruleToken.SubRules
+                        .OrderByDescending(r => r.RuleTokens.Count());
+                    foreach (var sb in subRules)
+                        queue.Enqueue(sb);
+                }
+            }
+        }
     }
 }
