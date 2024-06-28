@@ -1,9 +1,10 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    23/06/2023
+ * Date:    28/06/2023
  */
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Threading.Tasks;
@@ -17,7 +18,10 @@ namespace Orkestra.Extensions.VSCode;
 public class VSCodeExtension : Extension
 {
     List<VSCodeContribute> contributes = new();
+    List<JSContribute> jscontributes = new();
     public IEnumerable<VSCodeContribute> Contributes => contributes;
+    public IEnumerable<JSContribute> JSContributes => jscontributes;
+    
     public void Add(VSCodeContribute contribute)
     {
         if (contribute is null)
@@ -26,13 +30,21 @@ public class VSCodeExtension : Extension
         this.contributes.Add(contribute);
     }
 
+    public void Add(JSContribute contribute)
+    {
+        if (contribute is null)
+            return;
+        
+        this.jscontributes.Add(contribute);
+    }
+
     public virtual void LoadDefaultContributes(ExtensionArguments args)
     {
         foreach (var lang in args.Languages)
         {
             Add(new LanguageContribute(lang));
             Add(new GrammarContribute(lang));
-            Add(new SnippetContribute(lang));
+            Add(new AutoCompleteJSContribute(lang));
         }
     }
 
@@ -61,6 +73,7 @@ public class VSCodeExtension : Extension
         deleteFolderIfExists(path);
         Verbose.Info($"Temp directory removed from {path}.", 3);
     }
+    
     public override async Task Install(ExtensionArguments args)
     {
         var finalFile = args.Name + ".vsix";
@@ -197,17 +210,21 @@ public class VSCodeExtension : Extension
         const string file = "extension.js";
         var sw = open(dir, file);
 
+        var js = new StringBuilder();
+
+        foreach (var jscontribute in jscontributes)
+        {
+            js.AppendLine(
+                jscontribute.JSCode.Replace("\n", "\n\t")
+            );
+        }
+
         await sw.WriteAsync(
             $$"""
             const vscode = require('vscode');
 
             function activate(context) {
-                        
-                let disposable = vscode.commands.registerCommand('bruteforce.helloWorld', function () {
-                    vscode.window.showInformationMessage('Hello World from Orkestra!');
-                });
-
-                context.subscriptions.push(disposable);
+            {{js}}
             }
 
             function deactivate() {}
