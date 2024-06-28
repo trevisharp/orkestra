@@ -1,6 +1,7 @@
 /* Author:  Leonardo Trevisan Silio
  * Date:    28/06/2024
  */
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Orkestra;
@@ -8,7 +9,11 @@ namespace Orkestra;
 /// <summary>
 /// A record that represents a set of rules with same name.
 /// </summary>
-public class Rule(string name, bool startRule, params SubRule[] subRules) : ISyntacticElement
+public class Rule(
+    string name = null, 
+    bool startRule = false, 
+    params SubRule[] subRules
+    ) : ISyntacticElement, IEnumerable<SubRule>
 {
     private List<SubRule> subRules = [ ..subRules ];
 
@@ -18,6 +23,12 @@ public class Rule(string name, bool startRule, params SubRule[] subRules) : ISyn
 
     public override string ToString()
         => $"R:{Name ?? "unnamed"}";
+
+    public void Add(SubRule subRule)
+    {
+        this.subRules.Add(subRule);
+        subRule.Parent = this;
+    }
 
     public void AddSubRules(params SubRule[] subRules)
     {
@@ -50,7 +61,12 @@ public class Rule(string name, bool startRule, params SubRule[] subRules) : ISyn
 
     public static Rule CreateStartRule(params SubRule[] subRules)
         => new Rule(null, true, subRules);
-    
+
+    public IEnumerator<SubRule> GetEnumerator()
+        => this.subRules.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator()
+        => this.subRules.GetEnumerator();
+
     public static IntermediaryRuleOption operator |(Rule r1, Rule r2)
         => new IntermediaryRuleOption() | r1 | r2;
 }

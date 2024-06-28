@@ -99,15 +99,15 @@ public class BruteForceCompiler : Compiler
 
         exps = many(exp, COMMA);
 
-        value = rule(
+        value = [
             [ exp ],
             [ OPENPAR, exps, CLOSEPAR ]
-        );
+        ];
 
-        boolean = rule(
+        boolean = [
             [ value, IS, value ],
             [ ID, CONTAINS, value ]
-        );
+        ];
 
         cond = rule(cond => [
             [ boolean ],
@@ -117,29 +117,29 @@ public class BruteForceCompiler : Compiler
             [ OPENPAR, boolean, CLOSEPAR ]
         ]);
 
-        definition = rule(DEFINE, ID, AS, set);
+        definition = [[DEFINE, ID, AS, set]];
 
-        inclusion = rule(
+        inclusion = [
             [ ID, CONTAINS, value ],
             [ ID, CONTAINS, ID ]
-        );
+        ];
 
-        condinclusion = rule(IF, cond, THEN, inclusion);
+        condinclusion = [[IF, cond, THEN, inclusion]];
 
-        given = rule(GIVEN, ID, IN, set);
+        given = [[GIVEN, ID, IN, set]];
 
         fortype = SOME | ALL;
 
-        test = rule(FOR, fortype, ID, IN, set);
+        test = [[FOR, fortype, ID, IN, set]];
         
         tests = many(test);
 
-        checking = rule(
+        checking = [
             [ CHECK, IF, inclusion ],
             [ CHECK, IF, tests, inclusion ]
-        );
+        ];
 
-        import = rule(CONSIDERING, ID);
+        import = [[ CONSIDERING, ID ]];
 
         item = definition | inclusion | condinclusion | given | import;
 

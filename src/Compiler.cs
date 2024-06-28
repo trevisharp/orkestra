@@ -129,27 +129,11 @@ public class Compiler
 
     protected static Key identity(string expression)
         => Key.CreateIdentity(expression);
-
-    protected static Rule rule(params List<ISyntacticElement>[] subRules)
-    {
-        var rule = Rule.CreateRule();
-        rule.AddSubRules(subRules);
-        return rule;
-    }
-
+    
     protected static Rule rule(Func<Rule, List<ISyntacticElement>[]> creator)
     {
         var rule = Rule.CreateRule();
         rule.AddSubRules(creator(rule));
-        return rule;
-    }
-    
-    protected static Rule rule(params ISyntacticElement[] elements)
-    {
-        var rule = Rule.CreateRule();
-        rule.AddSubRules(
-            new SubRule(elements)
-        );
         return rule;
     }
     
@@ -187,13 +171,6 @@ public class Compiler
         );
         return newRule;
     }
-
-    protected static Rule one(params ISyntacticElement[] elements)
-        => Rule.CreateRule(
-            elements
-                .Select(element => new SubRule(element))
-                .ToArray()
-        );
 
     private string getSpecialName()
     {
