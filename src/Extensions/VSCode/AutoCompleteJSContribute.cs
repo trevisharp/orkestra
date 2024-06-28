@@ -1,6 +1,10 @@
 /* Author:  Leonardo Trevisan Silio
  * Date:    28/06/2023
  */
+using System.Linq;
+using System.Text;
+using Microsoft.VisualBasic;
+
 namespace Orkestra.Extensions.VSCode;
 
 /// <summary>
@@ -12,6 +16,15 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
 
     string buildJs()
     {
+        var sb = new StringBuilder();
+        var headers = language.GetHeaders();
+
+        int providerIndex = 0;
+        foreach (var header in headers)
+            process(header, sb, providerIndex++);
+        
+        return sb.ToString();
+
         return 
             """
             const provider = vscode.languages.registerCompletionItemProvider('bruteforce', {
@@ -48,5 +61,24 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
             context.subscriptions.push(provider);
             context.subscriptions.push(provider2);
             """;
+    }
+
+    void process(IGrouping<string, SubRule> group, StringBuilder sb, int index)
+    {
+        sb.AppendLine(
+            $$"""
+            const provider{{index}} = vscode.languages.registerCompletionItemProvider('{{language.Name}}', {
+
+                provideCompletionItems(document, position) {
+
+                    a
+
+                    retrun [];
+                }
+
+            });
+            context.subscriptions.push(provider{{index}});
+            """
+        );
     }
 }

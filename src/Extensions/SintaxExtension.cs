@@ -1,6 +1,7 @@
 /* Author:  Leonardo Trevisan Silio
  * Date:    28/06/2023
  */
+using System;
 using System.Linq;
 using System.Text;
 using System.Data;
@@ -10,6 +11,69 @@ namespace Orkestra.Extensions;
 
 public static class SintaxExtension
 {
+    /// <summary>
+    /// Returns the dictionary of all Subrules of a language that start with a keyword.
+    /// </summary>
+    public static IEnumerable<IGrouping<string, SubRule>> GetHeaders(this LanguageInfo language)
+    {
+        if (language is null)
+            return [];
+        
+        var rules = language.Rules;
+        var keyGroups = 
+            from subRule in rules.SelectMany(r => r)
+            where hasKeywordHeader(subRule)
+            group subRule by subRule.FirstOrDefault().Name;
+        
+        return keyGroups;
+    }
+
+    static bool hasKeywordHeader(SubRule rule)
+    {
+        if (rule?.FirstOrDefault() is not Key key)
+            return false;
+
+        if (!key.IsKeyword)
+            return false;
+        
+        return true;
+    }
+
+    public static IEnumerable<SubRule> OrderedDeepSubRules<T>(this IEnumerable<Rule> rules)
+    {
+        var first = rules.GetFirstRule();
+        if (first is null)
+            yield break;
+
+        var hash = new HashSet<Rule>();
+        var queue = new Queue<Rule>();
+        queue.Enqueue(first);
+        
+        while (queue.Count > 0)
+        {
+            var rule = queue.Dequeue();
+            if (hash.Contains(rule))
+                continue;
+            hash.Add(rule);
+
+            foreach (var subRule in rule)
+                yield return subRule;    
+        }
+    }
+
+    public static Rule GetFirstRule(this IEnumerable<Rule> rules)
+    {
+        foreach (var rule in rules)
+        {
+            if (!rule.IsStartRule)
+                continue;
+            
+            return rule;
+        }
+
+        return null;
+    }
+
     const string newBody = "\",\n\"\\t";
     public static string GetNormalForm(this Key key, ref int index)
     {
@@ -129,7 +193,7 @@ public static class SintaxExtension
         return hash.Count;
     }
 
-    public static  IEnumerable<SubRule> GetFirstSet(this IEnumerable<Rule> rules)
+    public static IEnumerable<SubRule> GetFirstSet(this IEnumerable<Rule> rules)
     {
         var queue = new Queue<SubRule>();
         var hash = new HashSet<SubRule>();
