@@ -13,7 +13,6 @@ function activate(context) {
             
             const comp = new vscode.CompletionItem('check');
             comp.insertText = new vscode.SnippetString('check if\n\t${1|for,sl|}');
-
             
             const comp2 = new vscode.CompletionItem('for');
             comp2.insertText = new vscode.SnippetString('for ${1|all,some|} in ${2:set}!');
@@ -23,7 +22,6 @@ function activate(context) {
             ]
         }
     })
-
     context.subscriptions.push(provider);
 }
 

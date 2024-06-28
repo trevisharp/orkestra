@@ -30,8 +30,11 @@ Coming soon.
 ### Orkestra v1.0.0 (Coming soon)
 
  - ![](https://img.shields.io/badge/new-green) Added Tree consumer system.
+
+### Orkestra v0.6.0 (Coming soon)
+
  - ![](https://img.shields.io/badge/new-green) Add Smart Autocomplete in extension generation.
- 
+
 ### Orkestra v0.5.0 (Not yet published)
 
  - ![](https://img.shields.io/badge/new-blue) Improve key definition using intermediary objects. Now ruleA | ruleB, keyA | keyB is allowed.

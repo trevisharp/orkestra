@@ -1,0 +1,20 @@
+EXPECTED MAP
+op		${1|+,*,-,/,%|}
+exp		$1
+baseset		${1|NAT,REAL,INT,RAT|}
+set		n|NAT,REAL,INT,RAT,SUBSET|
+exps		n
+value		n
+boolean		n
+cond		n
+definition	define n as n|NAT,REAL,INT,RAT,SUBSET|
+inclusion	n contains n
+condinclusion	if n then n contains n
+given		given n in n|NAT,REAL,INT,RAT,SUBSET|
+fortype		n|some,all
+test		for n|some,all n in n|NAT,REAL,INT,RAT,SUBSET|
+tests		n
+checking	check if $3 $1 contains $2
+import		considering $1
+item		n|define,if,given,considering|
+
