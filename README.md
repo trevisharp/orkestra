@@ -32,7 +32,7 @@ Coming soon.
  - ![](https://img.shields.io/badge/new-green) Added Tree consumer system.
  - ![](https://img.shields.io/badge/new-green) Add Smart Autocomplete in extension generation.
  
-### Orkestra v0.5.0 (Coming soon)
+### Orkestra v0.5.0 (Not yet published)
 
  - ![](https://img.shields.io/badge/new-blue) Improve key definition using intermediary objects. Now ruleA | ruleB, keyA | keyB is allowed.
  - ![](https://img.shields.io/badge/new-blue) Improve auto convertion between rules and list expressions.
