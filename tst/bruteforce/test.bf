@@ -1,4 +1,4 @@
-define cs as subset of (nat, nat)
+define cs as subset of (nat, nat) :: Função de Collatz
 
 given n in nat
 
@@ -8,7 +8,7 @@ if n % 2 is 0 then
 if n % 2 is 1 then
     cs contains (n, 3 * n + 1)
 
-define csk as subset of (nat, nat, nat)
+define csk as subset of (nat, nat, nat) :: Função de Collatz aplicado k vezes
 csk contains (n, 0, n)
 
 given k in nat

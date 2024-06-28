@@ -1,10 +1,13 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    21/06/2023
+ * Date:    28/06/2023
  */
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Orkestra.Extensions.VSCode;
+
+using Processings.Implementations;
 
 /// <summary>
 /// A Language Contribute for a VSCode Extension.
@@ -33,11 +36,17 @@ public class LanguageContribute(LanguageInfo info) : VSCodeContribute
     {
         var sw = new StreamWriter($"{dir}/{info.Name}-configuration.json");
 
+        var lineComment = info.Processings
+            .FirstOrDefault(p => p is LineCommentProcessing)
+            as LineCommentProcessing;
+
         await sw.WriteLineAsync(
             $$"""
             {
                 "comments": {
-                    "lineComment": "//"
+                    {{(
+                        lineComment is null ? "" : $"\"lineComment\": \"{lineComment.CommentStarter}\""
+                    )}}
                 }
             }
             """

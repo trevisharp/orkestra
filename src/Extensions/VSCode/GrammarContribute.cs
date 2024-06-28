@@ -8,6 +8,8 @@ using System.Collections.Generic;
 
 namespace Orkestra.Extensions.VSCode;
 
+using Processings.Implementations;
+
 /// <summary>
 /// A Grammar Contribute for a VSCode Extension
 /// </summary>
@@ -38,6 +40,10 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
     {
         const string schema = "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json";
         var sw = new StreamWriter($"{dir}/{info.Name}.tmLanguage.json");
+
+        var lineComment = info.Processings
+            .FirstOrDefault(p => p is LineCommentProcessing)
+            as LineCommentProcessing;
 
         string nums = "";
         string ids = "";
@@ -190,7 +196,10 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
                         { "include": "#keywords" },
                         { "include": "#entitys" },
                         { "include": "#constants" },
-                        { "include": "#variables" }
+                        { "include": "#variables" }{{(
+                            lineComment is null ? string.Empty :
+                            ",\n\t\t{ \"include\": \"#comments\" }"
+                        )}}
                     ],
                     "repository": {
                         "keywords": {
@@ -235,7 +244,21 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
                                     "match": "\\b({{ids}})\\b"
                                 }
                             ]
-                        }
+                        }{{(
+                            lineComment is null ? string.Empty :
+                            $$"""
+                            ,
+
+                                    "comments": {
+                                        "patterns": [
+                                            {
+                                                "name": "comment.line.{{info.Name}}",
+                                                "match": "{{lineComment.CommentStarter}}.*$"
+                                            }
+                                        ]
+                                    }
+                            """
+                        )}}
                     },
                     "scopeName": "source{{info.Extension}}"
                 }

@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    23/06/2024
+ * Date:    28/06/2024
  */
 using System;
 using System.Linq;
@@ -56,14 +56,7 @@ public class Project<T>
         var extension = ExtensionProvider.Provide();
 
         Verbose.Info("Loading language metadata...", 1);
-        var extArgs = new ExtensionArguments
-        {
-            Name = typeof(T).Name.Replace("Project", ""),
-            Arguments = args
-        };
-        
-        foreach (var lang in getLangs())
-            extArgs.Languages.Add(lang);
+        var extArgs = getArgs(args);
 
         try
         {
@@ -88,14 +81,7 @@ public class Project<T>
         var extension = ExtensionProvider.Provide();
 
         Verbose.Info("Loading language metadata...", 1);
-        var extArgs = new ExtensionArguments
-        {
-            Name = typeof(T).Name.Replace("Project", ""),
-            Arguments = args
-        };
-        
-        foreach (var lang in getLangs())
-            extArgs.Languages.Add(lang);
+        var extArgs = getArgs(args);
 
         try
         {
@@ -171,6 +157,20 @@ public class Project<T>
         var results = queue.ToArray();
     }
 
+    private ExtensionArguments getArgs(string[] args)
+    {
+        var extArgs = new ExtensionArguments
+        {
+            Name = typeof(T).Name.Replace("Project", ""),
+            Arguments = args
+        };
+        
+        foreach (var lang in getLangs())
+            extArgs.Languages.Add(lang);
+        
+        return extArgs;
+    }
+
     private IEnumerable<LanguageInfo> getLangs() => 
         from action in actions
         where action.Selector is FileSelector
@@ -181,6 +181,7 @@ public class Project<T>
                 .ToLower(),
             Extension = ((FileSelector)action.Selector).Extension,
             Keys = action.Compiler.Keys,
-            Rules = action.Compiler.Rules
+            Rules = action.Compiler.Rules,
+            Processings = action.Compiler.Processings
         };
 }
