@@ -13,10 +13,12 @@ public class BruteForceCLI : CLI
         BruteForceProject.Compile(args);
     }
 
-    [HelpMessage("Install the BruteForce extension for VSCode.")]
-    void install(params string[] args)
+    [HelpMessage("Manage the BruteForce extension for VSCode.")]
+    void ext(params string[] args)
     {
-        BruteForceProject.InstallExtension(args);
+        if (args is [ "gen" ])
+            BruteForceProject.GenerateExtension(args);
+        else BruteForceProject.InstallExtension(args);
     }
 }
 

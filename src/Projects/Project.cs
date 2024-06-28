@@ -37,6 +37,12 @@ public class Project<T>
         prj.CreateInstallExtension(args);
     }
 
+    public static void GenerateExtension(params string[] args)
+    {
+        var prj = new T();
+        prj.CreateExtension(args);
+    }
+
     public void Add<C>(PathSelector selector)
         where C : Compiler, new()
         => actions.Add(new(
@@ -45,6 +51,38 @@ public class Project<T>
         ));
 
     public void CreateInstallExtension(params string[] args)
+    {
+        Verbose.Info("Generating and installing Extension...");
+        var extension = ExtensionProvider.Provide();
+
+        Verbose.Info("Loading language metadata...", 1);
+        var extArgs = new ExtensionArguments
+        {
+            Name = typeof(T).Name.Replace("Project", ""),
+            Arguments = args
+        };
+        
+        foreach (var lang in getLangs())
+            extArgs.Languages.Add(lang);
+
+        try
+        {
+            extension.Install(extArgs).Wait();
+        }
+        catch (Exception ex)
+        {
+            Verbose.Error("Error in extension generation!");
+            Verbose.Error("Use --verbose 1 or bigger to see details...");
+            Verbose.Error(ex.Message, 1);
+            Verbose.Error(ex.StackTrace, 2);
+        }
+        finally
+        {
+            Verbose.Info("Extension generation process finished!");
+        }
+    }   
+
+    public void CreateExtension(string[] args)
     {
         Verbose.Info("Generating Extension...");
         var extension = ExtensionProvider.Provide();
@@ -61,7 +99,6 @@ public class Project<T>
 
         try
         {
-            Verbose.StartGroup();
             extension.Generate(extArgs).Wait();
         }
         catch (Exception ex)
@@ -73,10 +110,9 @@ public class Project<T>
         }
         finally
         {
-            Verbose.EndGroup();
             Verbose.Info("Extension generation process finished!");
         }
-    }      
+    }   
 
     /// <summary>
     /// Start compile process.

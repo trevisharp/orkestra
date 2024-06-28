@@ -12,4 +12,5 @@ namespace Orkestra.Extensions;
 public abstract class Extension
 {
     public abstract Task Generate(ExtensionArguments args);
+    public abstract Task Install(ExtensionArguments args);
 }
