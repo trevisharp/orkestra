@@ -78,7 +78,7 @@ public class BruteForceCompiler : Compiler
     
     public BruteForceCompiler()
     {
-        op = one(SUM, MUL, SUB, DIV, POW, MOD);
+        op = SUM | MUL | SUB | DIV | MOD;
 
         exp = rule(exp => [
             [ NUMBER ],
@@ -87,7 +87,7 @@ public class BruteForceCompiler : Compiler
             [ ID, op, exp ]
         ]);
 
-        baseset = one(NAT, REAL, RAT, INT);
+        baseset = NAT | REAL | INT | RAT;
 
         set = rule(set => [
             [ baseset ],
@@ -128,7 +128,7 @@ public class BruteForceCompiler : Compiler
 
         given = rule(GIVEN, ID, IN, set);
 
-        fortype = one(SOME, ALL);
+        fortype = SOME | ALL;
 
         test = rule(FOR, fortype, ID, IN, set);
         
@@ -141,10 +141,7 @@ public class BruteForceCompiler : Compiler
 
         import = rule(CONSIDERING, ID);
 
-        item = one(
-            definition, inclusion, 
-            condinclusion, given, import
-        );
+        item = definition | inclusion | condinclusion | given | import;
 
         itens = many(item);
 

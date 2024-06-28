@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    24/06/2024
+ * Date:    28/06/2024
  */
 using System.Linq;
 
@@ -60,4 +60,13 @@ public class Key(
         bool isKeyword = expression.All(char.IsAsciiLetter);
         return new(null, expression, false, false, isKeyword, false);
     }
+
+    public static IntermediaryRuleOption operator |(Key k1, Key k2)
+        => new IntermediaryRuleOption() | k1 | k2;
+
+    public static IntermediaryRuleOption operator |(Rule r, Key k)
+        => new IntermediaryRuleOption() | r | k;
+
+    public static IntermediaryRuleOption operator |(Key k, Rule r)
+        => new IntermediaryRuleOption() | k | r;
 }

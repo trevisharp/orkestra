@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    24/06/2024
+ * Date:    28/06/2024
  */
 using System.Collections.Generic;
 
@@ -50,4 +50,7 @@ public class Rule(string name, bool startRule, params SubRule[] subRules) : ISyn
 
     public static Rule CreateStartRule(params SubRule[] subRules)
         => new Rule(null, true, subRules);
+    
+    public static IntermediaryRuleOption operator |(Rule r1, Rule r2)
+        => new IntermediaryRuleOption() | r1 | r2;
 }
