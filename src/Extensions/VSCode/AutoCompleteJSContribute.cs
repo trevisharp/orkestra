@@ -2,7 +2,9 @@
  * Date:    28/06/2023
  */
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text;
 using Orkestra.SyntacticAnalysis;
@@ -20,10 +22,11 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
     {
         var sb = new StringBuilder();
         var headers = language.GetHeaders();
+        var specials = new HashSet<string>();
 
         int providerIndex = 0;
         foreach (var header in headers)
-            process(header, sb, providerIndex++);
+            process(header, sb, specials, providerIndex++);
         
         return sb.ToString();
 
@@ -66,7 +69,11 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
             """;
     }
 
-    void process(IGrouping<string, SubRule> group, StringBuilder sb, int index)
+    void process(
+        IGrouping<string, SubRule> group,
+        HashSet<string> specials, 
+        StringBuilder sb, 
+        int index)
     {
         Verbose.Success(group.Key);
         Verbose.NewLine();
@@ -80,25 +87,47 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
         Verbose.EndGroup();
         Verbose.NewLine();
 
-        var code = getCode(group, index);
+        var code = getCode(group, specials, index);
         if (code is null)
             return;
         
         sb.AppendLine(code);
     }
 
-    string getCode(IGrouping<string, SubRule> group, int index)
+    string registerCompletionItemProvider(string providerName, string code)
+    {
+        return
+            $$"""
+            const {{providerName}} = vscode.languages.registerCompletionItemProvider('{{language.Name}}', {
+
+                provideCompletionItems(document, position) {
+                
+                    {{code.Replace("\n", "\n\t\t")}}
+
+                }
+            });
+            context.subscriptions.push({{providerName}});
+            """;
+    }
+
+    string getCode(
+        IGrouping<string, SubRule> group, 
+        HashSet<string> specials, 
+        int index)
     {
         if (group.All(g => g.Count() == 1))
-            return getSimpleAutoComplete(group, index);
+            return getSimpleAutoComplete(group, specials, index);
         
         if (group.Count() == 1)
-            return getComplexUnique(group, index);
+            return getComplexUnique(group, specials, index);
 
         return null;
     }
 
-    string getSimpleAutoComplete(IGrouping<string, SubRule> group, int index)
+    string getSimpleAutoComplete(
+        IGrouping<string, SubRule> group, 
+        HashSet<string> specials,
+        int index)
     {
         var subRule = group.FirstOrDefault();
         if (subRule is null)
@@ -108,40 +137,28 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
         if (header is null)
             return string.Empty;
 
-        return registerCompletionItemProvider(index,
+        return registerCompletionItemProvider($"provider{index}",
             $$"""
             const comp = new vscode.CompletionItem('{{header.Expression}}');
-
             return [ comp ];
             """
         );
     }
 
-    string getComplexUnique(IGrouping<string, SubRule> group, int index)
+    string getComplexUnique(
+        IGrouping<string, SubRule> group,
+        HashSet<string> specials,
+        int index)
     {
         var rule = group.FirstOrDefault();
         if (rule is null)
             return string.Empty;
 
-        return
+        return 
+            registerCompletionItemProvider($"provider{index}",
             $$"""
-                
-            """;
-    }
-
-    string registerCompletionItemProvider(int index, string code)
-    {
-        return
-            $$"""
-            const provider{{index}} = vscode.languages.registerCompletionItemProvider('{{language.Name}}', {
-
-                provideCompletionItems(document, position) {
-                
-            {{code.Replace("\n", "\n\t\t")}}
-
-                }
-            });
-            context.subscriptions.push(provider{{index}});
-            """;
+            
+            """
+        );
     }
 }
