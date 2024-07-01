@@ -23,3 +23,4 @@ check if
     csk contains (x, y, 1)
 
 given id in ${2|subset|nat|real|int|rat|} 
+:: https://code.visualstudio.com/docs/editor/userdefinedsnippets
