@@ -26,7 +26,7 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
 
         int providerIndex = 0;
         foreach (var header in headers)
-            process(header, sb, specials, providerIndex++);
+            process(header, specials, sb, providerIndex++);
         
         return sb.ToString();
 
@@ -131,11 +131,11 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
     {
         var subRule = group.FirstOrDefault();
         if (subRule is null)
-            return string.Empty;
+            return null;
         
         var header = subRule.FirstOrDefault() as Key;
         if (header is null)
-            return string.Empty;
+            return null;
 
         return registerCompletionItemProvider($"provider{index}",
             $$"""
@@ -152,13 +152,41 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
     {
         var rule = group.FirstOrDefault();
         if (rule is null)
-            return string.Empty;
+            return null;
+
+        var header = rule.FirstOrDefault() as Key;
+        if (header is null)
+            return null;
+
+        string item = header.Expression;
+        string snippet = header.Expression;
+        int snippetIndex = 0;
+        string extraCode = "";
+        string baseProviderName = $"provider{index}";
+
+        foreach (var element in rule.Skip(1))
+        {
+            snippet += " ";
+            if (element is Key key)
+            {
+                
+                continue;
+            }
+
+            if (element is Rule subRule)
+            {
+                
+                continue;
+            }
+        }
 
         return 
-            registerCompletionItemProvider($"provider{index}",
+            registerCompletionItemProvider(baseProviderName,
             $$"""
-            
+            const comp = new vscode.CompletionItem('${{item}}');
+            comp.insertText = new vscode.SnippetString('${{snippet}}');
+            return [ comp ];
             """
-        );
+        ) + extraCode;
     }
 }
