@@ -21,3 +21,5 @@ check if
     for all x in nat
     for some y in nat
     csk contains (x, y, 1)
+
+given id in ${2|subset|nat|real|int|rat|} 

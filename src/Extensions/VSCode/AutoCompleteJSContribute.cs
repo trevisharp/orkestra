@@ -1,13 +1,10 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    28/06/2023
+ * Date:    01/07/2023
  */
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
 using System.Text;
-using Orkestra.SyntacticAnalysis;
+using System.Collections.Generic;
 
 namespace Orkestra.Extensions.VSCode;
 
@@ -159,34 +156,16 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
             return null;
 
         string item = header.Expression;
-        string snippet = header.Expression;
-        int snippetIndex = 0;
-        string extraCode = "";
+        string snippet = rule.GetVSSnippetForm();
         string baseProviderName = $"provider{index}";
-
-        foreach (var element in rule.Skip(1))
-        {
-            snippet += " ";
-            if (element is Key key)
-            {
-                
-                continue;
-            }
-
-            if (element is Rule subRule)
-            {
-                
-                continue;
-            }
-        }
 
         return 
             registerCompletionItemProvider(baseProviderName,
             $$"""
-            const comp = new vscode.CompletionItem('${{item}}');
-            comp.insertText = new vscode.SnippetString('${{snippet}}');
+            const comp = new vscode.CompletionItem('{{item}}');
+            comp.insertText = new vscode.SnippetString('{{snippet}}');
             return [ comp ];
             """
-        ) + extraCode;
+        );
     }
 }
