@@ -118,7 +118,7 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
         if (group.Count() == 1)
             return getComplexUnique(group, specials, index);
 
-        return null;
+        return getComplexMax(group, specials, index);
     }
 
     string getSimpleAutoComplete(
@@ -157,6 +157,33 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
 
         string item = header.Expression;
         string snippet = rule.GetVSSnippetForm();
+        string baseProviderName = $"provider{index}";
+
+        return 
+            registerCompletionItemProvider(baseProviderName,
+            $$"""
+            const comp = new vscode.CompletionItem('{{item}}');
+            comp.insertText = new vscode.SnippetString('{{snippet}}');
+            return [ comp ];
+            """
+        );
+    }
+
+    string getComplexMax(
+        IGrouping<string, SubRule> group,
+        HashSet<string> specials,
+        int index)
+    {
+        var biggesst = group.MaxBy(g => g.Count());
+        if (biggesst is null)
+            return null;
+
+        var header = biggesst.FirstOrDefault() as Key;
+        if (header is null)
+            return null;
+
+        string item = header.Expression;
+        string snippet = biggesst.GetVSSnippetForm();
         string baseProviderName = $"provider{index}";
 
         return 

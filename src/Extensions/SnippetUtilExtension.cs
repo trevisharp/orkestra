@@ -1,11 +1,10 @@
 /* Author:  Leonardo Trevisan Silio
  * Date:    01/07/2023
  */
+using System;
 using System.Linq;
 using System.Data;
 using System.Collections.Generic;
-using System.Globalization;
-using System;
 using System.Text.RegularExpressions;
 
 namespace Orkestra.Extensions;
@@ -62,7 +61,7 @@ public static class SnippetUtilExtension
             }
         }
 
-        return snippet;
+        return snippet.Trim();
     }
 
     /// <summary>
@@ -98,11 +97,25 @@ public static class SnippetUtilExtension
 
     static string getSnippetParam(Rule rule, ref int snippetIndex)
     {
+        if (rule is null)
+            return null;
+        
         var headers = getHeaders(rule);
+        int headerCount = headers.Count();
+
         var completableHeaders = 
             from header in headers
             where isCompletableKey(header)
             select header.Expression;
+        int completableCount = completableHeaders.Count();
+
+        if (completableCount == 0)
+            return $"${{{++snippetIndex}:{rule.Name?.ToLower() ?? "value"}}}";
+
+        bool isWeakCompletable = completableCount <= headerCount / 2;
+        if (isWeakCompletable)
+            return $"${{{++snippetIndex}:{rule.Name?.ToLower() ?? "value"}}}";
+
         var snippet = string.Join(',', completableHeaders);
 
         return $"${{{++snippetIndex}|{snippet}|}}";
