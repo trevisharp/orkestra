@@ -85,10 +85,8 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
         Verbose.NewLine();
 
         var code = getCode(group, specials, index);
-        if (code is null)
-            return;
-        
-        sb.AppendLine(code);
+        if (code is not null)
+            sb.AppendLine(code);
     }
 
     string registerCompletionItemProvider(string providerName, string code)
@@ -109,21 +107,22 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
 
     string getCode(
         IGrouping<string, SubRule> group, 
-        HashSet<string> specials, 
+        HashSet<string> generatedKeys, 
         int index)
     {
+        generatedKeys.Add(group.Key);
+
         if (group.All(g => g.Count() == 1))
-            return getSimpleAutoComplete(group, specials, index);
+            return getSimpleAutoComplete(group, index);
         
         if (group.Count() == 1)
-            return getComplexUnique(group, specials, index);
+            return getComplexUnique(group, index);
 
-        return getComplexMax(group, specials, index);
+        return getComplexMax(group, index);
     }
 
     string getSimpleAutoComplete(
-        IGrouping<string, SubRule> group, 
-        HashSet<string> specials,
+        IGrouping<string, SubRule> group,
         int index)
     {
         var subRule = group.FirstOrDefault();
@@ -144,7 +143,6 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
 
     string getComplexUnique(
         IGrouping<string, SubRule> group,
-        HashSet<string> specials,
         int index)
     {
         var rule = group.FirstOrDefault();
@@ -171,7 +169,6 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
 
     string getComplexMax(
         IGrouping<string, SubRule> group,
-        HashSet<string> specials,
         int index)
     {
         var biggesst = group.MaxBy(g => g.Count());
