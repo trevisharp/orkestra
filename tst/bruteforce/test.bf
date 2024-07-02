@@ -21,3 +21,5 @@ check if
     for all x in nat
     for some y in nat
     csk contains (x, y, 1)
+
+:: https://medium.com/dataseries/quick-start-to-vscode-plug-ins-diagnostic-information-b218823f6bdf
