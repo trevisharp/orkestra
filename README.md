@@ -42,8 +42,8 @@ Coming soon.
 
 ### Orkestra v0.5.0
 
- - ![](https://img.shields.io/badge/new-blue) Improve key definition using intermediary objects. Now ruleA | ruleB, keyA | keyB is allowed.
- - ![](https://img.shields.io/badge/new-blue) Improve auto convertion between rules and list expressions.
+ - ![](https://img.shields.io/badge/new-green) Improve key definition using intermediary objects. Now ruleA | ruleB, keyA | keyB is allowed.
+ - ![](https://img.shields.io/badge/new-green) Improve auto convertion between rules and list expressions.
  - ![](https://img.shields.io/badge/removed-red) one and some rule functions in Compiler class.
 
 ### Orkestra v0.4.0
