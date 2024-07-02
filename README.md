@@ -31,11 +31,11 @@ Coming soon.
 
  - ![](https://img.shields.io/badge/new-green) Added Tree consumer system.
 
-### Orkestra v0.7.0 (Coming soons)
+### Orkestra v0.7.0 (Coming soon)
 
  - ![](https://img.shields.io/badge/new-green) Default CLI, Project and Compiler for small projects.
 
-### Orkestra v0.6.0 (Coming soons)
+### Orkestra v0.6.0 (Coming soon)
 
  - ![](https://img.shields.io/badge/new-green) Add Smart Autocomplete in extension generation.
  - ![](https://img.shields.io/badge/removed-red) Replace the snippet contribute by autocomplete.
