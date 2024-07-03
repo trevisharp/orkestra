@@ -17,5 +17,12 @@ given z in nat
 if csk contains (n, k, m) and cs contains (m, z) then
     csk contains (n, k + 1, z)
 
+check if 
+    for all n in nat
+    for some k in nat
+    csk contains (n, k, 1)  
+
+:: future usefull contento to expand this project:
 :: https://medium.com/dataseries/quick-start-to-vscode-plug-ins-diagnostic-information-b218823f6bdf
 :: comp.command = { command: 'editor.action.triggerSuggest' }
+:: https://vshaxe.github.io/vscode-extern/vscode/DiagnosticSeverity.html
