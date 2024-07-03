@@ -34,10 +34,12 @@ Coming soon.
 ### Orkestra v0.7.0 (Coming soon)
 
  - ![](https://img.shields.io/badge/new-green) Default CLI, Project and Compiler for small projects.
+ - ![](https://img.shields.io/badge/new-green) Use Cache system by default.
 
-### Orkestra v0.6.0 (Coming soon)
+### Orkestra v0.6.0 (Not published yet)
 
  - ![](https://img.shields.io/badge/new-green) Add Smart Autocomplete in extension generation.
+ - ![](https://img.shields.io/badge/updated-blue) Improve error messages when using LR1 algorithm.
  - ![](https://img.shields.io/badge/removed-red) Replace the snippet contribute by autocomplete.
 
 ### Orkestra v0.5.0
@@ -79,4 +81,3 @@ Coming soon.
 # Next Features
 
 - Syntactic tree analyzes system.
-- Default Apply of the Cache System.
