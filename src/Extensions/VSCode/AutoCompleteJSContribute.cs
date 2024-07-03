@@ -19,11 +19,26 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
     {
         var sb = new StringBuilder();
         var headers = language.GetHeaders();
-        var specials = new HashSet<string>();
+        var keyHash = new HashSet<string>();
+        var simpleSet = language.Keys.Where(
+            key => key.IsSimple(language.Rules)
+        );
 
         int providerIndex = 0;
         foreach (var header in headers)
-            process(header, specials, sb, providerIndex++);
+            process(header, keyHash, sb, providerIndex++);
+        
+        var missingKeys = 
+            from key in language.Keys
+            where !keyHash.Contains(key.Name)
+            where key.IsCompletableKey()
+            where simpleSet.Contains(key)
+            select key;
+        foreach (var key in missingKeys)
+        {
+            keyHash.Add(key.Name);
+            sb.Append(getSimpleAutoComplete(key, providerIndex++));
+        }
         
         return sb.ToString();
 
@@ -68,7 +83,7 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
 
     void process(
         IGrouping<string, SubRule> group,
-        HashSet<string> specials, 
+        HashSet<string> keyHash, 
         StringBuilder sb, 
         int index)
     {
@@ -84,9 +99,12 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
         Verbose.EndGroup();
         Verbose.NewLine();
 
-        var code = getCode(group, specials, index);
-        if (code is not null)
-            sb.AppendLine(code);
+        var code = getCode(group, index);
+        if (code is null)
+            return;
+            
+        keyHash.Add(group.Key);
+        sb.AppendLine(code);
     }
 
     string registerCompletionItemProvider(string providerName, string code)
@@ -106,19 +124,16 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
     }
 
     string getCode(
-        IGrouping<string, SubRule> group, 
-        HashSet<string> generatedKeys, 
+        IGrouping<string, SubRule> group,
         int index)
     {
-        generatedKeys.Add(group.Key);
-
         if (group.All(g => g.Count() == 1))
             return getSimpleAutoComplete(group, index);
         
         if (group.Count() == 1)
             return getComplexUnique(group, index);
 
-        return getComplexMax(group, index);
+        return getComplexMin(group, index);
     }
 
     string getSimpleAutoComplete(
@@ -136,6 +151,16 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
         return registerCompletionItemProvider($"provider{index}",
             $$"""
             const comp = new vscode.CompletionItem('{{header.Expression}}');
+            return [ comp ];
+            """
+        );
+    }
+
+    string getSimpleAutoComplete(Key key, int index)
+    {
+        return registerCompletionItemProvider($"provider{index}",
+            $$"""
+            const comp = new vscode.CompletionItem('{{key.Expression}}');
             return [ comp ];
             """
         );
@@ -167,11 +192,11 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
         );
     }
 
-    string getComplexMax(
+    string getComplexMin(
         IGrouping<string, SubRule> group,
         int index)
     {
-        var biggesst = group.MaxBy(g => g.Count());
+        var biggesst = group.MinBy(g => g.Count());
         if (biggesst is null)
             return null;
 

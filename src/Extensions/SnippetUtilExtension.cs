@@ -28,17 +28,9 @@ public static class SnippetUtilExtension
         return keyGroups;
     }
 
-    static bool hasKeywordHeader(SubRule rule)
-    {
-        if (rule?.FirstOrDefault() is not Key key)
-            return false;
-
-        if (!key.IsKeyword)
-            return false;
-        
-        return true;
-    }
-
+    /// <summary>
+    /// Convert SubRule to a Visual Studio Code Snippet
+    /// </summary>
     public static string GetVSSnippetForm(this SubRule rule)
     {
         string snippet = "";
@@ -84,6 +76,55 @@ public static class SnippetUtilExtension
         return getSnippetParam(rule, ref snippetIndex);
     }
     
+    /// <summary>
+    /// Return if the key is a non-variable alphanumeric keyword.
+    /// </summary>
+    public static bool IsCompletableKey(this Key key)
+    {
+        if (key.IsIdentity)
+            return false;
+        
+        if (!key.IsKeyword)
+            return false;
+        
+        var regex = new Regex("[A-Za-z0-9]+");
+        var match = regex.Match(key.Expression);
+        return match.Length == key.Expression.Length;
+    }
+
+    /// <summary>
+    /// Return if a key is not the header of a complex rule.
+    /// </summary>
+    public static bool IsSimple(this Key key, IEnumerable<Rule> rules)
+    {
+        foreach (var rule in rules.SelectMany(r => r))
+        {
+            if (rule.FirstOrDefault() != key)
+                continue;
+            
+            if (rule.Count() == 1)
+                continue;
+            
+            if (!rule.Any(t => t is Rule))
+                continue;
+            
+            return false;
+        }
+
+        return true;
+    }
+
+    static bool hasKeywordHeader(SubRule rule)
+    {
+        if (rule?.FirstOrDefault() is not Key key)
+            return false;
+
+        if (!key.IsKeyword)
+            return false;
+        
+        return true;
+    }
+    
     static string getSnippetParam(Key key, ref int snippetIndex)
     {
         if (key.IsIdentity)
@@ -105,7 +146,7 @@ public static class SnippetUtilExtension
 
         var completableHeaders = 
             from header in headers
-            where isCompletableKey(header)
+            where IsCompletableKey(header)
             select header.Expression;
         int completableCount = completableHeaders.Count();
 
@@ -117,21 +158,7 @@ public static class SnippetUtilExtension
             return $"${{{++snippetIndex}:{rule.Name?.ToLower() ?? "value"}}}";
 
         var snippet = string.Join(',', completableHeaders);
-
-        return $"${{{++snippetIndex}|{snippet}|}}";
-    }
-
-    static bool isCompletableKey(Key key)
-    {
-        if (key.IsIdentity)
-            return false;
-        
-        if (!key.IsKeyword)
-            return false;
-        
-        var regex = new Regex("[A-Za-z]+");
-        var match = regex.Match(key.Expression);
-        return match.Length == key.Expression.Length;
+        return $"${{{++snippetIndex}:{snippet} ${{{++snippetIndex}:test}}}}";
     }
 
     static IEnumerable<Key> getHeaders(Rule rule)
