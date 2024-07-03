@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    28/06/2024
+ * Date:    03/07/2024
  */
 using System;
 using System.Linq;
@@ -18,39 +18,29 @@ using InternalStructure;
 /// Represents a collection of compile actions,
 /// tree processing and output generation.
 /// </summary>
-public class Project<T>
-    where T : Project<T>, new()
+public class Project
 {
     List<CompileAction> actions = new();
     public IExtensionProvider ExtensionProvider { get; set; }
         = new DefaultExtensionProvider();
 
-    public static void Compile(params string[] args)
-    {
-        var prj = new T();
-        prj.StartCompilation(args);
-    }
+    /// <summary>
+    /// Add a compiler action to the project.
+    /// </summary>
+    public void Add(CompileAction action)
+        => actions.Add(action ?? throw new ArgumentNullException(nameof(action)));
 
-    public static void InstallExtension(params string[] args)
-    {
-        var prj = new T();
-        prj.CreateInstallExtension(args);
-    }
-
-    public static void GenerateExtension(params string[] args)
-    {
-        var prj = new T();
-        prj.CreateExtension(args);
-    }
-
+    /// <summary>
+    /// Add a compiler action to the project.
+    /// </summary>
     public void Add<C>(PathSelector selector)
         where C : Compiler, new()
         => actions.Add(new(
             selector, 
             ReflectionHelper.GetConfiguredCompiler<C>()
         ));
-
-    public void CreateInstallExtension(params string[] args)
+    
+    public void InstallExtension(params string[] args)
     {
         Verbose.Info("Generating and installing Extension...");
         var extension = ExtensionProvider.Provide();
@@ -75,7 +65,7 @@ public class Project<T>
         }
     }   
 
-    public void CreateExtension(string[] args)
+    public void GenerateExtension(string[] args)
     {
         Verbose.Info("Generating Extension...");
         var extension = ExtensionProvider.Provide();
@@ -100,10 +90,11 @@ public class Project<T>
         }
     }   
 
+
     /// <summary>
     /// Start compile process.
     /// </summary>
-    public void StartCompilation(string[] args)
+    public void Compile(string[] args)
     {
         var dir = Environment.CurrentDirectory;
         ConcurrentQueue<CompilerOutput> queue = new();
@@ -161,7 +152,7 @@ public class Project<T>
     {
         var extArgs = new ExtensionArguments
         {
-            Name = typeof(T).Name.Replace("Project", ""),
+            Name = GetType().Name.Replace("Project", ""),
             Arguments = args
         };
         

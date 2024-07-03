@@ -1,28 +1,10 @@
 ﻿using Orkestra;
 using Orkestra.Projects;
-using Orkestra.LineInterfaces;
 using Orkestra.Processings;
 
-CLI.Run(args);
+Tech.Run(args);
 
-public class BruteForceCLI : CLI
-{
-    [HelpMessage("Run the BruteForce project.")]
-    void run(params string[] args)
-    {
-        BruteForceProject.Compile(args);
-    }
-
-    [HelpMessage("Manage the BruteForce extension for VSCode.")]
-    void ext(params string[] args)
-    {
-        if (args is [ "gen" ])
-            BruteForceProject.GenerateExtension(args);
-        else BruteForceProject.InstallExtension(args);
-    }
-}
-
-public class BruteForceProject : Project<BruteForceProject>
+public class BruteForceProject : Project
 {
     public BruteForceProject()
     {
@@ -78,7 +60,7 @@ public class BruteForceCompiler : Compiler
     
     public BruteForceCompiler()
     {
-        op = SUM | MUL | SUB | DIV | MOD;
+        op = SUM | MUL | SUB | DIV | MOD | POW;
 
         exp = rule(exp => [
             [ NUMBER ],

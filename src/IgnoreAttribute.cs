@@ -1,6 +1,7 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    30/06/2023
+ * Date:    03/07/2023
  */
 using System;
 
+namespace Orkestra;
 public class IgnoreAttribute : Attribute { }

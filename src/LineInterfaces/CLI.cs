@@ -9,8 +9,8 @@ using static System.Console;
 
 namespace Orkestra.LineInterfaces;
 
+using Projects;
 using InternalStructure;
-using Orkestra.Exceptions;
 
 /// <summary>
 /// Represents a command line interface implementation.

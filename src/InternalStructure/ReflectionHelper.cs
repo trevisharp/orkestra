@@ -1,14 +1,17 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    23/06/2024
+ * Date:    03/07/2024
  */
 using System;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace Orkestra.InternalStructure;
 
+using Projects;
 using Providers;
 using Exceptions;
 using LineInterfaces;
+using System.Diagnostics.Contracts;
 
 internal class ReflectionHelper
 {
@@ -23,22 +26,61 @@ internal class ReflectionHelper
             var constructor = getEmptyConstructor(type);
             
             if (constructor is null)
-                throw new NoConstructorException();
+                throw new NoConstructorException("CLI");
             
             var cli = constructor.Invoke([]) as CLI;
 
             return cli;
         }
         
-        throw new NoCLIExceptionsException();
+        return new DefaultCLI(
+            GetConfiguredProject()
+        );
     }
 
+    internal static Project GetConfiguredProject()
+    {
+        List<Type> findedTypes = [];
+
+        var types = getAssemplyTypes();
+        foreach (var type in types)
+        {
+            var baseType = type.BaseType;
+            if (baseType is null)
+                continue;
+            
+            if (type.GetCustomAttribute<IgnoreAttribute>() is not null)
+                continue;
+            
+            if (baseType != typeof(Project))
+                continue;
+            
+            findedTypes.Add(baseType);
+        }
+
+        if (findedTypes.Count == 1)
+        {
+            var constructor = getEmptyConstructor(findedTypes[0]);
+            if (constructor is null)
+                throw new NoConstructorException("Project");
+            return constructor.Invoke([]) as Project;
+        }
+
+        if (findedTypes.Count > 1)
+            throw new ManyProjectDefinitionException();
+        
+        var compiler = GetConfiguredCompiler<>();
+
+        return ;
+    }
+    
     internal static Compiler GetConfiguredCompiler<T>()
         where T : Compiler, new()
     {
         var types = getAssemplyTypes();
         var provider = getProvider<IAlgorithmGroupProvider>(
-            types, new DefaultAlgorithmGroupProvider());
+            types, new DefaultAlgorithmGroupProvider()
+        );
 
         var compiler = new T {
             Provider = provider
