@@ -17,11 +17,6 @@ given z in nat
 if csk contains (n, k, m) and cs contains (m, z) then
     csk contains (n, k + 1, z)
 
-check if
-    for all x in nat
-    for some y in nat
-    csk contains (x, y, 1)
-
-if cond then inclusion
+given id in subset
 
 :: https://medium.com/dataseries/quick-start-to-vscode-plug-ins-diagnostic-information-b218823f6bdf

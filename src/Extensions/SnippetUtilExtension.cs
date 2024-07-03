@@ -66,6 +66,16 @@ public static class SnippetUtilExtension
         return getSnippetParam(key, ref snippetIndex);
     }
 
+    public static string GetVSSnippetParameter(this IEnumerable<Key> keys)
+    {
+        var completableKeys = 
+            from key in keys
+            where IsCompletableKey(key)
+            select key.Expression;
+        var snippet = string.Join(',', completableKeys);
+        return $"${{1|{snippet}|}}";
+    }
+
     /// <summary>
     /// Get the Visual Studio Code Snippet Parameter form:
     /// ${number_of_parameter:default_value|option1,option2,option3|}
@@ -76,6 +86,15 @@ public static class SnippetUtilExtension
         return getSnippetParam(rule, ref snippetIndex);
     }
     
+    public static IEnumerable<Key> GetHeaders(this IEnumerable<ISyntacticElement> elements)
+        => elements?
+            .SelectMany(el => el switch
+            {
+                Key key => [ key ],
+                Rule rule => getHeaders(rule),
+                _ => []
+            }) ?? [];
+
     /// <summary>
     /// Return if the key is a non-variable alphanumeric keyword.
     /// </summary>

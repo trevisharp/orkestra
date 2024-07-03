@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Collections.Generic;
+using System.Collections.Frozen;
 
 namespace Orkestra.Extensions.VSCode;
 
@@ -115,12 +116,37 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
             nextElements = [];
         }
 
-        foreach (var g in next)
+        foreach (var pair in next)
         {
-            Verbose.Success(g.Key);
-            foreach (var x in g.Value)
-                Verbose.InlineContent(x);
-            Verbose.NewLine();
+            var list = pair.Value.ToList();
+            var option = 
+                list switch
+                {
+                    [ Key key ] => key.GetVSSnippetParameter(),
+                    [ Rule rule ] => rule.GetVSSnippetParameter(),
+                    { Count: > 1 } => 
+                        list.All(el => el is Key) ?
+                            list.Select(el => el as Key).GetVSSnippetParameter() :
+                            list.GetHeaders().GetVSSnippetParameter(),
+                    _ => null
+                };
+            if (option is null)
+                continue;
+
+            var provider = $"provider{++index}";
+            var item = pair.Value.FirstOrDefault()?.Name?.ToLower() ?? "value";
+            sb.AppendLine(registerCompletionItemProvider(provider, 
+                $$"""
+                    const linePrefix = document.lineAt(position).text.slice(0, position.character);
+                    if (!linePrefix.endsWith('{{pair.Key.Expression}} ')) {
+                        return undefined;
+                    }
+
+                    const comp = new vscode.CompletionItem('{{item}}');
+                    comp.insertText = new vscode.SnippetString('{{option}}');
+                    return [ comp ];
+                """, ' '
+            ));
         }
     }
 
@@ -138,8 +164,9 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
         sb.AppendLine(code);
     }
 
-    string registerCompletionItemProvider(string providerName, string code)
+    string registerCompletionItemProvider(string providerName, string code, char trigger = char.MinValue)
     {
+        var triggerData = trigger == char.MinValue ? "" : $", '{trigger}'";
         return
             $$"""
             const {{providerName}} = vscode.languages.registerCompletionItemProvider('{{language.Name}}', {
@@ -149,7 +176,7 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
                     {{code.Replace("\n", "\n\t\t")}}
 
                 }
-            });
+            }{{triggerData}});
             context.subscriptions.push({{providerName}});
             """;
     }
@@ -182,6 +209,7 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
         return registerCompletionItemProvider($"provider{index}",
             $$"""
             const comp = new vscode.CompletionItem('{{header.Expression}}', vscode.CompletionItemKind.Keyword);
+            comp.commitCharacters = [' '];
             return [ comp ];
             """
         );
@@ -192,6 +220,7 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
         return registerCompletionItemProvider($"provider{index}",
             $$"""
             const comp = new vscode.CompletionItem('{{key.Expression}}', vscode.CompletionItemKind.Keyword);
+            comp.commitCharacters = [' '];
             return [ comp ];
             """
         );
@@ -218,6 +247,7 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
             $$"""
             const comp = new vscode.CompletionItem('{{item}}', vscode.CompletionItemKind.Keyword);
             comp.insertText = new vscode.SnippetString('{{snippet}}');
+            comp.commitCharacters = [' '];
             return [ comp ];
             """
         );
@@ -244,6 +274,7 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
             $$"""
             const comp = new vscode.CompletionItem('{{item}}', vscode.CompletionItemKind.Keyword);
             comp.insertText = new vscode.SnippetString('{{snippet}}');
+            comp.commitCharacters = [' '];
             return [ comp ];
             """
         );
