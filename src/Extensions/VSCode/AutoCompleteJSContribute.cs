@@ -39,6 +39,8 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
             keyHash.Add(key.Name);
             sb.Append(getSimpleAutoComplete(key, providerIndex++));
         }
+
+        generateNextCompletations(sb, providerIndex);
         
         return sb.ToString();
 
@@ -81,24 +83,53 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
             """;
     }
 
+    void generateNextCompletations(StringBuilder sb, int index)
+    {
+        var completableKeys =
+            from key in language.Keys
+            where key.IsCompletableKey()
+            select key;
+        var rules = language.Rules
+            .SelectMany(subrule => subrule);
+        
+        var next = new Dictionary<Key, IEnumerable<ISyntacticElement>>();
+        var nextElements = new List<ISyntacticElement>();
+        foreach (var key in completableKeys)
+        {
+            foreach (var rule in rules)
+            {
+                var nexts = 
+                    from pair in rule.Zip(rule.Skip(1))
+                    where pair.First == key
+                    select pair.Second;
+                var hasElements = nexts.Any();
+                if (!hasElements)
+                    continue;
+                nextElements.AddRange(nexts);
+            }
+
+            if (nextElements.Count == 0)
+                continue;
+            
+            next.Add(key, nextElements.Distinct());
+            nextElements = [];
+        }
+
+        foreach (var g in next)
+        {
+            Verbose.Success(g.Key);
+            foreach (var x in g.Value)
+                Verbose.InlineContent(x);
+            Verbose.NewLine();
+        }
+    }
+
     void process(
         IGrouping<string, SubRule> group,
         HashSet<string> keyHash, 
         StringBuilder sb, 
         int index)
     {
-        Verbose.Success(group.Key);
-        Verbose.NewLine();
-        Verbose.StartGroup();
-        foreach (var item in group)
-        {
-            foreach (var el in item)
-                Verbose.InlineContent(el.Name);
-            Verbose.NewLine();
-        }
-        Verbose.EndGroup();
-        Verbose.NewLine();
-
         var code = getCode(group, index);
         if (code is null)
             return;

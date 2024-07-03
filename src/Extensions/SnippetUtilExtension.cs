@@ -124,7 +124,7 @@ public static class SnippetUtilExtension
         
         return true;
     }
-    
+
     static string getSnippetParam(Key key, ref int snippetIndex)
     {
         if (key.IsIdentity)
@@ -158,7 +158,7 @@ public static class SnippetUtilExtension
             return $"${{{++snippetIndex}:{rule.Name?.ToLower() ?? "value"}}}";
 
         var snippet = string.Join(',', completableHeaders);
-        return $"${{{++snippetIndex}:{snippet} ${{{++snippetIndex}:test}}}}";
+        return $"${{{++snippetIndex}|{snippet}|}}";
     }
 
     static IEnumerable<Key> getHeaders(Rule rule)

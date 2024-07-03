@@ -22,6 +22,6 @@ check if
     for some y in nat
     csk contains (x, y, 1)
 
-
+if cond then inclusion
 
 :: https://medium.com/dataseries/quick-start-to-vscode-plug-ins-diagnostic-information-b218823f6bdf
