@@ -150,7 +150,7 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
 
         return registerCompletionItemProvider($"provider{index}",
             $$"""
-            const comp = new vscode.CompletionItem('{{header.Expression}}');
+            const comp = new vscode.CompletionItem('{{header.Expression}}', vscode.CompletionItemKind.Keyword);
             return [ comp ];
             """
         );
@@ -160,7 +160,7 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
     {
         return registerCompletionItemProvider($"provider{index}",
             $$"""
-            const comp = new vscode.CompletionItem('{{key.Expression}}');
+            const comp = new vscode.CompletionItem('{{key.Expression}}', vscode.CompletionItemKind.Keyword);
             return [ comp ];
             """
         );
@@ -185,7 +185,7 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
         return 
             registerCompletionItemProvider(baseProviderName,
             $$"""
-            const comp = new vscode.CompletionItem('{{item}}');
+            const comp = new vscode.CompletionItem('{{item}}', vscode.CompletionItemKind.Keyword);
             comp.insertText = new vscode.SnippetString('{{snippet}}');
             return [ comp ];
             """
@@ -211,7 +211,7 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
         return 
             registerCompletionItemProvider(baseProviderName,
             $$"""
-            const comp = new vscode.CompletionItem('{{item}}');
+            const comp = new vscode.CompletionItem('{{item}}', vscode.CompletionItemKind.Keyword);
             comp.insertText = new vscode.SnippetString('{{snippet}}');
             return [ comp ];
             """
