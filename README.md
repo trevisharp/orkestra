@@ -31,10 +31,15 @@ Coming soon.
 
  - ![](https://img.shields.io/badge/new-green) Added Tree consumer system.
 
+### Orkestra v0.8.0 (Coming soon)
+
+ - ![](https://img.shields.io/badge/new-green) Auto key finder on rules.
+
 ### Orkestra v0.7.0 (Coming soon)
 
  - ![](https://img.shields.io/badge/new-green) Default CLI, Project and Compiler for small projects.
- - ![](https://img.shields.io/badge/new-green) Use Cache system by default.
+ - ![](https://img.shields.io/badge/updated-blue) New application configuration and start workflow.
+ - ![](https://img.shields.io/badge/updated-blue) Use Cache system by default.
 
 ### Orkestra v0.6.0 (Not published yet)
 
