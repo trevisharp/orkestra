@@ -37,7 +37,7 @@ public class Project
         where C : Compiler, new()
         => actions.Add(new(
             selector, 
-            ReflectionHelper.GetConfiguredCompiler<C>()
+            ReflectionHelper.GetCompilerByType<C>()
         ));
     
     public void InstallExtension(params string[] args)
@@ -175,4 +175,17 @@ public class Project
             Rules = action.Compiler.Rules,
             Processings = action.Compiler.Processings
         };
+
+    /// <summary>
+    /// Create a empty project with only one compiler for a only extension type.
+    /// </summary>
+    public static Project CreateDefault(string path, Compiler compiler)
+    {
+        var prj = new Project();
+        prj.Add(new CompileAction(
+            new FileSelector(path), 
+            compiler
+        ));
+        return prj;
+    }
 }

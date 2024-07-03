@@ -17,17 +17,10 @@ using InternalStructure;
 /// </summary>
 public abstract class CLI
 {
-    [IgnoreCommand]
-    public static void Run(params string[] args)
-    {
-        var cli = ReflectionHelper.GetConfiguredCLI();
-        cli.reciveCommand(args);
-    }
-
     public virtual string Header => "Running iteractive command line interface...";
 
     [IgnoreCommand]
-    private void reciveCommand(params string[] args)
+    public void ReciveCommand(params string[] args)
     {
         if (args.Length == 0)
         {

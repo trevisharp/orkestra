@@ -2,6 +2,7 @@
 using Orkestra.Projects;
 using Orkestra.Processings;
 
+// Tech.ConfigureProject("*.bf");
 Tech.Run(args);
 
 public class BruteForceProject : Project

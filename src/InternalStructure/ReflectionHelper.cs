@@ -11,70 +11,74 @@ using Projects;
 using Providers;
 using Exceptions;
 using LineInterfaces;
-using System.Diagnostics.Contracts;
 
 internal class ReflectionHelper
 {
     internal static CLI GetConfiguredCLI()
     {
-        var types = getAssemplyTypes();
-        foreach (var type in types)
+        try
         {
-            if (type.BaseType != typeof(CLI))
-                continue;
-            
-            var constructor = getEmptyConstructor(type);
-            
-            if (constructor is null)
-                throw new NoConstructorException("CLI");
-            
-            var cli = constructor.Invoke([]) as CLI;
-
-            return cli;
+            return construct(typeof(CLI), 
+                new DefaultCLI(GetConfiguredProject())
+                ) as CLI;
         }
-        
-        return new DefaultCLI(
-            GetConfiguredProject()
-        );
+        // catch (ManyDefinitionException)
+        // {
+        //     throw new ManyProjectDefinitionException();
+        // }
+        // catch (MissingDefinitionException)
+        // {
+        //     throw new ManyProjectDefinitionException();
+        // }
+        catch (Exception ex)
+        {
+            throw new UnexpectedException(ex);
+        }
     }
 
     internal static Project GetConfiguredProject()
     {
-        List<Type> findedTypes = [];
-
-        var types = getAssemplyTypes();
-        foreach (var type in types)
+        try
         {
-            var baseType = type.BaseType;
-            if (baseType is null)
-                continue;
-            
-            if (type.GetCustomAttribute<IgnoreAttribute>() is not null)
-                continue;
-            
-            if (baseType != typeof(Project))
-                continue;
-            
-            findedTypes.Add(baseType);
+            var defaultProject = Tech.defaultProject 
+                ?? Project.CreateDefault(".code", GetConfiguredCompiler());
+            return construct(typeof(Project), defaultProject) as Project;
         }
-
-        if (findedTypes.Count == 1)
+        catch (ManyDefinitionException)
         {
-            var constructor = getEmptyConstructor(findedTypes[0]);
-            if (constructor is null)
-                throw new NoConstructorException("Project");
-            return constructor.Invoke([]) as Project;
-        }
-
-        if (findedTypes.Count > 1)
             throw new ManyProjectDefinitionException();
-        
-        var compiler = GetConfiguredCompiler<>();
-
-        return ;
+        }
+        catch (MissingDefinitionException)
+        {
+            throw new ManyProjectDefinitionException();
+        }
+        catch (Exception ex)
+        {
+            throw new UnexpectedException(ex);
+        }
     }
     
-    internal static Compiler GetConfiguredCompiler<T>()
+    internal static Compiler GetConfiguredCompiler()
+    {
+        try
+        {
+            return construct(typeof(Compiler)) as Compiler;
+        }
+        // catch (ManyDefinitionException)
+        // {
+        //     throw new ManyProjectDefinitionException();
+        // }
+        // catch (MissingDefinitionException)
+        // {
+        //     throw new ManyProjectDefinitionException();
+        // }
+        catch (Exception ex)
+        {
+            throw new UnexpectedException(ex);
+        }
+    }
+
+    internal static Compiler GetCompilerByType<T>()
         where T : Compiler, new()
     {
         var types = getAssemplyTypes();
@@ -88,6 +92,40 @@ internal class ReflectionHelper
         compiler.Load();
 
         return compiler;
+    }
+
+    private static object construct(Type matchType, object defaultValue = null)
+    {
+        List<Type> findedTypes = [];
+
+        var types = getAssemplyTypes();
+        foreach (var type in types)
+        {
+            var baseType = type.BaseType;
+            if (baseType is null)
+                continue;
+            
+            if (type.GetCustomAttribute<IgnoreAttribute>() is not null)
+                continue;
+            
+            if (baseType != matchType)
+                continue;
+            
+            findedTypes.Add(baseType);
+        }
+
+        if (findedTypes.Count == 1)
+        {
+            var constructor = getEmptyConstructor(findedTypes[0]);
+            if (constructor is null)
+                throw new NoConstructorException(matchType.Name);
+            return constructor.Invoke([]);
+        }
+
+        if (findedTypes.Count > 1)
+            throw new ManyDefinitionException();
+
+        return defaultValue ?? throw new MissingDefinitionException();
     }
 
     private static Type[] getAssemplyTypes()
@@ -131,7 +169,7 @@ internal class ReflectionHelper
         var constructor = getEmptyConstructor(type);
         
         if (constructor is null)
-            throw new NoConstructorException();
+            throw new NoConstructorException(type.Name);
         
         var compiler = constructor.Invoke([]);
 
