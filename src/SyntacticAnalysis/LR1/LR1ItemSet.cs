@@ -194,20 +194,6 @@ public class LR1ItemSet
                 }
             }
         }
-
-        // foreach (var pair in firstSet)
-        // {
-        //     System.Console.Write(
-        //         indexMap[pair.Key].KeyName
-        //     );
-        //     System.Console.Write(" = {");
-        //     foreach (var item in pair.Value)
-        //     {
-        //         System.Console.Write(indexMap[item].KeyName);
-        //         System.Console.Write(", ");
-        //     }
-        //     System.Console.WriteLine("}");
-        // }
     }
 
     /// <summary>

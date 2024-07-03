@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    29/04/2024
+ * Date:    03/07/2024
  */
 using System.Collections.Generic;
 
@@ -97,7 +97,9 @@ public class LR1SyntacticAnalyzer(
             }
             else
             {
-                syntacticErrors.Add($"Syntax error on {file}:{token?.Line ?? -1}.");
+                syntacticErrors.Add($"Syntax error on {file} next to '{token.Value}' on line {token?.Line ?? -1}.");
+                
+                // panic recover
                 do
                 {
                     token = 

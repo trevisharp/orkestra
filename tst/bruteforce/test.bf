@@ -12,7 +12,7 @@ define csk as subset of (nat, nat, nat) :: Função de Collatz aplicado k vezes
 csk contains (n, 0, n)
 
 given k in nat
-given m nat
+given m in nat
 given z in nat
 if csk contains (n, k, m) and cs contains (m, z) then
     csk contains (n, k + 1, z)
