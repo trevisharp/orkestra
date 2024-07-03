@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    25/06/2024
+ * Date:    03/07/2024
  */
 using System;
 using System.IO;
@@ -360,29 +360,44 @@ public class Text
     {
         List<object> data = new List<object>();
         int index = 0;
+        int crrLine = 0;
 
         while (index < this.data.Count)
         {
             StringBuilder sb = new StringBuilder();
-            while (this.data[index].Token is null)
+            var crr = this.data[index];
+            while (crr.Token is null)
             {
-                sb.Append(this.data[index].Character);
+                if (crr.Character == '\n')
+                {
+                    index++;
+                    if (index >= this.data.Count)
+                        break;
+                    crr = this.data[index];
+                    break;
+                }
+
+                sb.Append(crr.Character);
+                crrLine = crr.Line;
 
                 index++;
                 if (index >= this.data.Count)
                     break;
+                crr = this.data[index];
             }
-            data.Add(sb.ToString());
+
+            data.Add(new Line(crrLine, sb.ToString()));
             if (index >= this.data.Count)
                 break;
 
-            while (this.data[index].Token is not null)
+            while (crr.Token is not null)
             {
-                data.Add(this.data[index].Token);
+                data.Add(crr.Token);
 
                 index++;
                 if (index >= this.data.Count)
                     break;
+                crr = this.data[index];
             }
             if (index >= this.data.Count)
                 break;

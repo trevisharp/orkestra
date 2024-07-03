@@ -28,15 +28,15 @@ public class DefaultLexicalAnalyzer : ILexicalAnalyzer
         {
             if (source is Token tk)
                 yield return tk;
-            else if (source is string str)
+            else if (source is Line line)
             {
-                foreach (var token in parse(str, text.SourceFile))
+                foreach (var token in parse(line.Text, text.SourceFile, line.Number))
                     yield return token;
             }
         }
     }
 
-    private IEnumerable<Token> parse(string code, string file)
+    private IEnumerable<Token> parse(string code, string file, int line)
     {
         int startIndex = 0;
         int keyIndex = 0;
@@ -53,8 +53,8 @@ public class DefaultLexicalAnalyzer : ILexicalAnalyzer
             {       
                 if (crrMatch == null)
                     yield break;
-
-                yield return createToken(crrKey, crrMatch, file, 0);
+                
+                yield return createToken(crrKey, crrMatch, file, line);
 
                 startIndex = crrMatch.Index + crrMatch.Value.Length;
                 minToken = int.MaxValue;
