@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    01/07/2023
+ * Date:    03/07/2023
  */
 using System;
 using System.Linq;
@@ -72,6 +72,8 @@ public static class SnippetUtilExtension
             from key in keys
             where IsCompletableKey(key)
             select key.Expression;
+        if (completableKeys.Count() == 0)
+            return  $"$1";
         var snippet = string.Join(',', completableKeys);
         return $"${{1|{snippet}|}}";
     }
