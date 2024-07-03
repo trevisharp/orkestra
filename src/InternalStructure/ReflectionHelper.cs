@@ -19,9 +19,10 @@ internal class ReflectionHelper
         try
         {
             return construct(typeof(CLI), 
-                new DefaultCLI(GetConfiguredProject())
+                    new DefaultCLI(GetConfiguredProject())
                 ) as CLI;
         }
+        // TODO: Create exceptions
         // catch (ManyDefinitionException)
         // {
         //     throw new ManyProjectDefinitionException();
@@ -40,7 +41,7 @@ internal class ReflectionHelper
     {
         try
         {
-            var defaultProject = Tech.defaultProject 
+            var defaultProject = Tech.DefaultProject 
                 ?? Project.CreateDefault(".code", GetConfiguredCompiler());
             return construct(typeof(Project), defaultProject) as Project;
         }
@@ -64,6 +65,7 @@ internal class ReflectionHelper
         {
             return construct(typeof(Compiler)) as Compiler;
         }
+        // TODO: Create exceptions
         // catch (ManyDefinitionException)
         // {
         //     throw new ManyProjectDefinitionException();

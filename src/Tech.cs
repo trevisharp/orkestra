@@ -14,13 +14,13 @@ using InternalStructure;
 /// </summary>
 public static class Tech
 {
-    internal static Project defaultProject = null;
+    internal static Project DefaultProject = null;
     public static void ConfigureProject(string fileSelector, Compiler compiler = null)
     {
         if (fileSelector is null)
             throw new ArgumentNullException(nameof(fileSelector));
         
-        defaultProject = Project.CreateDefault(fileSelector, compiler);
+        DefaultProject = Project.CreateDefault(fileSelector, compiler);
     }
 
     public static void Run(params string[] args)
