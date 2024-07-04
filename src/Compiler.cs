@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    24/06/2024
+ * Date:    04/07/2024
  */
 using System;
 using System.IO;
@@ -83,29 +83,29 @@ public class Compiler
 
         var sourceCode = await Text.FromFile(filePath);
 
-        Info("Preprocessing started...", 1);
+        Info($"[{filePath}]: Preprocessing started...", 3);
         var machine = buildProcessingMachine();
         var processedText = machine.ProcessAll(sourceCode);
-        Success("Preprocessing completed!", 1);
-        Content("Processed Text:", 5);
-        Content(processedText, 5);
+        Success($"[{filePath}]: Preprocessing completed!", 3);
+        Content($"[{filePath}]: Processed Text:", 10);
+        Content(processedText, 10);
         NewLine(1);
 
-        Info("Lexical Analysis started...", 1);
+        Info($"[{filePath}]: Lexical Analysis started...", 3);
         var lex = buildLexicalAnalyzer();
         var tokens = lex.Parse(processedText);
-        Success("Lexical Analysis completed!", 1);
-        Content("Token List:", 5);
+        Success($"[{filePath}]: Lexical Analysis completed!", 3);
+        Content($"[{filePath}]: Token List:", 10);
         foreach (var token in tokens)
-            InlineContent(token, 5);
+            InlineContent(token, 10);
         NewLine(1);
 
-        Info("Syntacic Analysis started...", 1);
+        Info($"[{filePath}]: Syntacic Analysis started...", 3);
         var parser = buildSyntacticAnalyzer();
         var tree = parser.Parse(tokens);
-        Success("Syntacic Analysis completed!", 1);
-        Content("Syntacic Tree:", 5);
-        Content(tree.ToString(), 5);
+        Success($"[{filePath}]: Syntacic Analysis completed!", 3);
+        Content($"[{filePath}]: Syntacic Tree:", 10);
+        Content(tree.ToString(), 10);
         NewLine(1);
 
         return tree;
