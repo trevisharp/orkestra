@@ -76,6 +76,8 @@ Syntax error in C:\path\test3.code next to 'compilers' on line 1.
 ### Orkestra v0.8.0 (Coming soon)
 
  - ![](https://img.shields.io/badge/new-green) Auto key finder on rules.
+ - ![](https://img.shields.io/badge/updated-blue) Improve Compiler Load and key/rule search process.
+ - ![](https://img.shields.io/badge/new-green) Fast Compiler easy sintax added.
 
 ### Orkestra v0.7.0 (Coming soon)
 
