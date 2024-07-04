@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    03/07/2024
+ * Date:    04/07/2024
  */
 using System;
 using System.Reflection;
@@ -40,29 +40,34 @@ internal class ReflectionHelper
     {
         try
         {
-            var defaultProject = Tech.DefaultProject 
-                ?? Project.CreateDefault(".code", GetConfiguredCompiler());
-            return construct(typeof(Project), () => defaultProject) as Project;
+            return construct(typeof(Project), 
+                () => Tech.DefaultProject ?? 
+                    Project.CreateDefault(".code", GetConfiguredCompiler())
+                ) as Project;
         }
         catch (ManyDefinitionException)
         {
+            System.Console.WriteLine("dfsiadfj2");
             throw new ManyProjectDefinitionException();
         }
         catch (MissingDefinitionException)
         {
+            System.Console.WriteLine("dfsiadfj");
             throw new MissingProjectDefinitionException();
         }
         catch (Exception ex)
         {
+            System.Console.WriteLine("dfsiadfj3");
             throw new UnexpectedException(ex);
         }
     }
     
     internal static Compiler GetConfiguredCompiler()
     {
+        Compiler compiler = null;
         try
         {
-            return construct(typeof(Compiler)) as Compiler;
+            compiler = construct(typeof(Compiler)) as Compiler;
         }
         catch (ManyDefinitionException)
         {
@@ -76,18 +81,38 @@ internal class ReflectionHelper
         {
             throw new UnexpectedException(ex);
         }
+
+        compiler.Provider = GetConfiguredAlgorithmGroupProvider();
+        compiler.Load();
+
+        return compiler;
+    }
+
+    internal static IAlgorithmGroupProvider GetConfiguredAlgorithmGroupProvider()
+    {
+        try
+        {
+            var provider = construct(
+                typeof(IAlgorithmGroupProvider), 
+                () => new DefaultAlgorithmGroupProvider()
+            ) as IAlgorithmGroupProvider;
+            return provider;
+        }
+        catch (MissingDefinitionException)
+        {
+            return new DefaultAlgorithmGroupProvider();
+        }
+        catch (ManyDefinitionException)
+        {
+            throw new ManyAlgorithmGroupProviderDefinitionException();
+        }
     }
 
     internal static Compiler GetCompilerByType<T>()
         where T : Compiler, new()
     {
-        var types = getAssemplyTypes();
-        var provider = getProvider<IAlgorithmGroupProvider>(
-            types, new DefaultAlgorithmGroupProvider()
-        );
-
         var compiler = new T {
-            Provider = provider
+            Provider = GetConfiguredAlgorithmGroupProvider()
         };
         compiler.Load();
 
@@ -111,7 +136,7 @@ internal class ReflectionHelper
             if (baseType != matchType)
                 continue;
             
-            findedTypes.Add(baseType);
+            findedTypes.Add(type);
         }
 
         if (findedTypes.Count == 1)
@@ -136,46 +161,6 @@ internal class ReflectionHelper
         return types;
     }
 
-    private static T getProvider<T>(Type[] types, T defaultValue)
-    {
-        var providerType = getProviderType<T>(types);
-
-        var provider = providerType is null ?
-            defaultValue :
-            createProvider<T>(providerType);
-        
-        return provider;
-    }
-
-    private static Type getProviderType<T>(Type[] types)
-    {
-        foreach (var type in types)
-        {
-            if (type.BaseType != typeof(T))
-                continue;
-            
-            var ignoreAttribute = type.GetCustomAttribute<IgnoreAttribute>();
-            if (ignoreAttribute is not null)
-                continue;
-            
-            return type;
-        }
-
-        return null;
-    }
-
-    private static T createProvider<T>(Type type)
-    {
-        var constructor = getEmptyConstructor(type);
-        
-        if (constructor is null)
-            throw new NoConstructorException(type.Name);
-        
-        var compiler = constructor.Invoke([]);
-
-        return (T)compiler;
-    }
-    
     private static ConstructorInfo getEmptyConstructor(Type type)
     {
         var constructors = type.GetConstructors();

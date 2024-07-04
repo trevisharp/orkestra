@@ -94,18 +94,21 @@ public class Project
     /// <summary>
     /// Start compile process.
     /// </summary>
-    public void Compile(string[] args)
+    public void Build(string[] args)
     {
+        Verbose.Info("Build started...");
+
         var dir = Environment.CurrentDirectory;
         ConcurrentQueue<CompilerOutput> queue = new();
 
         var compilationPairs = actions
-            .Select(
+            .SelectMany(
                 action => action.Selector
                     .GetFiles(dir)
                     .Select(file => (file, action.Compiler))
             )
-            .SelectMany(x => x);
+            .ToArray();
+        Verbose.Info($"Compiling {compilationPairs.Length} files...");
         
         try
         {
@@ -146,6 +149,9 @@ public class Project
         }
 
         var results = queue.ToArray();
+
+        
+        Verbose.Success("Build finished succefully!");
     }
 
     private ExtensionArguments getArgs(string[] args)

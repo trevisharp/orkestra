@@ -12,7 +12,7 @@ public class DefaultCLI(Project project) : CLI
     [HelpMessage("Run the project.")]
     void run(params string[] args)
     {
-        project.Compile(args);
+        project.Build(args);
     }
 
     [HelpMessage("Manage the extension.")]

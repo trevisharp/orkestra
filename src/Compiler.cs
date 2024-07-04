@@ -81,8 +81,6 @@ public class Compiler
         await Cache.LastWrite.Set(filePath, newWrite);
 
         var sourceCode = await Text.FromFile(filePath);
-        Info("Build started...");
-        NewLine();
 
         Info("Preprocessing started...", 1);
         var machine = buildProcessingMachine();

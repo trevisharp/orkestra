@@ -1,19 +1,8 @@
 ﻿using Orkestra;
-using Orkestra.Projects;
 using Orkestra.Processings;
 
-// Tech.ConfigureProject("*.bf");
+Tech.ConfigureProject("*.bf");
 Tech.Run(args);
-
-public class BruteForceProject : Project
-{
-    public BruteForceProject()
-    {
-        Add<BruteForceCompiler>(
-            new FileSelector("*.bf")
-        );
-    }
-}
 
 public class BruteForceCompiler : Compiler
 {

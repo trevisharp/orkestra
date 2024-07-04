@@ -6,7 +6,6 @@ using System;
 namespace Orkestra;
 
 using Projects;
-using LineInterfaces;
 using InternalStructure;
 
 /// <summary>
@@ -20,6 +19,7 @@ public static class Tech
         if (fileSelector is null)
             throw new ArgumentNullException(nameof(fileSelector));
         
+        compiler ??= ReflectionHelper.GetConfiguredCompiler();
         DefaultProject = Project.CreateDefault(fileSelector, compiler);
     }
 
