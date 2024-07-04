@@ -39,6 +39,7 @@ public class MyFirstCompiler : Compiler
 
     public MyFirstCompiler()
     {
+        // Accept 'hello' or 'hello compilers'
         program = start(
             [ HELLO ],
             [ HELLO, COMPILERS ]
@@ -47,9 +48,27 @@ public class MyFirstCompiler : Compiler
 }
 ```
 
-On test.code:
+Succes on test1.code:
 ```
 hello compilers
+```
+Succes on test2.code:
+```
+hello
+```
+And a error in test3.code:
+```
+compilers
+```
+See the CMD:
+```
+>> dotnet run run # First run is for C# second run is the parameter for the application
+Build started...
+Compiling 1 files...
+Syntax error in C:\path\test3.code compilation:
+Syntax error on C:\path\test3.code next to 'compilers' on line 1.
+
+Build finished succefully!
 ```
 
 # Versions
