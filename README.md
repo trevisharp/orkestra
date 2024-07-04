@@ -47,11 +47,11 @@ public class MyFirstCompiler : Compiler
     }
 }
 ```
-Succes on test1.code:
+Success on test1.code:
 ```
 hello compilers
 ```
-Succes on test2.code:
+Success on test2.code:
 ```
 hello
 ```
@@ -59,7 +59,7 @@ And a error in test3.code:
 ```
 compilers
 ```
-See the CMD:
+See the console:
 ```
 >> dotnet run run # First run is for C# second run is the parameter for the application
 Build started...
