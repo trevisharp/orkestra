@@ -18,6 +18,7 @@ using Extensions;
 using Processings;
 using LexicalAnalysis;
 using SyntacticAnalysis;
+using Processings.Implementations;
 
 /// <summary>
 /// A base class for all compiler created with Orkestra framework.
@@ -109,6 +110,9 @@ public class Compiler
 
         return tree;
     }
+
+    protected static LineCommentProcessing lineComment(string starter)
+        => new LineCommentProcessing(starter);
 
     protected static Key key(string name, string expression)
         => Key.CreateKey(name, expression);

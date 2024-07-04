@@ -1,5 +1,4 @@
 ﻿using Orkestra;
-using Orkestra.Processings;
 
 Tech.ConfigureProject("*.bf");
 Tech.Run(args);
@@ -46,7 +45,7 @@ public class BruteForceCompiler : Compiler
         definition, inclusion, checking, cond, condinclusion,
         test, tests, import, item, itens, program, fortype;
     
-    Processing lineComment = Processing.LineComment("::");
+    Processing comment = lineComment("::");
     
     public BruteForceCompiler()
     {
