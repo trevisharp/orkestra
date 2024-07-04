@@ -110,6 +110,7 @@ public class Project
             .ToArray();
         Verbose.Info($"Compiling {compilationPairs.Length} files...");
         
+        bool hasCompilationErrors = false;
         try
         {
             Parallel.ForEachAsync(compilationPairs, async (tuple, tk) =>
@@ -125,11 +126,12 @@ public class Project
                 }
                 catch (SyntacticException ex)
                 {
-                    Verbose.Error($"Syntax error in {tuple.file} compilation:");
+                    hasCompilationErrors = true;
                     Verbose.Error(ex.Message);
                 }
                 catch (Exception ex)
                 {
+                    hasCompilationErrors = true;
                     Verbose.Error($"Internal error in {tuple.file} compilation!");
                     Verbose.StartGroup();
                     Verbose.Error(ex.Message);
@@ -147,10 +149,11 @@ public class Project
                 )
             );
         }
+        if (hasCompilationErrors)
+            return;
 
         var results = queue.ToArray();
 
-        
         Verbose.Success("Build finished succefully!");
     }
 

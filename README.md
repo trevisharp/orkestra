@@ -47,7 +47,6 @@ public class MyFirstCompiler : Compiler
     }
 }
 ```
-
 Succes on test1.code:
 ```
 hello compilers
@@ -65,10 +64,7 @@ See the CMD:
 >> dotnet run run # First run is for C# second run is the parameter for the application
 Build started...
 Compiling 1 files...
-Syntax error in C:\path\test3.code compilation:
-Syntax error on C:\path\test3.code next to 'compilers' on line 1.
-
-Build finished succefully!
+Syntax error in C:\path\test3.code next to 'compilers' on line 1.
 ```
 
 # Versions
