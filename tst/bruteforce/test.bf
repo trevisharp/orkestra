@@ -20,7 +20,7 @@ if csk contains (n, k, m) and cs contains (m, z) then
 check if 
     for all n in nat
     for some k in nat
-    csk contains (n, k, 1)  
+    csk contains (n, k, 1)
 
 :: future usefull contento to expand this project:
 :: https://medium.com/dataseries/quick-start-to-vscode-plug-ins-diagnostic-information-b218823f6bdf

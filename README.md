@@ -23,7 +23,34 @@ dotnet add package Orkestra # Install Orkestra
 
 # Learn by examples
 
-Coming soon.
+### Hello, Compilers
+
+```cs
+using Orkestra;
+
+Tech.Run(args);
+
+public class MyFirstCompiler : Compiler
+{
+    Key HELLO = "hello";
+    Key COMPILERS = "compilers";
+
+    Rule program;
+
+    public MyFirstCompiler()
+    {
+        program = start(
+            [ HELLO ],
+            [ HELLO, COMPILERS ]
+        );
+    }
+}
+```
+
+On test.code:
+```
+hello compilers
+```
 
 # Versions
 
