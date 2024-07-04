@@ -8,7 +8,6 @@ A technology to build your own technologies.
  - [How to install](#how-to-install)
  - [Learn by examples](#learn-by-examples)
  - [Versions](#versions)
- - [Next Features](#next-features)
 
 # Overview
 
@@ -126,7 +125,3 @@ Syntax error in C:\path\test3.code next to 'compilers' on line 1.
  - ![](https://img.shields.io/badge/new-green) Cache System.
  - ![](https://img.shields.io/badge/new-green) Project definition System.
  - ![](https://img.shields.io/badge/new-green) Command Line Interface definition System.
-
-# Next Features
-
-- Syntactic tree analyzes system.
