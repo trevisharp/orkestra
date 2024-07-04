@@ -19,18 +19,17 @@ internal class ReflectionHelper
         try
         {
             return construct(typeof(CLI), 
-                    new DefaultCLI(GetConfiguredProject())
+                    () => new DefaultCLI(GetConfiguredProject())
                 ) as CLI;
         }
-        // TODO: Create exceptions
-        // catch (ManyDefinitionException)
-        // {
-        //     throw new ManyProjectDefinitionException();
-        // }
-        // catch (MissingDefinitionException)
-        // {
-        //     throw new ManyProjectDefinitionException();
-        // }
+        catch (ManyDefinitionException)
+        {
+            throw new ManyCLIDefinitionException();
+        }
+        catch (MissingDefinitionException)
+        {
+            throw new MissingCLIDefinitionException();
+        }
         catch (Exception ex)
         {
             throw new UnexpectedException(ex);
@@ -43,7 +42,7 @@ internal class ReflectionHelper
         {
             var defaultProject = Tech.DefaultProject 
                 ?? Project.CreateDefault(".code", GetConfiguredCompiler());
-            return construct(typeof(Project), defaultProject) as Project;
+            return construct(typeof(Project), () => defaultProject) as Project;
         }
         catch (ManyDefinitionException)
         {
@@ -51,7 +50,7 @@ internal class ReflectionHelper
         }
         catch (MissingDefinitionException)
         {
-            throw new ManyProjectDefinitionException();
+            throw new MissingProjectDefinitionException();
         }
         catch (Exception ex)
         {
@@ -65,15 +64,14 @@ internal class ReflectionHelper
         {
             return construct(typeof(Compiler)) as Compiler;
         }
-        // TODO: Create exceptions
-        // catch (ManyDefinitionException)
-        // {
-        //     throw new ManyProjectDefinitionException();
-        // }
-        // catch (MissingDefinitionException)
-        // {
-        //     throw new ManyProjectDefinitionException();
-        // }
+        catch (ManyDefinitionException)
+        {
+            throw new ManyCompilerDefinitionException();
+        }
+        catch (MissingDefinitionException)
+        {
+            throw new MissingCompilerDefinitionException();
+        }
         catch (Exception ex)
         {
             throw new UnexpectedException(ex);
@@ -96,7 +94,7 @@ internal class ReflectionHelper
         return compiler;
     }
 
-    private static object construct(Type matchType, object defaultValue = null)
+    private static object construct(Type matchType, Func<object> defaultValue = null)
     {
         List<Type> findedTypes = [];
 
@@ -127,7 +125,7 @@ internal class ReflectionHelper
         if (findedTypes.Count > 1)
             throw new ManyDefinitionException();
 
-        return defaultValue ?? throw new MissingDefinitionException();
+        return defaultValue() ?? throw new MissingDefinitionException();
     }
 
     private static Type[] getAssemplyTypes()

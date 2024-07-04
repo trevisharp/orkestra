@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    03/07/2023
+ * Date:    04/07/2023
  */
 using System;
 
@@ -13,7 +13,7 @@ public class MissingProjectDefinitionException : Exception
         can:
         A) Define a class likes that:
 
-         1. public class MyProject : Project<MyProject>
+         1. public class MyProject : Project
          2. {
          3.    public MyProject()
          4.    {
