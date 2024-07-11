@@ -84,7 +84,7 @@ Syntax error in C:\path\test3.code next to 'compilers' on line 1.
  - ![](https://img.shields.io/badge/updated-blue) New application configuration and start workflow.
  - ![](https://img.shields.io/badge/updated-blue) Use Cache system by default.
 
-### Orkestra v0.6.0 (Not published yet)
+### Orkestra v0.6.0
 
  - ![](https://img.shields.io/badge/new-green) Add Smart Autocomplete in extension generation.
  - ![](https://img.shields.io/badge/updated-blue) Improve error messages when using LR1 algorithm.
