@@ -6,9 +6,7 @@ namespace Orkestra.Caches;
 /// <summary>
 /// Return if a Cache hit the data or not and return the store object. 
 /// </summary>
-public record CacheResult<T>(
-    bool IsHit, T Object
-)
+public record CacheResult<T>(bool IsHit, T? Object)
 {
     /// <summary>
     /// Get a cache hit with value.

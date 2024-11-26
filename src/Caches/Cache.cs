@@ -15,8 +15,10 @@ public static class Cache
 
 /// <summary>
 /// A base class for all caches of data.
+/// Recive the id of the cache implementation.
+/// The filename of caches are equal to cacheId.
 /// </summary>
-public abstract class Cache<T>
+public abstract class Cache<T>(string cacheId)
 {
     /// <summary>
     /// Try get a specific data about a file.
@@ -31,43 +33,47 @@ public abstract class Cache<T>
     /// <summary>
     /// Return if a chache exists based on cache Id.
     /// </summary>
-    protected bool Exists(string filePath, string cacheId)
+    protected bool Exists(string id)
     {
-        var cacheFolder = getFileCache(filePath);
-        var cacheFile = Path.Combine(cacheFolder, cacheId);
+        var cacheFile = GetCacheFile(id);
         return Path.Exists(cacheFile);
     }
 
     /// <summary>
-    /// Open a json data from a cache of a file based in cacheId and return a object of type T.
+    /// Open a json data based on id and CacheId implementation.
+    /// Consider use the name of the file associated with this cache was id.
     /// </summary>
-    protected async Task<J> openJson<J>(string filePath, string cacheId)
+    protected async Task<J?> Load<J>(string id)
     {
-        var cacheFolder = getFileCache(filePath);
-        var cacheFile = Path.Combine(cacheFolder, cacheId);
-
+        var cacheFile = GetCacheFile(id);
         var json = await File.ReadAllTextAsync(cacheFile);
         var obj = JsonSerializer.Deserialize<J>(json);
         return obj;
     }
 
     /// <summary>
-    /// Save a object of type T in a json file of a cache of a file based in cacheId.
+    /// Store a json data based on id and CacheId implementation.
+    /// Consider use the name of the file associated with this cache was id.
     /// </summary>
-    protected async Task saveJson<J>(string filePath, string cacheId, J obj)
+    protected async Task Store<J>(string id, J obj)
     {
-        var cacheFolder = getFileCache(filePath);
-        var cacheFile = Path.Combine(cacheFolder, cacheId);
-
-        var json = JsonSerializer.Serialize<J>(obj);
+        var cacheFile = GetCacheFile(id);
+        var json = JsonSerializer.Serialize(obj);
         await File.WriteAllTextAsync(cacheFile, json);
     }
-
-    private string getFileCache(string filePath)
+    
+    private string GetCacheFile(string id)
     {
-        var fileName = Path.GetFileNameWithoutExtension(filePath);
-        var cacheFolder = getCacheFolderPath();
-        var fileCache = Path.Combine(cacheFolder, fileName);
+        var cacheFolder = GetCacheFolderWithId(id);
+        var cacheFile = Path.Combine(cacheFolder, cacheId);
+        return cacheFile;
+    }
+
+    private static string GetCacheFolderWithId(string id)
+    {
+        var folderName = Path.GetFileNameWithoutExtension(id);
+        var cacheFolder = GetCacheFolderPath();
+        var fileCache = Path.Combine(cacheFolder, folderName);
         if (Path.Exists(fileCache))
             return fileCache;
         
@@ -75,20 +81,20 @@ public abstract class Cache<T>
         return fileCache;
     }
 
-    private string getDefaultCacheFolderPath()
+    private static string GetCacheFolderPath()
     {
-        var basePath = Environment.CurrentDirectory;
-        const string cacheFolder = ".cache";
-        return Path.Combine(basePath, cacheFolder);
-    }
-
-    private string getCacheFolderPath()
-    {
-        var cacheFolder = getDefaultCacheFolderPath();
+        var cacheFolder = GetDefaultCacheFolderPath();
         if (Path.Exists(cacheFolder))
             return cacheFolder;
         
         Directory.CreateDirectory(cacheFolder);
         return cacheFolder;
+    }
+    
+    private static string GetDefaultCacheFolderPath()
+    {
+        const string cacheFolder = ".cache";
+        var basePath = Environment.CurrentDirectory;
+        return Path.Combine(basePath, cacheFolder);
     }
 }
