@@ -10,7 +10,7 @@ namespace Orkestra.Caches;
 
 public static class Cache
 {
-    public readonly static LastWriteCache LastWrite = new LastWriteCache();
+    public readonly static LastWriteCache LastWrite = new();
 }
 
 /// <summary>
@@ -31,7 +31,7 @@ public abstract class Cache<T>
     /// <summary>
     /// Return if a chache exists based on cache Id.
     /// </summary>
-    protected bool exists(string filePath, string cacheId)
+    protected bool Exists(string filePath, string cacheId)
     {
         var cacheFolder = getFileCache(filePath);
         var cacheFile = Path.Combine(cacheFolder, cacheId);

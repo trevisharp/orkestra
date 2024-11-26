@@ -14,7 +14,7 @@ public class LastWriteCache : Cache<DateTime>
 
     public override async Task<CacheResult<DateTime>> TryGet(string filePath)
     {
-        if (!exists(filePath, lastWriteCacheId))
+        if (!Exists(filePath, lastWriteCacheId))
             return CacheResult<DateTime>.Miss;
 
         var lastWriteCache = await openJson<LastWriteJson>(filePath, lastWriteCacheId);

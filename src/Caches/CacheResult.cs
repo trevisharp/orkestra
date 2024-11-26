@@ -1,11 +1,6 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    21/03/2024
+ * Date:    26/11/2024
  */
-using System;
-using System.IO;
-using System.Text.Json;
-using System.Threading.Tasks;
-
 namespace Orkestra.Caches;
 
 /// <summary>
@@ -15,6 +10,13 @@ public record CacheResult<T>(
     bool IsHit, T Object
 )
 {
+    /// <summary>
+    /// Get a cache hit with value.
+    /// </summary>
     public static CacheResult<T> Hit(T obj) => new (true, obj);
-    public readonly static CacheResult<T> Miss = new(false, default(T));
+
+    /// <summary>
+    /// Get a cache Miss without value.
+    /// </summary>
+    public readonly static CacheResult<T> Miss = new(false, default);
 }
