@@ -16,7 +16,6 @@ using Caches;
 using Providers;
 using Extensions;
 using Processings;
-using Processings.Implementations;
 using LexicalAnalysis;
 using SyntacticAnalysis;
 using Orkestra.Exceptions;
@@ -31,15 +30,15 @@ public class Compiler
     public string Name => loadedName ??= LoadName();
 
     public IAlgorithmGroupProvider? Provider { get; set; }
-    public Rule StartRule { get; private set; } = [];
-    public List<Key> Keys { get; private set; } = [];
-    public List<Rule> Rules { get; private set; } = [];
-    public List<Processing> Processings { get; private set; } = [];
+    public Rule StartRule { get; protected set; } = [];
+    public List<Key> Keys { get; protected set; } = [];
+    public List<Rule> Rules { get; protected set; } = [];
+    public List<Processing> Processings { get; protected set; } = [];
 
     /// <summary>
     /// Load all data of compiler from fields.
     /// </summary>
-    public void Load()
+    public virtual void Load()
     {
         LoadFromFields();
     }
@@ -59,7 +58,7 @@ public class Compiler
         };
     }
 
-    public async Task<ExpressionTree> Compile(string filePath, params string[] args)
+    public virtual async Task<ExpressionTree> Compile(string filePath, params string[] args)
     {
         if (Provider is null)
             throw new MissingProviderException();
