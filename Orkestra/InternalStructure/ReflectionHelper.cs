@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    04/07/2024
+ * Date:    05/01/2025
  */
 using System;
 using System.Reflection;
@@ -16,9 +16,10 @@ internal class ReflectionHelper
 {
     internal static CLI GetConfiguredCLI()
     {
+        CLI? cli = null;
         try
         {
-            return construct(typeof(CLI), 
+            cli = Construct(typeof(CLI), 
                     () => new DefaultCLI(GetConfiguredProject())
                 ) as CLI;
         }
@@ -34,40 +35,48 @@ internal class ReflectionHelper
         {
             throw new UnexpectedException(ex);
         }
+
+        if (cli is null)
+            throw new MissingCLIDefinitionException();
+        
+        return cli;
     }
 
     internal static Project GetConfiguredProject()
     {
+        Project? project = null;
         try
         {
-            return construct(typeof(Project), 
+            project = Construct(typeof(Project), 
                 () => Tech.DefaultProject ?? 
                     Project.CreateDefault(".code", GetConfiguredCompiler())
                 ) as Project;
         }
         catch (ManyDefinitionException)
         {
-            System.Console.WriteLine("dfsiadfj2");
             throw new ManyProjectDefinitionException();
         }
         catch (MissingDefinitionException)
         {
-            System.Console.WriteLine("dfsiadfj");
             throw new MissingProjectDefinitionException();
         }
         catch (Exception ex)
         {
-            System.Console.WriteLine("dfsiadfj3");
             throw new UnexpectedException(ex);
         }
+
+        if (project is null)
+            throw new MissingProjectDefinitionException();
+        
+        return project;
     }
     
     internal static Compiler GetConfiguredCompiler()
     {
-        Compiler compiler = null;
+        Compiler? compiler = null;
         try
         {
-            compiler = construct(typeof(Compiler)) as Compiler;
+            compiler = Construct(typeof(Compiler)) as Compiler;
         }
         catch (ManyDefinitionException)
         {
@@ -82,17 +91,20 @@ internal class ReflectionHelper
             throw new UnexpectedException(ex);
         }
 
+        if (compiler is null)
+            throw new MissingCompilerDefinitionException();
+
         compiler.Provider = GetConfiguredAlgorithmGroupProvider();
         compiler.Load();
 
         return compiler;
     }
 
-    internal static IAlgorithmGroupProvider GetConfiguredAlgorithmGroupProvider()
+    internal static IAlgorithmGroupProvider? GetConfiguredAlgorithmGroupProvider()
     {
         try
         {
-            var provider = construct(
+            var provider = Construct(
                 typeof(IAlgorithmGroupProvider), 
                 () => new DefaultAlgorithmGroupProvider()
             ) as IAlgorithmGroupProvider;
@@ -119,11 +131,11 @@ internal class ReflectionHelper
         return compiler;
     }
 
-    private static object construct(Type matchType, Func<object> defaultValue = null)
+    static object Construct(Type matchType, Func<object>? defaultValue = null)
     {
         List<Type> findedTypes = [];
 
-        var types = getAssemplyTypes();
+        var types = GetAssemplyTypes();
         foreach (var type in types)
         {
             var baseType = type.BaseType;
@@ -141,7 +153,7 @@ internal class ReflectionHelper
 
         if (findedTypes.Count == 1)
         {
-            var constructor = getEmptyConstructor(findedTypes[0]);
+            var constructor = GetEmptyConstructor(findedTypes[0]);
             if (constructor is null)
                 throw new NoConstructorException(matchType.Name);
             return constructor.Invoke([]);
@@ -150,18 +162,23 @@ internal class ReflectionHelper
         if (findedTypes.Count > 1)
             throw new ManyDefinitionException();
 
-        return defaultValue() ?? throw new MissingDefinitionException();
+        if (defaultValue is null)
+            throw new MissingDefinitionException();
+
+        return defaultValue();
     }
 
-    private static Type[] getAssemplyTypes()
+    static Type[] GetAssemplyTypes()
     {
         var assembly = Assembly.GetEntryAssembly();
+        if (assembly is null)
+            return [];
+        
         var types = assembly.GetTypes();
-
         return types;
     }
 
-    private static ConstructorInfo getEmptyConstructor(Type type)
+    static ConstructorInfo? GetEmptyConstructor(Type type)
     {
         var constructors = type.GetConstructors();
 

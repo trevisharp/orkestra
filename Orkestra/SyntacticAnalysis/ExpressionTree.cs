@@ -12,7 +12,7 @@ namespace Orkestra.SyntacticAnalysis;
 public record ExpressionTree(
     ISyntacticElement Element,
     ExpressionTree[] Children,
-    object Data = null
+    object? Data = null
 )
 {
     public override string ToString()
@@ -27,7 +27,7 @@ public record ExpressionTree(
             {
                 foreach (var tab in tabulation)
                     sb.Append(tab);
-                var tail = tabulation.Last.Value;
+                var tail = tabulation.Last!.Value;
                 tabulation.RemoveLast();
                 tabulation.AddLast(
                     tail == '├' ? '│' : ' '
