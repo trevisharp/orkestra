@@ -99,27 +99,6 @@ public class Compiler
         return tree;
     }
 
-    protected static LineCommentProcessing lineComment(string starter)
-        => new(starter);
-
-    protected static Key key(string name, string expression)
-        => Key.CreateKey(name, expression);
-
-    protected static Key keyword(string name, string expression)
-        => Key.CreateKeyword(name, expression);
-
-    protected static Key keyword(string expression)
-        => keyword(expression.ToUpper(), expression);
-
-    protected static Key contextual(string expression)
-        => Key.CreateContextual(null, expression);
-
-    protected static Key auto(string name)
-        => Key.CreateAutoKeyword(name);
-
-    protected static Key identity(string expression)
-        => Key.CreateIdentity(expression);
-
     ProcessingCollection BuildProcessingMachine()
     {
         ProcessingCollection package = new();

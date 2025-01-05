@@ -9,18 +9,15 @@ namespace Orkestra;
 /// Represents a Key for syntactical analisys.
 /// </summary>
 public class Key(
-    string name, string expression, 
-    bool contextual, bool identity, 
-    bool keyword, bool auto
-    ) : ISyntacticElement
+    string? name, string? expression, bool contextual, 
+    bool identity, bool keyword, bool auto) : ISyntacticElement
 {
-
-    public string Name { get; set; } = name;
-    public string Expression { get; private set; } = expression;
-    public bool IsContextual { get; private set; } = contextual;
-    public bool IsIdentity { get; private set; } = identity;
-    public bool IsKeyword { get; private set; } = keyword;
-    public bool IsAuto { get; private set; } = auto;
+    public string? Name { get; set; } = name;
+    public string? Expression { get; init; } = expression;
+    public bool IsContextual { get; init; } = contextual;
+    public bool IsIdentity { get; init; } = identity;
+    public bool IsKeyword { get; init; } = keyword;
+    public bool IsAuto { get; init; } = auto;
 
     public override string ToString()
         => $"K:{Name ?? "unnamed"}";
