@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    05/01/2025
+ * Date:    05/01/2024
  */
 using System.Linq;
 using System.Collections;
@@ -12,7 +12,7 @@ namespace Orkestra;
 /// </summary>
 public class SubRule(params ISyntacticElement[] tokens) : IEnumerable<ISyntacticElement>
 {
-    readonly ISyntacticElement[] ruleTokens = tokens;
+    readonly List<ISyntacticElement> ruleTokens = [ ..tokens ];
 
     /// <summary>
     /// Get tokens for this rule.
@@ -28,6 +28,12 @@ public class SubRule(params ISyntacticElement[] tokens) : IEnumerable<ISyntactic
     /// Get the name of the subrule.
     /// </summary>
     public string Name => (Parent?.Name ?? "NoParent") + "." + ruleTokens.First().Name;
+
+    /// <summary>
+    /// Add a new sub toke in this sub rule.
+    /// </summary>
+    public void Add(ISyntacticElement element)
+        => ruleTokens.Add(element);
 
     public IEnumerator<ISyntacticElement> GetEnumerator()
     {

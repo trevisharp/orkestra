@@ -11,7 +11,7 @@ namespace Orkestra;
 /// </summary>
 public class IntermediaryRuleOption
 {
-    private List<SubRule> subRules = new List<SubRule>();
+    readonly List<SubRule> subRules = [];
 
     public static implicit operator Rule(IntermediaryRuleOption option)
         => Rule.CreateRule(option?.subRules?.ToArray() ?? []);

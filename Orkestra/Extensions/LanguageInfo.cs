@@ -1,20 +1,18 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    28/06/2023
+ * Date:    05/01/2024
  */
 using System.Collections.Generic;
 
 namespace Orkestra.Extensions;
-
-using Processings;
 
 /// <summary>
 /// Represents info of a specific language.
 /// </summary>
 public class LanguageInfo
 {
-    public string Name { get; set; }
-    public string Extension { get; set; }
-    public List<Rule> Rules { get; set; }
-    public List<Key> Keys { get; set; }
-    public List<Processing> Processings { get; set; }
+    public required string Name { get; init; }
+    public required Rule InitialRule { get; init; }
+    public required List<Rule> Rules { get; init; }
+    public required List<Key> Keys { get; init; }
+    public required List<Processing> Processings { get; init; }
 }

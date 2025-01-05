@@ -11,5 +11,5 @@ public interface ISyntacticElement
     /// <summary>
     /// The string name of the element.
     /// </summary>
-    string Name { get; set; }
+    string? Name { get; set; }
 }

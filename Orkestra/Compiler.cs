@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    04/07/2024
+ * Date:    05/01/2025
  */
 using System;
 using System.IO;
@@ -16,9 +16,10 @@ using Caches;
 using Providers;
 using Extensions;
 using Processings;
+using Processings.Implementations;
 using LexicalAnalysis;
 using SyntacticAnalysis;
-using Processings.Implementations;
+using Orkestra.Exceptions;
 
 /// <summary>
 /// A base class for all compiler created with Orkestra framework.
@@ -28,6 +29,15 @@ public class Compiler
     private bool loadedFromFields = false;
 
     string? loadedName = null;
+
+    string GetSpecialName()
+    {
+        var baseName = GetType().Name;
+        if (baseName == "Compiler")
+            return "no-named-lang";
+        return baseName.Replace("Compiler", "");
+    }
+
     string LoadName()
     {
         var className = ToString() ?? "nonamecompiler";
@@ -47,10 +57,11 @@ public class Compiler
     }
     public string Name => loadedName ??= LoadName();
 
-    public IAlgorithmGroupProvider Provider { get; set; }
-    public List<Key> Keys { get; private set; } = new();
-    public List<Rule> Rules { get; private set; } = new();
-    public List<Processing> Processings { get; private set; } = new();
+    public IAlgorithmGroupProvider? Provider { get; set; }
+    public Rule StartRule { get; private set; } = [];
+    public List<Key> Keys { get; private set; } = [];
+    public List<Rule> Rules { get; private set; } = [];
+    public List<Processing> Processings { get; private set; } = [];
 
     /// <summary>
     /// Load all data of compiler from fields.
@@ -66,9 +77,11 @@ public class Compiler
     public LanguageInfo GetInfo()
     {
         return new() {
-            Name = getSpecialName(),
-            Keys = Keys,
-            Rules = Rules
+            InitialRule = null,
+            Name = GetSpecialName(),
+            Keys = [ ..Keys ],
+            Rules = [ ..Rules ],
+            Processings = [ ..Processings ],
         };
     }
 
@@ -82,7 +95,7 @@ public class Compiler
         var sourceCode = await Text.FromFile(filePath);
 
         Info($"[{filePath}]: Preprocessing started...", 3);
-        var machine = buildProcessingMachine();
+        var machine = BuildProcessingMachine();
         var processedText = machine.ProcessAll(sourceCode);
         Success($"[{filePath}]: Preprocessing completed!", 3);
         Content($"[{filePath}]: Processed Text:", 10);
@@ -90,7 +103,7 @@ public class Compiler
         NewLine(1);
 
         Info($"[{filePath}]: Lexical Analysis started...", 3);
-        var lex = buildLexicalAnalyzer();
+        var lex = BuildLexicalAnalyzer();
         var tokens = lex.Parse(processedText);
         Success($"[{filePath}]: Lexical Analysis completed!", 3);
         Content($"[{filePath}]: Token List:", 10);
@@ -99,7 +112,7 @@ public class Compiler
         NewLine(1);
 
         Info($"[{filePath}]: Syntacic Analysis started...", 3);
-        var parser = buildSyntacticAnalyzer();
+        var parser = BuildSyntacticAnalyzer();
         var tree = parser.Parse(tokens);
         Success($"[{filePath}]: Syntacic Analysis completed!", 3);
         Content($"[{filePath}]: Syntacic Tree:", 10);
@@ -130,36 +143,6 @@ public class Compiler
     protected static Key identity(string expression)
         => Key.CreateIdentity(expression);
     
-    protected static Rule rule(Func<Rule, List<ISyntacticElement>[]> creator)
-    {
-        var rule = Rule.CreateRule();
-        rule.AddSubRules(creator(rule));
-        return rule;
-    }
-    
-    protected static Rule start(params List<ISyntacticElement>[] subRules)
-    {
-        var rule = Rule.CreateStartRule();
-        rule.AddSubRules(subRules);
-        return rule;
-    }
-
-    protected static Rule start(Func<Rule, List<ISyntacticElement>[]> creator)
-    {
-        var rule = Rule.CreateStartRule();
-        rule.AddSubRules(creator(rule));
-        return rule;
-    }
-    
-    protected static Rule start(params ISyntacticElement[] elements)
-    {
-        var rule = Rule.CreateStartRule();
-        rule.AddSubRules(
-            new SubRule(elements)
-        );
-        return rule;
-    }
-    
     protected static Rule many(ISyntacticElement element, ISyntacticElement separator = null)
     {
         var newRule = Rule.CreateRule();
@@ -171,56 +154,25 @@ public class Compiler
         );
         return newRule;
     }
-
-    private string getSpecialName()
-    {
-        var baseName = GetType().Name;
-        if (baseName == "Compiler")
-            return "no-named-lang";
-        return baseName.Replace("Compiler", "");
-    }
-
-    private void LoadFromFields()
-    {
-        if (loadedFromFields)
-            return;
-        loadedFromFields = true;
-        setEmptyNames();
-
-        Keys = Keys
-            .Concat(getFields<Key>())
-            .Distinct()
-            .ToList();
-        
-        Rules = Rules
-            .Concat(getFields<Rule>())
-            .Distinct()
-            .ToList();
-        
-        Processings = Processings
-            .Concat(getFields<Processing>())
-            .Distinct()
-            .ToList();
-    }
-
-    private ProcessingCollection buildProcessingMachine()
+    
+    ProcessingCollection BuildProcessingMachine()
     {
         ProcessingCollection package = new ProcessingCollection();
 
-        foreach (var process in getFields<Processing>())
+        foreach (var process in GetFields<Processing>())
             package.Add(process);
 
         return package;
     }
     
-    private ILexicalAnalyzer buildLexicalAnalyzer()
+    ILexicalAnalyzer BuildLexicalAnalyzer()
     {
         var lexicalAnalyzer = Provider.ProvideLexicalAnalyzer();
         lexicalAnalyzer.AddKeys(Keys);
         return lexicalAnalyzer;
     }
 
-    private ISyntacticAnalyzer buildSyntacticAnalyzer()
+    ISyntacticAnalyzer BuildSyntacticAnalyzer()
     {
         var builder = Provider.ProvideSyntacticAnalyzerBuilder();
         var loaded = builder.LoadCache();
@@ -229,32 +181,48 @@ public class Compiler
             return builder.Build();
         
         foreach (var rule in Rules)
-        {
-            if (rule is null)
-                continue;
-
-            if (rule.IsStartRule)
-                builder.StartRule = rule;
             builder.Add(rule);
-        }
+        builder.StartRule = StartRule;
         builder.Load(Keys);
         builder.SaveCache();
 
         return builder.Build();
     }
 
-    private void setEmptyNames()
+    void LoadFromFields()
     {
-        var type = this.GetType();
+        if (loadedFromFields)
+            return;
+        
+        loadedFromFields = true;
+        SetEmptyNames();
+
+        Keys = Keys
+            .Concat(GetFields<Key>())
+            .Distinct()
+            .ToList();
+        
+        Rules = Rules
+            .Concat(GetFields<Rule>())
+            .Distinct()
+            .ToList();
+        
+        Processings = Processings
+            .Concat(GetFields<Processing>())
+            .Distinct()
+            .ToList();
+        
+        StartRule = GetStartRule();
+    }
+
+    void SetEmptyNames()
+    {
+        var type = GetType();
         foreach (var field in type.GetRuntimeFields())
         {
-            if (field.FieldType != typeof(Rule) && field.FieldType != typeof(Key))
+            if (field.GetValue(this) is not ISyntacticElement obj)
                 continue;
-            
-            var obj = field.GetValue(this) as ISyntacticElement;
-            if (obj is null)
-                continue;
-            
+
             if (!string.IsNullOrEmpty(obj.Name))
                 continue;
             
@@ -262,14 +230,35 @@ public class Compiler
         }
     }
 
-    private IEnumerable<T> getFields<T>()
-        where T : class
+    IEnumerable<T> GetFields<T>() where T : class
     {
-        var type = this.GetType();
+        var type = GetType();
         foreach (var field in type.GetRuntimeFields())
         {
-            if (field.FieldType == typeof(T))
-                yield return field.GetValue(this) as T;
+            if (field.FieldType != typeof(T))
+                continue;
+            
+            var value = field.GetValue(this) as T;
+            yield return value!;
         }
+    }
+
+    Rule GetStartRule()
+    {
+        var type = GetType();
+        foreach (var field in type.GetRuntimeFields())
+        {
+            if (field.FieldType != typeof(Rule))
+                continue;
+            
+            var attribute = field.GetCustomAttribute<StartAttribute>();
+            if (attribute is null)
+                continue;
+            
+            var value = field.GetValue(this) as Rule;
+            return value!;
+        }
+
+        throw new MissingFirstRuleException();
     }
 }

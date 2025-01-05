@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    28/06/2024
+ * Date:    05/01/2025
  */
 using System.Collections;
 using System.Collections.Generic;
@@ -7,18 +7,14 @@ using System.Collections.Generic;
 namespace Orkestra;
 
 /// <summary>
-/// A record that represents a set of rules with same name.
+/// Represents a set of rules with same name.
 /// </summary>
-public class Rule(
-    string name = null, 
-    bool startRule = false, 
-    params SubRule[] subRules
-    ) : ISyntacticElement, IEnumerable<SubRule>
+public class Rule : ISyntacticElement, IEnumerable<SubRule>
 {
-    private List<SubRule> subRules = [ ..subRules ];
+    readonly List<SubRule> subRules = [];
 
-    public string Name { get; set; } = name;
-    public bool IsStartRule { get; set; } = startRule;
+    public string? Name { get; set; }
+
     public IEnumerable<SubRule> SubRules => subRules;
 
     public override string ToString()
@@ -38,34 +34,22 @@ public class Rule(
             subRule.Parent = this;
     }
     
-    public void AddSubRules(params List<ISyntacticElement>[] subRules)
+    public static Rule CreateRule(string? name, params SubRule[] subRules)
     {
-        foreach (var subRule in subRules)
-        {
-            var sb = new SubRule(
-                subRule.ToArray()
-            );
-            sb.Parent = this;
-            this.subRules.Add(sb);
-        }
+        Rule rule = [];
+        rule.Name = name;
+        rule.AddSubRules(subRules);
+        return rule;
     }
     
-    public static Rule CreateRule(string name, params SubRule[] subRules)
-        => new Rule(name, false, subRules);
-
-    public static Rule CreateStartRule(string name, params SubRule[] subRules)
-        => new Rule(name, true, subRules);
-    
     public static Rule CreateRule(params SubRule[] subRules)
-        => new Rule(null, false, subRules);
-
-    public static Rule CreateStartRule(params SubRule[] subRules)
-        => new Rule(null, true, subRules);
+        => CreateRule(null, subRules);
 
     public IEnumerator<SubRule> GetEnumerator()
-        => this.subRules.GetEnumerator();
+        => subRules.GetEnumerator();
+    
     IEnumerator IEnumerable.GetEnumerator()
-        => this.subRules.GetEnumerator();
+        => subRules.GetEnumerator();
 
     public static IntermediaryRuleOption operator |(Rule r1, Rule r2)
         => new IntermediaryRuleOption() | r1 | r2;
