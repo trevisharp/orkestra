@@ -10,8 +10,8 @@ using Packages;
 /// </summary>
 public class Error : PackageElement
 {
-    public string Message { get; set; }
-    public string Title { get; set; }
+    public required string Message { get; set; }
+    public required string Title { get; set; }
     public ErrorType Type { get; set; }
 
     public Error Clone()

@@ -13,9 +13,9 @@ namespace Orkestra.Extensions.VSCode;
 /// </summary>
 public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
 {
-    public override string JSCode => buildJs();
+    public override string JSCode => BuildJs();
 
-    string buildJs()
+    string BuildJs()
     {
         var sb = new StringBuilder();
         var headers = language.GetHeaders();
@@ -26,7 +26,7 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
 
         int providerIndex = 0;
         foreach (var header in headers)
-            process(header, keyHash, sb, providerIndex++);
+            Process(header, keyHash, sb, providerIndex++);
         
         var missingKeys = 
             from key in language.Keys
@@ -37,15 +37,15 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
         foreach (var key in missingKeys)
         {
             keyHash.Add(key.Name);
-            sb.Append(getSimpleAutoComplete(key, providerIndex++));
+            sb.Append(GetSimpleAutoComplete(key, providerIndex++));
         }
 
-        generateNextCompletations(sb, providerIndex);
+        GenerateNextCompletations(sb, providerIndex);
         
         return sb.ToString();
     }
 
-    void generateNextCompletations(StringBuilder sb, int index)
+    void GenerateNextCompletations(StringBuilder sb, int index)
     {
         var completableKeys =
             from key in language.Keys
@@ -96,7 +96,7 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
 
             var provider = $"provider{++index}";
             var item = pair.Value.FirstOrDefault()?.Name?.ToLower() ?? "value";
-            sb.AppendLine(registerCompletionItemProvider(provider, 
+            sb.AppendLine(RegisterCompletionItemProvider(provider, 
                 $$"""
                     const linePrefix = document.lineAt(position).text.slice(0, position.character);
                     if (!linePrefix.endsWith('{{pair.Key.Expression}} ')) {
@@ -111,13 +111,13 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
         }
     }
 
-    void process(
+    void Process(
         IGrouping<string, SubRule> group,
         HashSet<string> keyHash, 
         StringBuilder sb, 
         int index)
     {
-        var code = getCode(group, index);
+        var code = GetCode(group, index);
         if (code is null)
             return;
             
@@ -125,7 +125,7 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
         sb.AppendLine(code);
     }
 
-    string registerCompletionItemProvider(string providerName, string code, char trigger = char.MinValue)
+    string RegisterCompletionItemProvider(string providerName, string code, char trigger = char.MinValue)
     {
         var triggerData = trigger == char.MinValue ? "" : $", '{trigger}'";
         return
@@ -142,32 +142,31 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
             """;
     }
 
-    string getCode(
+    string? GetCode(
         IGrouping<string, SubRule> group,
         int index)
     {
         if (group.All(g => g.Count() == 1))
-            return getSimpleAutoComplete(group, index);
+            return GetSimpleAutoComplete(group, index);
         
         if (group.Count() == 1)
-            return getComplexUnique(group, index);
+            return GetComplexUnique(group, index);
 
-        return getComplexMin(group, index);
+        return GetComplexMin(group, index);
     }
 
-    string getSimpleAutoComplete(
+    string? GetSimpleAutoComplete(
         IGrouping<string, SubRule> group,
         int index)
     {
         var subRule = group.FirstOrDefault();
         if (subRule is null)
             return null;
-        
-        var header = subRule.FirstOrDefault() as Key;
-        if (header is null)
+
+        if (subRule.FirstOrDefault() is not Key header)
             return null;
 
-        return registerCompletionItemProvider($"provider{index}",
+        return RegisterCompletionItemProvider($"provider{index}",
             $$"""
             const comp = new vscode.CompletionItem('{{header.Expression}}', vscode.CompletionItemKind.Keyword);
             comp.commitCharacters = [' '];
@@ -176,9 +175,9 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
         );
     }
 
-    string getSimpleAutoComplete(Key key, int index)
+    string GetSimpleAutoComplete(Key key, int index)
     {
-        return registerCompletionItemProvider($"provider{index}",
+        return RegisterCompletionItemProvider($"provider{index}",
             $$"""
             const comp = new vscode.CompletionItem('{{key.Expression}}', vscode.CompletionItemKind.Keyword);
             comp.commitCharacters = [' '];
@@ -187,7 +186,7 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
         );
     }
 
-    string getComplexUnique(
+    string? GetComplexUnique(
         IGrouping<string, SubRule> group,
         int index)
     {
@@ -204,7 +203,7 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
         string baseProviderName = $"provider{index}";
 
         return 
-            registerCompletionItemProvider(baseProviderName,
+            RegisterCompletionItemProvider(baseProviderName,
             $$"""
             const comp = new vscode.CompletionItem('{{item}}', vscode.CompletionItemKind.Keyword);
             comp.insertText = new vscode.SnippetString('{{snippet}}');
@@ -214,9 +213,7 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
         );
     }
 
-    string getComplexMin(
-        IGrouping<string, SubRule> group,
-        int index)
+    string? GetComplexMin(IGrouping<string, SubRule> group, int index)
     {
         var biggesst = group.MinBy(g => g.Count());
         if (biggesst is null)
@@ -231,7 +228,7 @@ public class AutoCompleteJSContribute(LanguageInfo language) : JSContribute
         string baseProviderName = $"provider{index}";
 
         return 
-            registerCompletionItemProvider(baseProviderName,
+            RegisterCompletionItemProvider(baseProviderName,
             $$"""
             const comp = new vscode.CompletionItem('{{item}}', vscode.CompletionItemKind.Keyword);
             comp.insertText = new vscode.SnippetString('{{snippet}}');

@@ -23,7 +23,7 @@ public static class SnippetUtilExtension
         var keyGroups = 
             from subRule in rules.SelectMany(r => r)
             where hasKeywordHeader(subRule)
-            group subRule by subRule.FirstOrDefault().Name;
+            group subRule by subRule.FirstOrDefault()?.Name;
         
         return keyGroups;
     }
@@ -109,8 +109,8 @@ public static class SnippetUtilExtension
             return false;
         
         var regex = new Regex("[A-Za-z0-9]+");
-        var match = regex.Match(key.Expression);
-        return match.Length == key.Expression.Length;
+        var match = regex.Match(key.Expression!);
+        return match.Length == key.Expression!.Length;
     }
 
     /// <summary>
@@ -154,13 +154,13 @@ public static class SnippetUtilExtension
         if (!key.IsKeyword)
             return $"${{{++snippetIndex}:{key?.Name?.ToLower() ?? "value"}}}";
         
-        return key.Expression;
+        return key.Expression!;
     }
 
     static string getSnippetParam(Rule rule, ref int snippetIndex)
     {
         if (rule is null)
-            return null;
+            return null!;
         
         var headers = getHeaders(rule);
         int headerCount = headers.Count();

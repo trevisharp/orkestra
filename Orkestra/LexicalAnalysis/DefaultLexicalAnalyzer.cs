@@ -14,8 +14,7 @@ using SyntacticAnalysis;
 /// </summary>
 public class DefaultLexicalAnalyzer : ILexicalAnalyzer
 {
-    private List<Key> keys = new List<Key>();
-
+    readonly List<Key> keys = [];
     public IEnumerable<Key> Keys => this.keys;
 
     public void AddKeys(IEnumerable<Key> keys)
@@ -30,22 +29,22 @@ public class DefaultLexicalAnalyzer : ILexicalAnalyzer
                 yield return tk;
             else if (source is Line line)
             {
-                foreach (var token in parse(line.Text, text.SourceFile, line.Number))
+                foreach (var token in Parse(line.Text, text.SourceFile, line.Number))
                     yield return token;
             }
         }
     }
 
-    private IEnumerable<Token> parse(string code, string file, int line)
+    IEnumerable<Token> Parse(string code, string file, int line)
     {
         int startIndex = 0;
         int keyIndex = 0;
         int minToken = int.MaxValue;
-        Match crrMatch = null;
-        Key crrKey = null;
+        Match crrMatch = null!;
+        Key crrKey = null!;
         List<Key> keys = new List<Key>(this.keys);
         
-        var matches = getRegexMatchList(keys, code);
+        var matches = GetRegexMatchList(keys, code);
         
         while (keys.Count > 0)
         {
@@ -54,16 +53,16 @@ public class DefaultLexicalAnalyzer : ILexicalAnalyzer
                 if (crrMatch == null)
                     yield break;
                 
-                yield return createToken(crrKey, crrMatch, file, line);
+                yield return CreateToken(crrKey!, crrMatch, file, line);
 
                 startIndex = crrMatch.Index + crrMatch.Value.Length;
                 minToken = int.MaxValue;
-                crrMatch = null;
-                crrKey = null;
+                crrMatch = null!;
+                crrKey = null!;
                 keyIndex = 0;
             }
 
-            var match = getCurrentMatch(matches[keyIndex], startIndex);
+            var match = GetCurrentMatch(matches[keyIndex], startIndex);
             matches[keyIndex] = match;
 
             if (!match.Success)
@@ -84,9 +83,9 @@ public class DefaultLexicalAnalyzer : ILexicalAnalyzer
         }
     }
 
-    private List<Match> getRegexMatchList(List<Key> keys, string code)
+    static List<Match> GetRegexMatchList(List<Key> keys, string code)
     {
-        List<Match> matches = new List<Match>();
+        List<Match> matches = [];
 
         for (int j = 0; j < keys.Count; j++)
         {
@@ -99,7 +98,7 @@ public class DefaultLexicalAnalyzer : ILexicalAnalyzer
                 continue;
             }
 
-            var regex = new Regex(key.Expression);
+            var regex = new Regex(key.Expression!);
             var match = regex.Match(code);
             
             if (!match.Success)
@@ -115,14 +114,14 @@ public class DefaultLexicalAnalyzer : ILexicalAnalyzer
         return matches;
     }
 
-    private Match getCurrentMatch(Match match, int startIndex)
+    static Match GetCurrentMatch(Match match, int startIndex)
     {
         while (match.Index < startIndex && match.Success)
             match = match.NextMatch();
         return match;
     }
 
-    private Token createToken(Key key, Match match, string file, int line)
+    static Token CreateToken(Key key, Match match, string file, int line)
     {           
         Token token = new Token(
             key,

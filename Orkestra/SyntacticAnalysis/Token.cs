@@ -6,7 +6,7 @@ namespace Orkestra.SyntacticAnalysis;
 /// <summary>
 /// Represents a Token data output from lexical analisys.
 /// </summary>
-public record Token(Key Key, string Value, string File, int Line)
+public record Token(Key Key, string? Value, string File, int Line)
 {
     public bool Is(ISyntacticElement token)
         => token is Key key && key == this.Key;

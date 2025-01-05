@@ -38,8 +38,10 @@ public abstract class CLI
 
             ForegroundColor = ConsoleColor.Magenta;
             var args = ReadLine()?
-                .Trim()
+                .Trim()?
                 .Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (args is null)
+                continue;
             ForegroundColor = ConsoleColor.Gray;
 
             Verbose.NewLine();

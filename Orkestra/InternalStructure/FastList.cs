@@ -8,7 +8,7 @@ internal class FastList<T> : IEnumerable<T>
 {
     private const int maxSize = 1024;
     private LinkedList<List<T>> list = new();
-    private List<T> Last => list.Last.Value;
+    private List<T>? Last => list.Last?.Value;
     private int count = 0;
 
     public int Count => count;
@@ -21,7 +21,7 @@ internal class FastList<T> : IEnumerable<T>
         get
         {
             var node = list.First;
-            while (index >= node.Value.Count)
+            while (index >= node!.Value.Count)
             {
                 index -= node.Value.Count;
                 node = node.Next;
@@ -33,7 +33,7 @@ internal class FastList<T> : IEnumerable<T>
         set
         {
             var node = list.First;
-            while (index >= node.Value.Count)
+            while (index >= node!.Value.Count)
             {
                 index -= node.Value.Count;
                 node = node.Next;
@@ -53,7 +53,7 @@ internal class FastList<T> : IEnumerable<T>
     {
         count++;
 
-        if (Last.Count < maxSize)
+        if (Last!.Count < maxSize)
         {
             Last.Add(value);
             return;
@@ -76,7 +76,7 @@ internal class FastList<T> : IEnumerable<T>
     {
         this.count++;
         var node = this.list.First;
-        while (index > node.Value.Count)
+        while (index > node!.Value.Count)
         {
             index -= node.Value.Count;
             node = node.Next;
@@ -88,7 +88,7 @@ internal class FastList<T> : IEnumerable<T>
     internal void Insert(T[] values, int index)
     {
         var node = this.list.First;
-        while (index > node.Value.Count)
+        while (index > node!.Value.Count)
         {
             index -= node.Value.Count;
             node = node.Next;
@@ -127,7 +127,7 @@ internal class FastList<T> : IEnumerable<T>
             len = this.count - start - len + 1;
 
         var node = this.list.First;
-        while (start > node.Value.Count)
+        while (start > node!.Value.Count)
         {
             start -= node.Value.Count;
             node = node.Next;

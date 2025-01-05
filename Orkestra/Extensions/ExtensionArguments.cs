@@ -9,7 +9,7 @@ namespace Orkestra.Extensions;
 /// Represents parameters to create a item.
 /// </summary>
 public class ExtensionArguments {
-    public string Name { get; set; }
-    public string[] Arguments { get; set; }
+    public required string Name { get; set; }
+    public required string[] Arguments { get; set; }
     public List<LanguageInfo> Languages { get; set; } = new();
 }
