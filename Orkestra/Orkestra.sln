@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orkestra", "Orkestra.csproj", "{9AB21542-D2E5-4D3A-A12E-871C026335DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orkestra", "Orkestra.csproj", "{CD99B9DD-4217-47A7-8CBF-28F67C1EA578}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9AB21542-D2E5-4D3A-A12E-871C026335DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9AB21542-D2E5-4D3A-A12E-871C026335DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9AB21542-D2E5-4D3A-A12E-871C026335DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9AB21542-D2E5-4D3A-A12E-871C026335DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD99B9DD-4217-47A7-8CBF-28F67C1EA578}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD99B9DD-4217-47A7-8CBF-28F67C1EA578}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD99B9DD-4217-47A7-8CBF-28F67C1EA578}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD99B9DD-4217-47A7-8CBF-28F67C1EA578}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {CBD3955A-AEF2-41B4-9AB2-3CEFB936B0D3}
+		SolutionGuid = {6FBA3DAF-FFCF-4272-B706-A008409A3D2C}
 	EndGlobalSection
 EndGlobal

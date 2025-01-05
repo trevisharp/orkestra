@@ -26,7 +26,7 @@ public class Rule(
 
     public void Add(SubRule subRule)
     {
-        this.subRules.Add(subRule);
+        subRules.Add(subRule);
         subRule.Parent = this;
     }
 

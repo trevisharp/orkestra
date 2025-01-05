@@ -27,27 +27,25 @@ public class Compiler
 {
     private bool loadedFromFields = false;
 
-    public virtual string Name
+    string? loadedName = null;
+    string LoadName()
     {
-        get
-        {
-            var className = ToString();
-            var pascalLangName = className
-                .Replace("Compiler", "")
-                .Replace("compiler", "");
-            
-            return string.Concat(
-                pascalLangName.Select((c, i) =>
-                    (c, i) switch
-                    {
-                        (_, 0) => c.ToString(),
-                        _ when c >= 'A' && c <= 'Z' => $" {c}",
-                        _ => c.ToString()
-                    }
-                )
-            );
-        }
+        var className = ToString() ?? "nonamecompiler";
+        var pascalLangName = className
+            .Replace("Compiler", "")
+            .Replace("compiler", "");
+        
+        return string.Concat(
+            pascalLangName.Select((c, i) =>
+                (c, i) switch
+                {
+                    _ when c is >= 'A' and <= 'Z' && i is not 0 => $" {c}",
+                    _ => c.ToString()
+                }
+            )
+        );
     }
+    public string Name => loadedName ??= LoadName();
 
     public IAlgorithmGroupProvider Provider { get; set; }
     public List<Key> Keys { get; private set; } = new();
@@ -59,7 +57,7 @@ public class Compiler
     /// </summary>
     public void Load()
     {
-        loadFromFields();
+        LoadFromFields();
     }
 
     /// <summary>
@@ -112,7 +110,7 @@ public class Compiler
     }
 
     protected static LineCommentProcessing lineComment(string starter)
-        => new LineCommentProcessing(starter);
+        => new(starter);
 
     protected static Key key(string name, string expression)
         => Key.CreateKey(name, expression);
@@ -182,7 +180,7 @@ public class Compiler
         return baseName.Replace("Compiler", "");
     }
 
-    private void loadFromFields()
+    private void LoadFromFields()
     {
         if (loadedFromFields)
             return;

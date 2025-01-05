@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    28/06/2024
+ * Date:    05/01/2025
  */
 using System.Linq;
 using System.Collections;
@@ -8,21 +8,35 @@ using System.Collections.Generic;
 namespace Orkestra;
 
 /// <summary>
-/// A record that represents a sub sintactycal rule. 
+/// Represents a sub sintactycal rule. 
 /// </summary>
 public class SubRule(params ISyntacticElement[] tokens) : IEnumerable<ISyntacticElement>
 {
-    private List<ISyntacticElement> ruleTokens = [ ..tokens];
-    public IEnumerable<ISyntacticElement> RuleTokens => this.ruleTokens;
-    public Rule Parent { get; set; } = null;
-    public string Name => Parent.Name + "." + ruleTokens.First().Name;
+    readonly ISyntacticElement[] ruleTokens = tokens;
+
+    /// <summary>
+    /// Get tokens for this rule.
+    /// </summary>
+    public IEnumerable<ISyntacticElement> RuleTokens => ruleTokens;
+
+    /// <summary>
+    /// Get the parent Rule for this subrule.
+    /// </summary>
+    public Rule? Parent { get; set; } = null;
+
+    /// <summary>
+    /// Get the name of the subrule.
+    /// </summary>
+    public string Name => (Parent?.Name ?? "NoParent") + "." + ruleTokens.First().Name;
 
     public IEnumerator<ISyntacticElement> GetEnumerator()
-        => ruleTokens.GetEnumerator();
+    {
+        foreach (var token in ruleTokens)
+            yield return token;
+    }
+    
     IEnumerator IEnumerable.GetEnumerator()
-        => ruleTokens.GetEnumerator();
-    public void Add(ISyntacticElement element)
-        => ruleTokens.Add(element);
+        => GetEnumerator();
 
     public override string ToString()
         => $"sR:{Parent?.Name ?? "null"}";
