@@ -179,6 +179,7 @@ public class Project
             Name = action.Compiler.Name
                 .Replace(" ", "")
                 .ToLower(),
+            StartRule = action.Compiler.StartRule,
             Extension = ((FileSelector)action.Selector).Extension,
             Keys = action.Compiler.Keys,
             Rules = action.Compiler.Rules,

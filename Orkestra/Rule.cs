@@ -51,6 +51,29 @@ public class Rule : ISyntacticElement, IEnumerable<SubRule>
     IEnumerator IEnumerable.GetEnumerator()
         => subRules.GetEnumerator();
 
-    public static IntermediaryRuleOption operator |(Rule r1, Rule r2)
-        => new IntermediaryRuleOption() | r1 | r2;
+    public static Rule operator +(Rule element)
+    {
+        var rule = new Rule();
+        rule.AddSubRules(
+            [ element ],
+            [ element, rule ]
+        );
+        return rule;
+    }
+
+    public static Rule operator +(Rule element, Rule separator)
+    {
+        var rule = new Rule();
+        rule.AddSubRules(
+            [ element ],
+            [ element, separator, rule ]
+        );
+        return rule;
+    }
+
+    public static IntermediarySeparatorRule operator /(Rule rule, Key separator)
+        => new (rule, separator);
+
+    public static IntermediaryOrRule operator |(Rule r1, Rule r2)
+        => new IntermediaryOrRule() | r1 | r2;
 }

@@ -6,4 +6,4 @@ using System;
 namespace Orkestra;
 
 [AttributeUsage(AttributeTargets.Field)]
-sealed class StartAttribute : Attribute;
+public sealed class StartAttribute : Attribute;

@@ -84,7 +84,7 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
         string operations = "";
         string definitions = "";
 
-        var start = info.InitialRule;
+        var start = info.StartRule;
         (var brothers, var headers, var others) = getContextInfo(start, groupKeys);
 
         keywords = string.Join('|',

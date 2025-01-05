@@ -61,12 +61,12 @@ public class Key(
         return new(null, expression, false, false, isKeyword, false);
     }
 
-    public static IntermediaryRuleOption operator |(Key k1, Key k2)
-        => new IntermediaryRuleOption() | k1 | k2;
+    public static IntermediaryOrRule operator |(Key k1, Key k2)
+        => new IntermediaryOrRule() | k1 | k2;
 
-    public static IntermediaryRuleOption operator |(Rule r, Key k)
-        => new IntermediaryRuleOption() | r | k;
+    public static IntermediaryOrRule operator |(Rule r, Key k)
+        => new IntermediaryOrRule() | r | k;
 
-    public static IntermediaryRuleOption operator |(Key k, Rule r)
-        => new IntermediaryRuleOption() | k | r;
+    public static IntermediaryOrRule operator |(Key k, Rule r)
+        => new IntermediaryOrRule() | k | r;
 }

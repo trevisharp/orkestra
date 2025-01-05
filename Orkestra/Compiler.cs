@@ -26,35 +26,8 @@ using Orkestra.Exceptions;
 /// </summary>
 public class Compiler
 {
-    private bool loadedFromFields = false;
-
+    bool loadedFromFields = false;
     string? loadedName = null;
-
-    string GetSpecialName()
-    {
-        var baseName = GetType().Name;
-        if (baseName == "Compiler")
-            return "no-named-lang";
-        return baseName.Replace("Compiler", "");
-    }
-
-    string LoadName()
-    {
-        var className = ToString() ?? "nonamecompiler";
-        var pascalLangName = className
-            .Replace("Compiler", "")
-            .Replace("compiler", "");
-        
-        return string.Concat(
-            pascalLangName.Select((c, i) =>
-                (c, i) switch
-                {
-                    _ when c is >= 'A' and <= 'Z' && i is not 0 => $" {c}",
-                    _ => c.ToString()
-                }
-            )
-        );
-    }
     public string Name => loadedName ??= LoadName();
 
     public IAlgorithmGroupProvider? Provider { get; set; }
@@ -77,7 +50,8 @@ public class Compiler
     public LanguageInfo GetInfo()
     {
         return new() {
-            InitialRule = null,
+            StartRule = StartRule,
+            Extension = null,
             Name = GetSpecialName(),
             Keys = [ ..Keys ],
             Rules = [ ..Rules ],
@@ -87,6 +61,9 @@ public class Compiler
 
     public async Task<ExpressionTree> Compile(string filePath, params string[] args)
     {
+        if (Provider is null)
+            throw new MissingProviderException();
+
         // TODO: Finish Cache use
         var lstWrite = await Cache.LastWrite.TryGet(filePath);
         var newWrite = File.GetLastWriteTime(filePath);
@@ -103,7 +80,7 @@ public class Compiler
         NewLine(1);
 
         Info($"[{filePath}]: Lexical Analysis started...", 3);
-        var lex = BuildLexicalAnalyzer();
+        var lex = BuildLexicalAnalyzer(Provider);
         var tokens = lex.Parse(processedText);
         Success($"[{filePath}]: Lexical Analysis completed!", 3);
         Content($"[{filePath}]: Token List:", 10);
@@ -112,7 +89,7 @@ public class Compiler
         NewLine(1);
 
         Info($"[{filePath}]: Syntacic Analysis started...", 3);
-        var parser = BuildSyntacticAnalyzer();
+        var parser = BuildSyntacticAnalyzer(Provider);
         var tree = parser.Parse(tokens);
         Success($"[{filePath}]: Syntacic Analysis completed!", 3);
         Content($"[{filePath}]: Syntacic Tree:", 10);
@@ -142,22 +119,10 @@ public class Compiler
 
     protected static Key identity(string expression)
         => Key.CreateIdentity(expression);
-    
-    protected static Rule many(ISyntacticElement element, ISyntacticElement separator = null)
-    {
-        var newRule = Rule.CreateRule();
-        newRule.AddSubRules(
-            new SubRule(element),
-            separator is null
-                ? new SubRule(element, newRule)
-                : new SubRule(element, separator, newRule)
-        );
-        return newRule;
-    }
-    
+
     ProcessingCollection BuildProcessingMachine()
     {
-        ProcessingCollection package = new ProcessingCollection();
+        ProcessingCollection package = new();
 
         foreach (var process in GetFields<Processing>())
             package.Add(process);
@@ -165,16 +130,16 @@ public class Compiler
         return package;
     }
     
-    ILexicalAnalyzer BuildLexicalAnalyzer()
+    ILexicalAnalyzer BuildLexicalAnalyzer(IAlgorithmGroupProvider provider)
     {
-        var lexicalAnalyzer = Provider.ProvideLexicalAnalyzer();
+        var lexicalAnalyzer = provider.ProvideLexicalAnalyzer();
         lexicalAnalyzer.AddKeys(Keys);
         return lexicalAnalyzer;
     }
 
-    ISyntacticAnalyzer BuildSyntacticAnalyzer()
+    ISyntacticAnalyzer BuildSyntacticAnalyzer(IAlgorithmGroupProvider provider)
     {
-        var builder = Provider.ProvideSyntacticAnalyzerBuilder();
+        var builder = provider.ProvideSyntacticAnalyzerBuilder();
         var loaded = builder.LoadCache();
 
         if (loaded)
@@ -187,6 +152,32 @@ public class Compiler
         builder.SaveCache();
 
         return builder.Build();
+    }
+
+    string GetSpecialName()
+    {
+        var baseName = GetType().Name;
+        if (baseName == "Compiler")
+            return "no-named-lang";
+        return baseName.Replace("Compiler", "");
+    }
+
+    string LoadName()
+    {
+        var className = ToString() ?? "nonamecompiler";
+        var pascalLangName = className
+            .Replace("Compiler", "")
+            .Replace("compiler", "");
+        
+        return string.Concat(
+            pascalLangName.Select((c, i) =>
+                (c, i) switch
+                {
+                    _ when c is >= 'A' and <= 'Z' && i is not 0 => $" {c}",
+                    _ => c.ToString()
+                }
+            )
+        );
     }
 
     void LoadFromFields()
