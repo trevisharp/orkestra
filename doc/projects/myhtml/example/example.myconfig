@@ -1,4 +1,0 @@
-route
-    \login -> page1.myhtml
-    \mainPage -> page2.myhtml
-route
