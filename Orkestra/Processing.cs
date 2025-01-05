@@ -6,6 +6,7 @@ using System;
 namespace Orkestra;
 
 using Processings;
+using Processings.Implementations;
 
 /// <summary>
 /// A processing code to transform text.
@@ -16,4 +17,7 @@ public abstract class Processing
 
     public static Processing FromFunction(Func<Text, Text> func)
         => new FuncProcessing(func);
+
+    public static Processing LineComment(string commStart)
+        => new LineCommentProcessing(commStart);
 }
