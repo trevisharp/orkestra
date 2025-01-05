@@ -153,9 +153,8 @@ internal class ReflectionHelper
 
         if (findedTypes.Count == 1)
         {
-            var constructor = GetEmptyConstructor(findedTypes[0]);
-            if (constructor is null)
-                throw new NoConstructorException(matchType.Name);
+            var constructor = GetEmptyConstructor(findedTypes[0])
+                ?? throw new NoConstructorException(matchType.Name);
             return constructor.Invoke([]);
         }
 

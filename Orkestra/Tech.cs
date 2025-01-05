@@ -13,12 +13,11 @@ using InternalStructure;
 /// </summary>
 public static class Tech
 {
-    internal static Project DefaultProject = null;
-    public static void ConfigureProject(string fileSelector, Compiler compiler = null)
+    internal static Project? DefaultProject = null;
+
+    public static void ConfigureProject(string fileSelector, Compiler? compiler = null)
     {
-        if (fileSelector is null)
-            throw new ArgumentNullException(nameof(fileSelector));
-        
+        ArgumentNullException.ThrowIfNull(fileSelector, nameof(fileSelector));
         compiler ??= ReflectionHelper.GetConfiguredCompiler();
         DefaultProject = Project.CreateDefault(fileSelector, compiler);
     }

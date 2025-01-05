@@ -9,9 +9,6 @@ using static System.Console;
 
 namespace Orkestra.LineInterfaces;
 
-using Projects;
-using InternalStructure;
-
 /// <summary>
 /// Represents a command line interface implementation.
 /// </summary>
@@ -40,7 +37,7 @@ public abstract class CLI
             Verbose.Info(">> ");
 
             ForegroundColor = ConsoleColor.Magenta;
-            var args = ReadLine()
+            var args = ReadLine()?
                 .Trim()
                 .Split(' ', StringSplitOptions.RemoveEmptyEntries);
             ForegroundColor = ConsoleColor.Gray;
@@ -139,7 +136,7 @@ public abstract class CLI
                         $"Missing parameter named '{parameter.Name}' of type '{parameter.ParameterType.Name}'."
                     );
 
-                parameters[parameterIndex] = parameter.DefaultValue;
+                parameters[parameterIndex] = parameter?.DefaultValue!;
                 continue;
             }
 
