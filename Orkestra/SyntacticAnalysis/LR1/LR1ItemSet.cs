@@ -11,38 +11,38 @@ using Orkestra.InternalStructure;
 
 public class LR1ItemSet
 {
+    readonly Dictionary<ISyntacticElement, int> elementMap;
     /// <summary>
     /// The map to int from key or rule elements.
     /// </summary>
-    Dictionary<ISyntacticElement, int> elementMap;
     public Dictionary<ISyntacticElement, int> ElementMap => elementMap;
 
     /// <summary>
     /// The last index of keys on elementMap. Index higher than keyLastIndex
     /// are rule indexes.
     /// </summary>
-    int keyLastIndex;
+    readonly int keyLastIndex;
 
     /// <summary>
     /// The last index of rule on elementMap.
     /// </summary>
-    int ruleLastIndex;
+    readonly int ruleLastIndex;
 
+    readonly Dictionary<int, ISyntacticElement> indexMap;
     /// <summary>
     /// Reverse dicitionary of elementMap.
     /// </summary>
-    Dictionary<int, ISyntacticElement> indexMap;
     public Dictionary<int, ISyntacticElement> IndexMap => indexMap;
 
     /// <summary>
     /// The pool of buffer for items.
     /// </summary>
-    FastBuffer<int> pool;
+    readonly FastBuffer<int> pool;
 
     /// <summary>
     /// The index map from LR1Itens and int identities.
     /// </summary>
-    Dictionary<int, int[]> itemMap;
+    readonly Dictionary<int, int[]> itemMap;
 
     /// <summary>
     /// The next index of itemMap dicitionary.
@@ -53,23 +53,23 @@ public class LR1ItemSet
     /// The relation between elementMap's rule index and
     /// the collection of indexes in itemMap.
     /// </summary>
-    Dictionary<int, List<int>> ruleItemMap;
+    readonly Dictionary<int, List<int>> ruleItemMap;
 
     /// <summary>
     /// The first set of elements.
     /// </summary>
-    Dictionary<int, List<int>> firstSet;
+    readonly Dictionary<int, List<int>> firstSet;
 
     /// <summary>
     /// The map to item from another item moving the
     /// current character one position.
     /// </summary>
-    Dictionary<int, int> moveItemMap;
+    readonly Dictionary<int, int> moveItemMap;
 
     /// <summary>
     /// The pair item with a lookAhead.
     /// </summary>
-    Dictionary<int, (int item, int lookAhead)> lookAheadMap;
+    readonly Dictionary<int, (int item, int lookAhead)> lookAheadMap;
 
     /// <summary>
     /// next lookahed map index.
@@ -79,7 +79,7 @@ public class LR1ItemSet
     /// <summary>
     /// The reverse of lookAheadMap.
     /// </summary>
-    Dictionary<(int item, int lookAhead), int> revlookAheadMap;
+    readonly Dictionary<(int item, int lookAhead), int> revlookAheadMap;
 
     public LR1ItemSet(
         Key[] keys,
@@ -90,12 +90,12 @@ public class LR1ItemSet
         int ruleCount = rules.Length;
         int keyCount = keys.Length;
         int indexSize = ruleCount + keyCount;
-        this.indexMap = new (indexSize);
-        this.firstSet = new(indexSize + 1);
-        firstSet[0] = [0];
+        indexMap = new (indexSize);
+        firstSet = new(indexSize + 1);
+        firstSet[0] = [ 0 ];
         
         int index = 0;
-        this.elementMap = new (indexSize);
+        elementMap = new (indexSize);
         foreach (var key in keys)
         {
             var keyIndex = ++index;
@@ -104,7 +104,7 @@ public class LR1ItemSet
             // init: forall x in T: FIRST(x) = { x }
             firstSet.Add(keyIndex, [keyIndex]);
         }
-        this.keyLastIndex = index;
+        keyLastIndex = index;
 
         foreach (var rule in rules)
         {
@@ -114,11 +114,11 @@ public class LR1ItemSet
             // init: forall x in NT: FIRST(x) = { }
             firstSet.Add(ruleIndex, []);
         }
-        this.ruleLastIndex = index;
+        ruleLastIndex = index;
 
         pool = new();
-        this.itemMap = [];
-        this.ruleItemMap = new();
+        itemMap = [];
+        ruleItemMap = [];
 
         itemMapNextIndex = 1;
         foreach (var rule in rules)
@@ -154,9 +154,9 @@ public class LR1ItemSet
         List<int> goalFirst = [];
         firstSet[GetGoal()] = goalFirst;
 
-        this.moveItemMap = new();
-        this.lookAheadMap = new();
-        this.revlookAheadMap = new();
+        moveItemMap = [];
+        lookAheadMap = [];
+        revlookAheadMap = [];
 
         bool hasChange = true;
         while (hasChange)
@@ -230,6 +230,9 @@ public class LR1ItemSet
         return item[0];
     }
 
+    /// <summary>
+    /// Get the size os a specific rule.
+    /// </summary>
     public int GetRuleSize(int itemId)
     {
         var item = itemMap[itemId];
@@ -242,8 +245,8 @@ public class LR1ItemSet
     public int CreateLookAheadItem(int itemId, int lookAheadId)
     {
         var element = (itemId, lookAheadId);
-        if (revlookAheadMap.ContainsKey(element))
-            return revlookAheadMap[element];
+        if (revlookAheadMap.TryGetValue(element, out int value))
+            return value;
         
         int key = ++nextLookAheadMap;
         lookAheadMap.Add(key, element);
@@ -256,8 +259,8 @@ public class LR1ItemSet
     /// </summary>
     public int GetPureItem(int laItemId)
     {
-        var laItem = lookAheadMap[laItemId];
-        return laItem.item;
+        var (item, _) = lookAheadMap[laItemId];
+        return item;
     }
 
     /// <summary>
@@ -265,8 +268,8 @@ public class LR1ItemSet
     /// </summary>
     public int GetLookAhead(int laItemId)
     {
-        var laItem = lookAheadMap[laItemId];
-        return laItem.lookAhead;
+        var (_, lookAhead) = lookAheadMap[laItemId];
+        return lookAhead;
     }
 
     /// <summary>
@@ -318,7 +321,7 @@ public class LR1ItemSet
     /// <summary>
     /// Return a collections of all IRuleElements.
     /// </summary>
-    public IEnumerable<ISyntacticElement> GetElements()
+    public IEnumerable<ISyntacticElement?> GetElements()
     {
         var len = GetElementsLength();
         yield return null;
@@ -328,8 +331,8 @@ public class LR1ItemSet
     
     public int GetMovedItem(int item)
     {
-        if (moveItemMap.ContainsKey(item))
-            return moveItemMap[item];
+        if (moveItemMap.TryGetValue(item, out int value))
+            return value;
             
         var itemData = itemMap[item];
         var size = itemData.Length;
@@ -366,7 +369,7 @@ public class LR1ItemSet
         for (int i = 2; i < item.Length; i++)
         {
             if (i - 2 == item[1])
-                sb.Append("•");
+                sb.Append('•');
             
             var elName = 
                 item[i] == -1 ? "Goal" :
@@ -387,7 +390,7 @@ public class LR1ItemSet
     /// <summary>
     /// Get Element as String.
     /// </summary>
-    public string GetElementString(int element)
+    public string? GetElementString(int element)
         => element switch
         {
             0 => "Goal",
