@@ -18,4 +18,7 @@ public class LineCommentProcessing(string commentStarter) : FuncProcessing(text 
         }
     }
     return text;
-});
+})
+{
+    public readonly string CommentStarter = commentStarter;
+}
