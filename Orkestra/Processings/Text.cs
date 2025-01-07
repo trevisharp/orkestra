@@ -17,11 +17,13 @@ using InternalStructure;
 /// </summary>
 public class Text
 {
-    private string sourceFile;
-    private FastList<Data> data;
-    private Stack<ProcessStep> pointerStack;
-    private readonly Data newline = new('\n');
-    private readonly Data tab = new('\t');
+    readonly string sourceFile;
+    readonly FastList<Data> data;
+    readonly Stack<ProcessStep> pointerStack;
+    
+    readonly Data newline = new('\n');
+    readonly Data tab = new('\t');
+    readonly Data space = new(' ');
 
     public string SourceFile => sourceFile;
 
@@ -136,7 +138,7 @@ public class Text
     {
         var step = this.pointerStack.Peek();
         var data = this.data[step.Index];
-        Token token = new Token(baseKey, null, sourceFile, data.Line);
+        var token = new Token(baseKey, null, sourceFile, data.Line);
         Append(token);
     }
 
@@ -238,18 +240,42 @@ public class Text
         UpdateStep(step.Index - data.Length - 1, UnityType.Line, step.Started);
     }
 
+    /// <summary>
+    /// Append a newline after the current processing unity.
+    /// </summary>
     public void AppendNewline()
         => Append(newline);
 
+    /// <summary>
+    /// Append a tab after the current processing unity.
+    /// </summary>
     public void AppendTab()
         => Append(tab);
 
+    /// <summary>
+    /// Append a space after the current processing unity.
+    /// </summary>
+    public void AppendSpace()
+        => Append(space);
+
+    /// <summary>
+    /// Append a newline before the current processing unity.
+    /// </summary>
     public void PrependNewline()
         => Prepend(newline);
 
+    /// <summary>
+    /// Append a tab before the current processing unity.
+    /// </summary>
     public void PrependTab()
         => Prepend(tab);
-    
+
+    /// <summary>
+    /// Append a space before the current processing unity.
+    /// </summary>
+    public void PrependSpace()
+        => Prepend(space);
+
     /// <summary>
     /// Replace the current unity by a String.
     /// </summary>
@@ -278,10 +304,17 @@ public class Text
     }
 
     /// <summary>
-    /// Discard the following unities from final result.
+    /// Use this with break command to end processing.
+    /// </summary>
+    public void Break()
+        => PopStep();
+
+    /// <summary>
+    /// Discard the all next processing unitys including the current unity.
     /// </summary>
     public void Discard()
     {
+        // TODO: Improvment on null values validation.
         var step = PopStep()!;
         var parent = PopStep()!;
 
@@ -316,39 +349,9 @@ public class Text
         throw new Exception("Inconsistence in stack pointers.");
     }
 
-    //TODO: Update to new API; Improve code quality
-    public bool Continue()
-    {
-        var step = this.pointerStack.Peek();
-
-        switch (step.Type)
-        {
-            case UnityType.All:
-                this.pointerStack.Pop();
-                AddStep(-1, UnityType.All, true);
-                return true;
-            
-            case UnityType.Line:
-                return GoToNextLine();
-            
-            case UnityType.Character:
-                step = this.pointerStack.Pop();
-                var parent = this.pointerStack.Peek();
-                this.pointerStack.Push(step);
-
-                if (parent.Type == UnityType.All)
-                    return NextCharacter();
-                else if (parent.Type == UnityType.Line)
-                    return NextCharacterLine();
-                
-                return false;
-
-            default:
-                return false;    
-        }
-    }
-
-    //TODO: Update to new API; Improve code quality
+    /// <summary>
+    /// Remove the currently processing unity.
+    /// </summary>
     public void Skip()
     {
         var step = this.pointerStack.Peek();
