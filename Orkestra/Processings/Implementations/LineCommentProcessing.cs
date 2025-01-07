@@ -6,23 +6,16 @@ namespace Orkestra.Processings.Implementations;
 /// <summary>
 /// A processing for a line comment.
 /// </summary>
-public class LineCommentProcessing(string commentStarter) : Processing
-{
-    public string CommentStarter => commentStarter;
-    public override Text Process(Text text)
+public class LineCommentProcessing(string commentStarter) : FuncProcessing(text => {
+    text.ProcessLines();
+    while (text.Next())
     {
-        text.ProcessLines();
+        text.ProcessCharacters();
         while (text.Next())
         {
-            text.ProcessCharacters();
-            while (text.Next())
-            {
-                if (text.Is(commentStarter))
-                {
-                    text.Discard();
-                }
-            }
+            if (text.Is(commentStarter))
+                text.Discard();
         }
-        return text;
     }
-}
+    return text;
+});
