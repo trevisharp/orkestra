@@ -57,7 +57,8 @@ public class Project
             Verbose.Error("Error in extension generation!");
             Verbose.Error("Use --verbose 1 or bigger to see details...");
             Verbose.Error(ex.Message, 1);
-            Verbose.Error(ex.StackTrace, 2);
+            if (ex.StackTrace is not null)
+                Verbose.Error(ex.StackTrace, 2);
         }
         finally
         {
@@ -82,14 +83,14 @@ public class Project
             Verbose.Error("Error in extension generation!");
             Verbose.Error("Use --verbose 1 or bigger to see details...");
             Verbose.Error(ex.Message, 1);
-            Verbose.Error(ex.StackTrace, 2);
+            if (ex.StackTrace is not null)
+                Verbose.Error(ex.StackTrace, 2);
         }
         finally
         {
             Verbose.Info("Extension generation process finished!");
         }
     }   
-
 
     /// <summary>
     /// Start compile process.
@@ -135,7 +136,8 @@ public class Project
                     Verbose.Error($"Internal error in {tuple.file} compilation!");
                     Verbose.StartGroup();
                     Verbose.Error(ex.Message);
-                    Verbose.Error(ex.StackTrace, 1);
+                    if (ex.StackTrace is not null)
+                        Verbose.Error(ex.StackTrace, 1);
                     Verbose.EndGroup();
                 }
             }).Wait();
