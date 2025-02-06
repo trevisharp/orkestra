@@ -23,15 +23,14 @@ public record ExpressionTree(
 
         void toString(ExpressionTree node, LinkedList<char> tabulation)
         {
-            if (tabulation.Count > 0)
+            var tail = tabulation.Last?.Value;
+            if (tail is not null)
             {
                 foreach (var tab in tabulation)
                     sb.Append(tab);
-                var tail = tabulation.Last!.Value;
+                
                 tabulation.RemoveLast();
-                tabulation.AddLast(
-                    tail == '├' ? '│' : ' '
-                );
+                tabulation.AddLast(tail == '├' ? '│' : ' ');
             }
             
             sb.AppendLine(node.Element.Name);
