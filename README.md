@@ -34,15 +34,16 @@ public class MyFirstCompiler : Compiler
     Key HELLO = "hello";
     Key COMPILERS = "compilers";
 
+    [Start]
     Rule program;
 
     public MyFirstCompiler()
     {
         // Accept 'hello' or 'hello compilers'
-        program = start(
+        program = [
             [ HELLO ],
             [ HELLO, COMPILERS ]
-        );
+        ];
     }
 }
 ```
