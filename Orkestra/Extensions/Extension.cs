@@ -1,7 +1,6 @@
 /* Author:  Leonardo Trevisan Silio
  * Date:    11/06/2023
  */
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Orkestra.Extensions;

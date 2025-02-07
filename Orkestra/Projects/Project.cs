@@ -20,9 +20,8 @@ using InternalStructure;
 /// </summary>
 public class Project
 {
-    List<CompileAction> actions = new();
-    public IExtensionProvider ExtensionProvider { get; set; }
-        = new DefaultExtensionProvider();
+    readonly List<CompileAction> actions = [];
+    public IExtensionProvider ExtensionProvider { get; set; } = new DefaultExtensionProvider();
 
     /// <summary>
     /// Add a compiler action to the project.
@@ -46,7 +45,7 @@ public class Project
         var extension = ExtensionProvider.Provide();
 
         Verbose.Info("Loading language metadata...", 1);
-        var extArgs = getArgs(args);
+        var extArgs = GetArgs(args);
 
         try
         {
@@ -72,7 +71,7 @@ public class Project
         var extension = ExtensionProvider.Provide();
 
         Verbose.Info("Loading language metadata...", 1);
-        var extArgs = getArgs(args);
+        var extArgs = GetArgs(args);
 
         try
         {
@@ -159,21 +158,32 @@ public class Project
         Verbose.Success("Build finished succefully!");
     }
 
-    private ExtensionArguments getArgs(string[] args)
+    private ExtensionArguments GetArgs(string[] args)
     {
         var extArgs = new ExtensionArguments
         {
-            Name = GetType().Name.Replace("Project", ""),
+            Name = GetBestProjectName(),
             Arguments = args
         };
         
-        foreach (var lang in getLangs())
+        foreach (var lang in GetLangs())
             extArgs.Languages.Add(lang);
         
         return extArgs;
     }
 
-    private IEnumerable<LanguageInfo> getLangs() => 
+    private string GetBestProjectName()
+    {
+        var className = GetType().Name;
+        return (className, actions) switch
+        {
+            ("Project", [ { Selector: FileSelector selector }, .. ]) => selector.Extension.Replace(".", ""),
+            _ when className.Contains("Project") => className.Replace("Project", ""),
+            _ => "Unnamed"
+        };
+    }
+
+    private IEnumerable<LanguageInfo> GetLangs() => 
         from action in actions
         where action.Selector is FileSelector
         select new LanguageInfo

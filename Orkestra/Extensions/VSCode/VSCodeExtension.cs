@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    28/06/2023
+ * Date:    07/02/2025
  */
 using System;
 using System.IO;
@@ -17,8 +17,8 @@ namespace Orkestra.Extensions.VSCode;
 /// </summary>
 public class VSCodeExtension : Extension
 {
-    List<VSCodeContribute> contributes = [];
-    List<JSContribute> jscontributes = [];
+    readonly List<VSCodeContribute> contributes = [];
+    readonly List<JSContribute> jscontributes = [];
     public IEnumerable<VSCodeContribute> Contributes => contributes;
     public IEnumerable<JSContribute> JSContributes => jscontributes;
     
@@ -204,15 +204,7 @@ public class VSCodeExtension : Extension
     {
         const string file = "extension.js";
         var sw = OpenWriter(dir, file);
-
-        var js = new StringBuilder();
-
-        foreach (var jscontribute in jscontributes)
-        {
-            js.AppendLine(
-                jscontribute.JSCode.Replace("\n", "\n\t")
-            );
-        }
+        var js = BuildJavaScriptCode();
 
         await sw.WriteAsync(
             $$"""
@@ -234,6 +226,21 @@ public class VSCodeExtension : Extension
         sw.Close();
     }
 
+    string BuildJavaScriptCode()
+    {
+        var js = new StringBuilder();
+
+        foreach (var jscontribute in jscontributes)
+        {
+            var identifiedCode = jscontribute.JSCode.Replace("\n", "\n\t");
+            js.Append('\n');
+            js.Append('\t');
+            js.AppendLine(identifiedCode);
+        }
+
+        return js.ToString();
+    }
+
     static async Task AddChangeLog(string dir, ExtensionArguments args)
     {
         const string file = "CHANGELOG.md";
@@ -241,9 +248,10 @@ public class VSCodeExtension : Extension
 
         foreach (var (title, text) in args.Changelog)
         {
-            await sw.WriteLineAsync($"## {title}");
+            await sw.WriteLineAsync(title);
             await sw.WriteLineAsync();
             await sw.WriteLineAsync(text);
+            await sw.WriteLineAsync();
         }
 
         sw.Close();

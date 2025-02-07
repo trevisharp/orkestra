@@ -8,6 +8,5 @@ using Extensions.VSCode;
 
 public class DefaultExtensionProvider : IExtensionProvider
 {
-    public Extension Provide()
-        => new VSCodeExtension();
+    public Extension Provide() => new VSCodeExtension();
 }
