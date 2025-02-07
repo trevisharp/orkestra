@@ -73,17 +73,13 @@ Syntax error in C:\path\test3.code next to 'compilers' on line 1.
 
  - ![](https://img.shields.io/badge/new-green) Added Tree consumer system.
 
-### Orkestra v0.8.0 (Coming soon)
-
- - ![](https://img.shields.io/badge/new-green) Auto key finder on rules.
- - ![](https://img.shields.io/badge/updated-blue) Improve Compiler Load and key/rule search process.
- - ![](https://img.shields.io/badge/new-green) Fast Compiler easy sintax added.
-
 ### Orkestra v0.7.0 (Coming soon)
 
+ - ![](https://img.shields.io/badge/new-green) Fast Compiler easy sintax added.
  - ![](https://img.shields.io/badge/new-green) Default CLI, Project and Compiler for small projects.
  - ![](https://img.shields.io/badge/updated-blue) New application configuration and start workflow.
  - ![](https://img.shields.io/badge/updated-blue) Use Cache system by default.
+ - ![](https://img.shields.io/badge/updated-blue) General improvements on API to improve control over extensions.
 
 ### Orkestra v0.6.0
 

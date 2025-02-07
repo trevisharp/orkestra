@@ -175,11 +175,11 @@ public class Project
     private string GetBestProjectName()
     {
         var className = GetType().Name;
-        return (className, actions) switch
+        return className switch
         {
-            ("Project", [ { Selector: FileSelector selector }, .. ]) => selector.Extension.Replace(".", ""),
-            _ when className.Contains("Project") => className.Replace("Project", ""),
-            _ => "Unnamed"
+            "Project" when actions is [ { Compiler: Compiler compiler }, .. ] && compiler.Name != "Compiler" => compiler.Name.Replace("Compiler", ""),
+            "Project" when actions is [ { Selector: FileSelector selector }, .. ] => selector.Extension.Replace(".", ""),
+            _ => className.Replace("Project", "")
         };
     }
 
