@@ -114,10 +114,6 @@ public class VSCodeExtension : Extension
                 "activationEvents": [],
                 "main": "./extension.js",
                 "contributes": {
-                    "commands": [{
-                        "command": "bruteforce.helloWorld",
-                        "title": "Hello World"
-                    }],
             """
         );
 
