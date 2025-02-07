@@ -36,9 +36,8 @@ public class LanguageContribute(LanguageInfo info) : VSCodeContribute
     {
         var sw = new StreamWriter($"{dir}/{info.Name}-configuration.json");
 
-        var lineComment = info.Processings
-            .FirstOrDefault(p => p is LineCommentProcessing)
-            as LineCommentProcessing;
+        var lineComment = (LineCommentProcessing)info.Processings
+            .FirstOrDefault(p => p is LineCommentProcessing)!;
 
         await sw.WriteLineAsync(
             $$"""

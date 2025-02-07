@@ -8,6 +8,7 @@ using System.Collections.Generic;
 
 namespace Orkestra.Extensions.VSCode;
 
+using System.Text;
 using Processings.Implementations;
 
 /// <summary>
@@ -85,7 +86,7 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
         string definitions = "";
 
         var start = info.StartRule;
-        (var brothers, var headers, var others) = getContextInfo(start, groupKeys);
+        (var brothers, var headers, var others) = GetContextInfo(start, groupKeys);
 
         keywords = string.Join('|',
             from key in headers
@@ -186,89 +187,137 @@ public class GrammarContribute(LanguageInfo info) : VSCodeContribute
 
         async Task write()
         {
+            var includes = new StringBuilder();
+            var repositories = new StringBuilder();
+            var patterns = new StringBuilder();
+
+            void addInclude(string include)
+            {
+                if (includes.Length > 0)
+                    includes.Append(",\n");
+                
+                includes.Append($"\t\t{{ \"include\": \"#{include}\" }}");
+            }
+
+            void openRepo(string title)
+            {
+                if (repositories.Length > 0)
+                    repositories.Append(",\n");
+                
+                repositories.Append(
+                    $$"""
+                            "{{title}}": {
+                                "patterns": [
+                    
+                    """
+                );
+            }
+
+            void addRepoPattern(string name, string match)
+            {
+                if (match is null || match.Length == 0)
+                    return;
+                
+                if (patterns.Length > 0)
+                    patterns.Append(",\n");
+                
+                patterns.Append(
+                    $$"""
+                                    {
+                                        "name": "{{name}}{{info.Extension}}",
+                                        "match": "\\b({{match}})\\b"
+                                    }
+                    """
+                );
+            }
+
+            void closeRepo()
+            {
+                repositories.Append($"{patterns}\n\t\t\t]\n\t\t}}");
+                patterns.Clear();
+            }
+
+            if (keywords.Length > 0 || controls.Length > 0)
+            {
+                addInclude("keywords");
+                openRepo("keywords");
+                
+                addRepoPattern("keyword", keywords);
+
+                addRepoPattern("keyword.control", controls);
+
+                closeRepo();
+            }
+
+            if (operations.Length > 0 || definitions.Length > 0)
+            {
+                addInclude("entitys");
+                openRepo("entitys");
+
+                addRepoPattern("entity.name.function", operations);
+
+                addRepoPattern("entity.name.class", definitions);
+
+                closeRepo();
+            }
+
+            if (nums.Length > 0)
+            {
+                addInclude("constants");
+                openRepo("constants");
+
+                addRepoPattern("constant.numeric", operations);
+
+                closeRepo();
+            }
+
+            if (ids.Length > 0)
+            {
+                addInclude("variables");
+                openRepo("variables");
+
+                addRepoPattern("variables.parameter", ids);
+
+                closeRepo();
+            }
+
+            if (lineComment is not null)
+            {
+                addInclude("comments");
+                openRepo("comments");
+                
+                patterns.Append(
+                    $$"""
+                                    {
+                                        "name": "comment.line{{info.Extension}}",
+                                        "match": "{{lineComment.CommentStarter}}.*$"
+                                    }
+                    """
+                );
+
+                closeRepo();
+            }
+
             await sw.WriteAsync(
                 $$"""
                 {
                     "$schema": "{{schema}}",
                     "name": "{{info.Name}}",
                     "patterns": [
-                        { "include": "#keywords" },
-                        { "include": "#entitys" },
-                        { "include": "#constants" },
-                        { "include": "#variables" }{{(
-                            lineComment is null ? string.Empty :
-                            ",\n\t\t{ \"include\": \"#comments\" }"
-                        )}}
+                {{includes}}
                     ],
                     "repository": {
-                        "keywords": {
-                            "patterns": [
-                                {
-                                    "name": "keyword.{{info.Name}}",
-                                    "match": "\\b({{keywords}})\\b"
-                                },
-                                {
-                                    "name": "keyword.control.{{info.Name}}",
-                                    "match": "\\b({{controls}})\\b"
-                                }
-                            ]
-                        },
-                        
-                        "entitys": {
-                            "patterns": [
-                                {
-                                    "name": "entity.name.function.{{info.Name}}",
-                                    "match": "\\b({{operations}})\\b"
-                                },
-                                {
-                                    "name": "entity.name.class.{{info.Name}}",
-                                    "match": "\\b({{definitions}})\\b"
-                                }
-                            ]
-                        },
-
-                        "constants": {
-                            "patterns": [
-                                {
-                                    "name": "constant.numeric.{{info.Name}}",
-                                    "match": "\\b({{nums}})\\b"
-                                }
-                            ]
-                        },
-
-                        "variables": {
-                            "patterns": [
-                                {
-                                    "name": "variable.parameter.{{info.Name}}",
-                                    "match": "\\b({{ids}})\\b"
-                                }
-                            ]
-                        }{{(
-                            lineComment is null ? string.Empty :
-                            $$"""
-                            ,
-
-                                    "comments": {
-                                        "patterns": [
-                                            {
-                                                "name": "comment.line.{{info.Name}}",
-                                                "match": "{{lineComment.CommentStarter}}.*$"
-                                            }
-                                        ]
-                                    }
-                            """
-                        )}}
+                {{repositories}}
                     },
                     "scopeName": "source{{info.Extension}}"
                 }
-                """
-            );
+                """);
 
             sw.Close();
         }
     }
 
-    (List<List<Key>> brothers, List<Key> headers, List<Key> others) getContextInfo(Rule start, List<Key> allKeys)
+    (List<List<Key>> brothers, List<Key> headers, List<Key> others) GetContextInfo(Rule start, List<Key> allKeys)
     {
         var brothers = new List<List<Key>>();
         var headers = new List<Key>();

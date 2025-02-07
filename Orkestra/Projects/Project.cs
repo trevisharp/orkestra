@@ -177,7 +177,7 @@ public class Project
         var className = GetType().Name;
         return className switch
         {
-            "Project" when actions is [ { Compiler: Compiler compiler }, .. ] && compiler.Name != "Compiler" => compiler.Name.Replace("Compiler", ""),
+            "Project" when actions is [ { Compiler: Compiler compiler }, .. ] && compiler.Name != "nonamecompiler" => compiler.Name.Replace(" ", ""),
             "Project" when actions is [ { Selector: FileSelector selector }, .. ] => selector.Extension.Replace(".", ""),
             _ => className.Replace("Project", "")
         };
