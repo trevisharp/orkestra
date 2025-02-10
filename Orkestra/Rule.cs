@@ -61,18 +61,21 @@ public class Rule : ISyntacticElement, IEnumerable<SubRule>
         return rule;
     }
 
-    public static Rule operator +(Rule element, Rule separator)
+    public static Rule operator +(Rule start, Rule next)
     {
-        var rule = new Rule();
-        rule.AddSubRules(
-            [ element ],
-            [ element, separator, rule ]
-        );
-        return rule;
+        var result = new Rule();
+        foreach (var sb in start.SubRules)
+        {
+            var newSubRule = new SubRule();
+            foreach (var item in sb)
+                newSubRule.Add(item);
+            newSubRule.Add(next);
+        }
+        return result;
     }
 
-    public static IntermediarySeparatorRule operator /(Rule rule, Key separator)
-        => new (rule, separator);
+    public static Rule operator +(Rule start, IntermediaryOrRule next)
+        => start + (Rule)next;
 
     public static IntermediaryOrRule operator |(Rule r1, Rule r2)
         => new IntermediaryOrRule() | r1 | r2;

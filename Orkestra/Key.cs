@@ -58,6 +58,18 @@ public class Key(
         return new(null, expression, false, false, isKeyword, false);
     }
 
+    public static implicit operator Rule(Key key)
+        => [ [ key] ];
+
+    public static Rule operator +(Key key, Key rule)
+        => [ [ key, rule ] ];
+    
+    public static Rule operator +(Key key, Rule rule)
+        => [ [ key, rule ] ];
+    
+    public static Rule operator +(Key key, IntermediaryOrRule irule)
+        => [ [ key, (Rule)irule ] ];
+
     public static IntermediaryOrRule operator |(Key k1, Key k2)
         => new IntermediaryOrRule() | k1 | k2;
 
