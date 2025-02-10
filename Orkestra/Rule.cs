@@ -1,10 +1,12 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    05/01/2025
+ * Date:    10/02/2025
  */
 using System.Collections;
 using System.Collections.Generic;
 
 namespace Orkestra;
+
+using Expressions;
 
 /// <summary>
 /// Represents a set of rules with same name.
@@ -74,9 +76,6 @@ public class Rule : ISyntacticElement, IEnumerable<SubRule>
         return result;
     }
 
-    public static Rule operator +(Rule start, IntermediaryOrRule next)
-        => start + (Rule)next;
-
-    public static IntermediaryOrRule operator |(Rule r1, Rule r2)
-        => new IntermediaryOrRule() | r1 | r2;
+    public static ExpressionNode operator |(Rule r1, Rule r2)
+        => (ExpressionNode)r1 | (ExpressionNode)r2;
 }

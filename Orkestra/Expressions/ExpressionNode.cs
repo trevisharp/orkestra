@@ -3,6 +3,9 @@
  */
 namespace Orkestra.Expressions;
 
+using System;
+using Nodes;
+
 /// <summary>
 /// Represents a node in a rule expression.
 /// </summary>
@@ -14,4 +17,16 @@ public abstract class ExpressionNode(ExpressionType type)
     {
         throw new System.NotImplementedException();
     }
+
+    public static implicit operator Rule(ExpressionNode node)
+        => node.ToRule();
+
+    public static implicit operator ExpressionNode(Key key)
+        => new KeyExpressionNode(key);
+    
+    public static implicit operator ExpressionNode(Rule rule)
+        => new RuleExpressionNode(rule);
+
+    public static ExpressionNode operator |(ExpressionNode left, ExpressionNode right)
+        => new OrExpressionNode(left, right);
 }

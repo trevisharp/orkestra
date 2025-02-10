@@ -66,16 +66,4 @@ public class Key(
     
     public static Rule operator +(Key key, Rule rule)
         => [ [ key, rule ] ];
-    
-    public static Rule operator +(Key key, IntermediaryOrRule irule)
-        => [ [ key, (Rule)irule ] ];
-
-    public static IntermediaryOrRule operator |(Key k1, Key k2)
-        => new IntermediaryOrRule() | k1 | k2;
-
-    public static IntermediaryOrRule operator |(Rule r, Key k)
-        => new IntermediaryOrRule() | r | k;
-
-    public static IntermediaryOrRule operator |(Key k, Rule r)
-        => new IntermediaryOrRule() | k | r;
 }
