@@ -14,7 +14,6 @@ using Caches;
 /// </summary>
 public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
 {
-    private int anonymousCount = 0;
     private readonly List<Rule> rules = [];
     private readonly List<ISyntacticElement> panicSet = [];
     private LR1ItemSet set;
@@ -26,10 +25,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
     public IEnumerable<Rule> Rules => this.rules;
 
     public void Add(Rule rule)
-    {
-        rule.Name ??= $"anonymous{anonymousCount++}";
-        rules.Add(rule);
-    }
+        => rules.Add(rule);
 
     public ISyntacticAnalyzer Build()
     {
