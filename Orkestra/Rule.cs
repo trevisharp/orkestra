@@ -23,24 +23,12 @@ public class Rule : ISyntacticElement, IEnumerable<SubRule>
         => $"R:{Name ?? "unnamed"}";
 
     public void Add(SubRule subRule)
-    {
-        subRules.Add(subRule);
-        subRule.Parent = this;
-    }
-
-    public void AddSubRules(params SubRule[] subRules)
-    {
-        this.subRules.AddRange(subRules);
-
-        foreach (var subRule in subRules)
-            subRule.Parent = this;
-    }
+        => subRules.Add(subRule);
     
     public static Rule CreateRule(string? name, params SubRule[] subRules)
     {
-        Rule rule = [];
+        Rule rule = [ ..subRules ];
         rule.Name = name;
-        rule.AddSubRules(subRules);
         return rule;
     }
     

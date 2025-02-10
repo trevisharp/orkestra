@@ -20,16 +20,6 @@ public class SubRule(params ISyntacticElement[] tokens) : IEnumerable<ISyntactic
     public IEnumerable<ISyntacticElement> RuleTokens => ruleTokens;
 
     /// <summary>
-    /// Get the parent Rule for this subrule.
-    /// </summary>
-    public Rule? Parent { get; set; } = null;
-
-    /// <summary>
-    /// Get the name of the subrule.
-    /// </summary>
-    public string Name => (Parent?.Name ?? "NoParent") + "." + ruleTokens.First().Name;
-
-    /// <summary>
     /// Add a new sub toke in this sub rule.
     /// </summary>
     public void Add(ISyntacticElement element)
@@ -43,7 +33,4 @@ public class SubRule(params ISyntacticElement[] tokens) : IEnumerable<ISyntactic
     
     IEnumerator IEnumerable.GetEnumerator()
         => GetEnumerator();
-
-    public override string ToString()
-        => $"sR:{Parent?.Name ?? "null"}";
 }
