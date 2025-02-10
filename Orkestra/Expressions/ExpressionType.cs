@@ -3,3 +3,9 @@
  */
 namespace Orkestra.Expressions;
 
+public enum ExpressionType
+{
+    Key,
+    Rule,
+    OrOperation
+}
