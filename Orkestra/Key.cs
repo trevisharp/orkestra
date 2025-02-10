@@ -62,6 +62,12 @@ public class Key(
     
     public static ExpressionNode operator |(Key key1, Key key2)
         => (ExpressionNode)key1 | (ExpressionNode)key2;
+
+    public static ExpressionNode operator +(Key key1, Key key2)
+        => (ExpressionNode)key1 + (ExpressionNode)key2;
+
+    public static ExpressionNode operator ~(Key key)
+        => ~(ExpressionNode)key;
     
     public static Rule operator +(Key key)
     {

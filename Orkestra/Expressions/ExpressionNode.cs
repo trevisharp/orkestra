@@ -31,4 +31,13 @@ public abstract class ExpressionNode(ExpressionType type)
     
     public static ExpressionNode operator +(ExpressionNode left, ExpressionNode right)
         => new ConcantExpressionNode(left, right);
+    
+    public static ExpressionNode operator +(ExpressionNode left, Rule right)
+        => new ConcantExpressionNode(left, right);
+    
+    public static ExpressionNode operator +(Rule left, ExpressionNode right)
+        => new ConcantExpressionNode(left, right);
+    
+    public static ExpressionNode operator ~(ExpressionNode expression)
+        => new OptionalExpressionNode(expression);
 }

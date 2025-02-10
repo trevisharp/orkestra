@@ -9,5 +9,6 @@ public enum ExpressionType
     Rule,
     OrOperation,
     ManyOperation,
-    ConcatOperation
+    ConcatOperation,
+    OptionalOperation
 }

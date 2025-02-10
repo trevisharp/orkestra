@@ -60,6 +60,9 @@ public class Rule : ISyntacticElement, IEnumerable<SubRule>
         return repeatRule;
     }
 
+    public static ExpressionNode operator ~(Rule rule)
+        => ~(ExpressionNode)rule;
+
     public static ExpressionNode operator |(Rule rule1, Rule rule2)
         => (ExpressionNode)rule1 | (ExpressionNode)rule2;
 
@@ -68,4 +71,13 @@ public class Rule : ISyntacticElement, IEnumerable<SubRule>
 
     public static ExpressionNode operator |(Key key, Rule rule)
         => (ExpressionNode)key | (ExpressionNode)rule;
+
+    public static ExpressionNode operator +(Rule rule1, Rule rule2)
+        => (ExpressionNode)rule1 + (ExpressionNode)rule2;
+
+    public static ExpressionNode operator +(Rule rule, Key key)
+        => (ExpressionNode)rule + (ExpressionNode)key;
+
+    public static ExpressionNode operator +(Key key, Rule rule)
+        => (ExpressionNode)key + (ExpressionNode)rule;
 }
