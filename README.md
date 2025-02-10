@@ -44,6 +44,14 @@ public class MyFirstCompiler : Compiler
             [ HELLO ],
             [ HELLO, COMPILERS ]
         ];
+        // You can use the follow another valid notations:
+        program = [];
+        program.Add([ HELLO ]);
+        program.Add([ HELLO, COMPILERS ]);
+        // Or
+        program = HELLO | (HELLO + COMPILERS);
+        // Or (Compiler has optional)
+        program = HELLO + ~COMPILERS;
     }
 }
 ```
