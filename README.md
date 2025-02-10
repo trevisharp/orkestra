@@ -44,7 +44,7 @@ public class MyFirstCompiler : Compiler
             [ HELLO ],
             [ HELLO, COMPILERS ]
         ];
-        // You can use the follow another valid notations:
+        // You can use the following valid notations:
         program = [];
         program.Add([ HELLO ]);
         program.Add([ HELLO, COMPILERS ]);
@@ -85,6 +85,10 @@ Tech.Run(args);
 
 // your compiler here
 ```
+
+### Easy generate a extension for VSCode based on your compiler
+
+
 
 # Versions
 
