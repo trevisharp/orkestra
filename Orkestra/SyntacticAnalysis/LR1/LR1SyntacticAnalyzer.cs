@@ -97,7 +97,7 @@ public class LR1SyntacticAnalyzer(
             }
             else
             {
-                syntacticErrors.Add($"Syntax error in {file} next to '{token.Value}' on line {token?.Line ?? -1}.");
+                syntacticErrors.Add($"Syntax error in {file} next to '{token?.Value ?? ""}' on line {token?.Line ?? -1}.");
                 
                 // panic recover
                 do
