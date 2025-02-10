@@ -3,7 +3,6 @@
  */
 namespace Orkestra.Expressions;
 
-using System;
 using Nodes;
 
 /// <summary>

@@ -7,5 +7,6 @@ public enum ExpressionType
 {
     Key,
     Rule,
-    OrOperation
+    OrOperation,
+    ManyOperation
 }
