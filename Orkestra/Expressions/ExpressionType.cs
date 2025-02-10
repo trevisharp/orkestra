@@ -8,5 +8,6 @@ public enum ExpressionType
     Key,
     Rule,
     OrOperation,
-    ManyOperation
+    ManyOperation,
+    ConcatOperation
 }

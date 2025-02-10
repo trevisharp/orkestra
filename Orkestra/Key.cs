@@ -1,9 +1,11 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    28/06/2024
+ * Date:    10/02/2025
  */
 using System.Linq;
 
 namespace Orkestra;
+
+using Expressions;
 
 /// <summary>
 /// Represents a Key for syntactical analisys.
@@ -58,5 +60,9 @@ public class Key(
         return new(null, expression, false, false, isKeyword, false);
     }
     
+    public static ExpressionNode operator |(Key key1, Key key2)
+        => (ExpressionNode)key1 | (ExpressionNode)key2;
     
+    public static ExpressionNode operator +(Key key)
+        => +(ExpressionNode)key;
 }

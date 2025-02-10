@@ -53,9 +53,15 @@ public class Rule : ISyntacticElement, IEnumerable<SubRule>
     IEnumerator IEnumerable.GetEnumerator()
         => subRules.GetEnumerator();
 
-    public static ExpressionNode operator +(Rule element)
-        => +(ExpressionNode)element;
+    public static ExpressionNode operator +(Rule rule)
+        => +(ExpressionNode)rule;
 
-    public static ExpressionNode operator |(Rule r1, Rule r2)
-        => (ExpressionNode)r1 | (ExpressionNode)r2;
+    public static ExpressionNode operator |(Rule rule1, Rule rule2)
+        => (ExpressionNode)rule1 | (ExpressionNode)rule2;
+
+    public static ExpressionNode operator |(Rule rule, Key key)
+        => (ExpressionNode)rule | (ExpressionNode)key;
+
+    public static ExpressionNode operator |(Key key, Rule rule)
+        => (ExpressionNode)key | (ExpressionNode)rule;
 }

@@ -29,6 +29,9 @@ public abstract class ExpressionNode(ExpressionType type)
     public static ExpressionNode operator |(ExpressionNode left, ExpressionNode right)
         => new OrExpressionNode(left, right);
     
+    public static ExpressionNode operator +(ExpressionNode left, ExpressionNode right)
+        => new ConcantExpressionNode(left, right);
+    
     public static ExpressionNode operator +(ExpressionNode expression)
         => new ManyExpressionNode(expression);
 }
