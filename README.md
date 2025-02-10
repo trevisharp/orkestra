@@ -75,6 +75,17 @@ Compiling 1 files...
 Syntax error in C:\path\test3.code next to 'compilers' on line 1.
 ```
 
+### Configure your language
+
+```cs
+using Orkestra;
+
+Tech.ConfigureProject(".amazinglang");
+Tech.Run(args);
+
+// your compiler here
+```
+
 # Versions
 
 ### Orkestra v1.0.0 (Coming soon)
