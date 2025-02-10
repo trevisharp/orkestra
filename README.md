@@ -81,6 +81,7 @@ Syntax error in C:\path\test3.code next to 'compilers' on line 1.
  - ![](https://img.shields.io/badge/updated-blue) Use Cache system by default.
  - ![](https://img.shields.io/badge/updated-blue) General improvements on API to improve control over extensions.
  - ![](https://img.shields.io/badge/updated-blue) Move extension responsabilities from project class [IN PROGRESS].
+ - ![](https://img.shields.io/badge/updated-blue) Improvments on valid expressions to define rules.
 
 ### Orkestra v0.6.0
 
