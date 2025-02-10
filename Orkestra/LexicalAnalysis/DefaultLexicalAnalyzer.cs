@@ -15,7 +15,7 @@ using SyntacticAnalysis;
 public class DefaultLexicalAnalyzer : ILexicalAnalyzer
 {
     readonly List<Key> keys = [];
-    public IEnumerable<Key> Keys => this.keys;
+    public IEnumerable<Key> Keys => keys;
 
     public void AddKeys(IEnumerable<Key> keys)
         => this.keys.AddRange(keys);
@@ -40,9 +40,9 @@ public class DefaultLexicalAnalyzer : ILexicalAnalyzer
         int startIndex = 0;
         int keyIndex = 0;
         int minToken = int.MaxValue;
-        Match crrMatch = null!;
-        Key crrKey = null!;
-        List<Key> keys = new List<Key>(this.keys);
+        Match? crrMatch = null;
+        Key? crrKey = null;
+        List<Key> keys = [ ..this.keys ];
         
         var matches = GetRegexMatchList(keys, code);
         
@@ -57,8 +57,8 @@ public class DefaultLexicalAnalyzer : ILexicalAnalyzer
 
                 startIndex = crrMatch.Index + crrMatch.Value.Length;
                 minToken = int.MaxValue;
-                crrMatch = null!;
-                crrKey = null!;
+                crrMatch = null;
+                crrKey = null;
                 keyIndex = 0;
             }
 
@@ -122,13 +122,5 @@ public class DefaultLexicalAnalyzer : ILexicalAnalyzer
     }
 
     static Token CreateToken(Key key, Match match, string file, int line)
-    {           
-        Token token = new Token(
-            key,
-            match.Value,
-            file,
-            line
-        );
-        return token;
-    }
+        => new(key, match.Value, file, line);
 }

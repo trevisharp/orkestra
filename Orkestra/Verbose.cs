@@ -31,7 +31,7 @@ public static class Verbose
     }
 
     public static int VerboseLevel = 0;
-    private static string tabInfo = null;
+    private static string? tabInfo = null;
     private static void message(
         int level,
         object msg,

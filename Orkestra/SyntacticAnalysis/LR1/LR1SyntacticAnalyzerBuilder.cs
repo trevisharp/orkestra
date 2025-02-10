@@ -14,8 +14,9 @@ using Caches;
 /// </summary>
 public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
 {
-    private List<Rule> rules = new();
-    private List<ISyntacticElement> panicSet = new();
+    private int anonymousCount = 0;
+    private readonly List<Rule> rules = [];
+    private readonly List<ISyntacticElement> panicSet = [];
     private LR1ItemSet set;
     private int[] table;
     private int rows;
@@ -25,16 +26,19 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
     public IEnumerable<Rule> Rules => this.rules;
 
     public void Add(Rule rule)
-        => this.rules.Add(rule);
+    {
+        rule.Name ??= $"anonymous{anonymousCount++}";
+        rules.Add(rule);
+    }
 
     public ISyntacticAnalyzer Build()
     {
         LR1SyntacticAnalyzer analyzer = new(
-            this.rowSize,
-            this.table,
+            rowSize,
+            table,
             set.ElementMap,
             set.IndexMap,
-            this.panicSet
+            panicSet
         );
         return analyzer;
     }
@@ -72,21 +76,21 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
             crrIndex++;
         }
 
-        this.set = new LR1ItemSet(
+        set = new LR1ItemSet(
             keys.ToArray(),
-            rules.ToArray(),
+            [ ..rules ],
             StartRule
         );
-        List<int[]> gotoTable = new List<int[]>();
+        List<int[]> gotoTable = [];
 
         var goal = set.GetGoal();
         var eof = set.GetEOF();
         var initEl = set.CreateLookAheadItem(goal, eof);
 
-        List<int> s0 = closure([ initEl ], set);
+        List<int> s0 = Closure([ initEl ], set);
         List<List<int>> states = [ s0 ];
-        List<int> initStateHashes = [ getHash([ initEl ]) ];
-        List<int> stateHashes = [ getHash(s0) ];
+        List<int> initStateHashes = [ GetHash([ initEl ]) ];
+        List<int> stateHashes = [ GetHash(s0) ];
         Dictionary<int, int> hashStateId = new Dictionary<int, int>();
         Queue<List<int>> queue = new Queue<List<int>>();
         queue.Enqueue(s0);
@@ -104,14 +108,14 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
             for (int el = 0; el < elementCount; el++)
             {
                 // generate state that transite by element el
-                var newState = goTo(crr, el);
+                var newState = GoTo(crr, el);
                 if (newState.Count == 0)
                     continue;
                 int stateId = gotoTable.Count + queue.Count;
                 
                 // test if the new state will be generate
                 // other already generated state
-                var hash = getHash(newState);
+                var hash = GetHash(newState);
                 if (initStateHashes.Contains(hash))
                 {
                     stateRow[el] = hashStateId[hash];
@@ -121,10 +125,10 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
                 hashStateId.Add(hash, stateId);
                 
                 // get closure of state
-                closure(newState, set);
+                Closure(newState, set);
 
                 // test if the new state already exists
-                hash = getHash(newState);
+                hash = GetHash(newState);
                 if (stateHashes.Contains(hash))
                 {
                     stateRow[el] = hashStateId[hash];
@@ -146,7 +150,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         const int reduce = 1 << 30;
         const int sizeParam = 1 << 16;
 
-        ISyntacticElement[] elements = set
+        ISyntacticElement?[] elements = set
             .GetElements()
             .ToArray();
         
@@ -197,7 +201,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         }
     }
 
-    private void show(List<int[]> gotoTable)
+    private void Show(List<int[]> gotoTable)
     {
         var elementCount = set.GetElementsLength();
         Console.WriteLine();
@@ -217,7 +221,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         }
     }
 
-    private void show(List<int> list)
+    private void Show(List<int> list)
     {
         Console.WriteLine("{ " +
             list
@@ -227,7 +231,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         );
     }
 
-    private void show(int[] table, ISyntacticElement[] elements)
+    private static void Show(int[] table, ISyntacticElement[] elements)
     {
         Console.Write("#\t|");
         for (int i = 0; i < elements.Length; i++)
@@ -260,7 +264,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         }
     }
 
-    private int getHash(List<int> list)
+    private static int GetHash(List<int> list)
     {
         int hash = 0,
             last = 1,
@@ -280,7 +284,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         return hash;
     }
 
-    private List<int> closure(List<int> state, LR1ItemSet set)
+    private static List<int> Closure(List<int> state, LR1ItemSet set)
     {
         var queue = new Queue<int>();
         foreach (var item in state)
@@ -319,7 +323,7 @@ public class LR1SyntacticAnalyzerBuilder : ISyntacticAnalyzerBuilder
         return state;
     }
 
-    private List<int> goTo(List<int> state, int el)
+    private List<int> GoTo(List<int> state, int el)
     {
         List<int> newState = new List<int>();
         foreach (var laItem in state)
