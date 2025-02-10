@@ -53,28 +53,8 @@ public class Rule : ISyntacticElement, IEnumerable<SubRule>
     IEnumerator IEnumerable.GetEnumerator()
         => subRules.GetEnumerator();
 
-    public static Rule operator +(Rule element)
-    {
-        var rule = new Rule();
-        rule.AddSubRules(
-            [ element ],
-            [ element, rule ]
-        );
-        return rule;
-    }
-
-    public static Rule operator +(Rule start, Rule next)
-    {
-        var result = new Rule();
-        foreach (var sb in start.SubRules)
-        {
-            var newSubRule = new SubRule();
-            foreach (var item in sb)
-                newSubRule.Add(item);
-            newSubRule.Add(next);
-        }
-        return result;
-    }
+    public static ExpressionNode operator +(Rule element)
+        => +(ExpressionNode)element;
 
     public static ExpressionNode operator |(Rule r1, Rule r2)
         => (ExpressionNode)r1 | (ExpressionNode)r2;

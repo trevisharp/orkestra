@@ -57,13 +57,6 @@ public class Key(
         bool isKeyword = expression.All(char.IsAsciiLetter);
         return new(null, expression, false, false, isKeyword, false);
     }
-
-    public static implicit operator Rule(Key key)
-        => [ [ key] ];
-
-    public static Rule operator +(Key key, Key rule)
-        => [ [ key, rule ] ];
     
-    public static Rule operator +(Key key, Rule rule)
-        => [ [ key, rule ] ];
+    
 }
