@@ -6,4 +6,7 @@ namespace Orkestra.Expressions.Nodes;
 public class KeyExpressionNode(Key key) : ExpressionNode(ExpressionType.Key)
 {
     public readonly Key Key = key;
+
+    public override SubRule[] GetSubRules()
+        => [ [ Key] ];
 }

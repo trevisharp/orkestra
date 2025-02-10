@@ -6,4 +6,7 @@ namespace Orkestra.Expressions.Nodes;
 public class RuleExpressionNode(Rule rule) : ExpressionNode(ExpressionType.Rule)
 {
     public readonly Rule Rule = rule;
+
+    public override SubRule[] GetSubRules()
+        => [ [ Rule ] ];
 }
