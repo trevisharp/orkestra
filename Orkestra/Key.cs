@@ -1,5 +1,5 @@
 /* Author:  Leonardo Trevisan Silio
- * Date:    10/02/2025
+ * Date:    05/03/2025
  */
 using System.Linq;
 
@@ -11,12 +11,11 @@ using Expressions;
 /// Represents a Key for syntactical analisys.
 /// </summary>
 public class Key(
-    string? name, string? expression, bool contextual, 
+    string? name, string? expression, 
     bool identity, bool keyword, bool auto) : ISyntacticElement
 {
     public string? Name { get; set; } = name;
     public string? Expression { get; init; } = expression;
-    public bool IsContextual { get; init; } = contextual;
     public bool IsIdentity { get; init; } = identity;
     public bool IsKeyword { get; init; } = keyword;
     public bool IsAuto { get; init; } = auto;
@@ -25,39 +24,33 @@ public class Key(
         => $"K:{Name ?? "unnamed"}";
     
     public static Key CreateKey(string name, string expression)
-        => new(name, expression, false, false, false, false);
+        => new(name, expression, false, false, false);
     
     public static Key CreateKeyword(string name, string expression)
-        => new(name, expression, false, false, true, false);
+        => new(name, expression, false, true, false);
     
     public static Key CreateIdentity(string name, string expression)
-        => new(name, expression, false, true, false, false);
+        => new(name, expression, true, false, false);
       
     public static Key CreateAutoKeyword(string name)
-        => new(name, null, false, false, true, true);
-
-    public static Key CreateContextual(string name, string expression)
-        => new(name, expression, true, false, true, false);
+        => new(name, null, false, true, true);
     
     public static Key CreateKey(string expression)
-        => new(null, expression, false, false, false, false);
+        => new(null, expression, false, false, false);
     
     public static Key CreateKeyword(string expression)
-        => new(null, expression, false, false, true, false);
+        => new(null, expression, false, true, false);
     
     public static Key CreateIdentity(string expression)
-        => new(null, expression, false, true, false, false);
+        => new(null, expression, true, false, false);
     
     public static Key CreateAutoKeyword()
-        => new(null, null, false, false, true, true);
-
-    public static Key CreateContextual(string expression)
-        => new(null, expression, true, false, true, false);
+        => new(null, null, false, true, true);
     
     public static implicit operator Key(string expression)
     {
         bool isKeyword = expression.All(char.IsAsciiLetter);
-        return new(null, expression, false, false, isKeyword, false);
+        return new(null, expression, false, isKeyword, false);
     }
     
     public static ExpressionNode operator |(Key key1, Key key2)
