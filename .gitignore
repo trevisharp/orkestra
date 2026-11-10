@@ -1,2 +1,5 @@
 # Ignore vscode files
 .vscode
+# Build output
+[Bb]in/
+[Oo]bj/

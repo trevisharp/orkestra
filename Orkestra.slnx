@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Orkestra/Orkestra.csproj" />
+  <Project Path="Orkestra.Tests/Orkestra.Tests.csproj" />
+</Solution>
